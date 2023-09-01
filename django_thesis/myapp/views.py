@@ -19,3 +19,6 @@ def manage_users(request):
 
 def users(request):
     return render(request, "users.html")
+
+def users(request):
+    return render(request, "logout.html")
