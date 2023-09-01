@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$/PycharmProjects/Thesis4.0/UM_Thesis_IPS" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/UM_Thesis_IPS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
 </project>
