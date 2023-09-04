@@ -6,6 +6,8 @@
         <th>Name</th>
         <th>sex</th>
         <th>ID</th>
+        <th>Mac</th>
+        <th>Contact</th>
         <th>Date</th>
         <th>Dep</th>
 
@@ -43,6 +45,8 @@
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['user_date'];?></TD>
                   <TD><?php echo ($row['device_dep'] == "0") ? "All" : $row['device_dep'];?></TD>
+                  <TD><?php echo $row['MAC'];?></TD>
+                  <TD><?php echo $row['Contact'];?></TD>
                   </TR>
     <?php
             }   

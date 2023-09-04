@@ -11,9 +11,12 @@ if (isset($_POST['Add'])) {
     $Email = $_POST['email'];
     $dev_uid = $_POST['dev_uid'];	
     $sex = $_POST['sex'];
+    $Macaddress=isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
+    $Macaddress=isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
+    $Macaddress=isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
 
     
-	if (!empty($Uname) && !empty($Number) && !empty($Email)) {
+	if (!empty($Uname) && !empty($Number) && !empty($Email) && !empty($Macaddress)) {
     // ...
 	}
 	
@@ -32,7 +35,7 @@ if (isset($_POST['Add'])) {
 
             if ($row['add_card'] == 0) {
 
-                if (!empty($Uname) && !empty($Number) && !empty($Email) ) {
+                if (!empty($Uname) && !empty($Number) && !empty($Email)  && !empty($Macaddress) ) {
                     //check if there any user had already the Serial Number
                     $sql = "SELECT serialnumber FROM users WHERE serialnumber=? AND id NOT like ?";
                     $result = mysqli_stmt_init($conn);
@@ -62,14 +65,14 @@ if (isset($_POST['Add'])) {
                                     $dev_name = "All";
                                 }
                             }
-                            $sql="UPDATE users SET username=?, serialnumber=?, sex=?, email=?, user_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
+                            $sql="UPDATE users SET username=?, serialnumber=?, sex=?, Macaddress=? email=? ,user_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
                             $result = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($result, $sql)) {
                                 echo "SQL_Error_select_Fingerprint";
                                 exit();
                             }
                             else{
-                                mysqli_stmt_bind_param($result, , $Uname, $Number, $sex, $Email, $dev_uid, $dev_name, $user_id );
+                                mysqli_stmt_bind_param($result,  $Uname, $Number, $sex, $Email, $dev_uid, $dev_name, $user_id, $Macaddress );
                                 mysqli_stmt_execute($result);
 
                                 echo 1;
@@ -107,6 +110,8 @@ if (isset($_POST['Update'])) {
     $Email = $_POST['email'];
     $dev_uid = $_POST['dev_uid'];
     $sex = $_POST['sex'];
+    $Macaddress=isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
+
 
 
     //check if there any selected user
@@ -127,7 +132,7 @@ if (isset($_POST['Update'])) {
                 exit();
             }
             else{
-                if (empty($Uname) && empty($Number) && empty($Email)) {
+                if (empty($Uname) && empty($Number) && empty($Email) && empty($Macaddress)) {
                     echo "Empty Fields";
                     exit();
                 }
@@ -164,7 +169,7 @@ if (isset($_POST['Update'])) {
                                     
                             if (!empty($Uname) && !empty($Email) ) {
 
-                                $sql="UPDATE users SET username=?, serialnumber=?, sex=?, email=?, device_uid=?, device_dep=? WHERE id=?";
+                                $sql="UPDATE users SET username=?, serialnumber=?, sex=?, email=?, Macaddres, device_uid=?, device_dep=? WHERE id=?";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
                                     echo "SQL_Error_select_Card";

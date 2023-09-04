@@ -36,11 +36,15 @@ if (!isset($_SESSION['Admin-name'])) {
       <thead class="table-primary">
         <tr>
           <th>Name</th>
-          <th>IDr</th>
+          <th>ID</th>
           <th>sex</th>
           <th>UHF RFID</th>
+           <th>Contact Number</th>
           <th>Date</th>
+           <th>Mac address</th>
+            <th>emergency contact</th>
           <th>Deparment</th>
+
         </tr>
       </thead>
       <tbody class="table-secondary">
@@ -66,6 +70,7 @@ if (!isset($_SESSION['Admin-name'])) {
                       <TD><?php echo $row['card_uid'];?></TD>
                       <TD><?php echo $row['user_date'];?></TD>
                       <TD><?php echo $row['device_dep'];?></TD>
+
                       </TR>
         <?php
                 }   

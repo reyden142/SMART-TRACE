@@ -10,6 +10,7 @@ session_start();
         <th>Name</th>
         <th>ID</th>
         <th>UHF RFID</th>
+        <th>Mac Address</th>
         <th>Dep</th>
         <th>Date</th>
         <th>Time In</th>
@@ -94,6 +95,9 @@ session_start();
               $dev_uid = $_POST['dev_uid'];
               $_SESSION['searchQuery'] .= " AND device_uid='".$dev_uid."'";
           }
+
+
+        }
         
         if ($_POST['select_date'] == 1) {
             $Start_date = date("Y-m-d");
@@ -119,10 +123,12 @@ session_start();
                   <TD><?php echo $row['username'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['card_uid'];?></TD>
+                  <TD><?php echo $row['Mac address'];?></TD>
                   <TD><?php echo $row['device_dep'];?></TD>
                   <TD><?php echo $row['checkindate'];?></TD>
                   <TD><?php echo $row['timein'];?></TD>
                   <TD><?php echo $row['timeout'];?></TD>
+
                   </TR>
       <?php
                 }

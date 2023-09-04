@@ -57,7 +57,9 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="text" name="name" id="name" placeholder="Name">
 				<input type="text" name="number" id="number" placeholder="ID Number">
 				<input type="email" name="email" id="email" placeholder="Email">
-				
+				<input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
+			    <input type="text" name="Contact number" id="Contact" placeholder="Contact">
+			    <input type="text" name="Emergency number" id="Emergency" placeholder="Macaddress">
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
