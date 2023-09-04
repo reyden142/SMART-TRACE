@@ -8,7 +8,7 @@
         <th>ID</th>
         <th>Date</th>
         <th>Dep</th>
-		<th>Sticker</th>
+
       </tr>
     </thead>
     <tbody class="table-secondary">
@@ -43,7 +43,6 @@
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['user_date'];?></TD>
                   <TD><?php echo ($row['device_dep'] == "0") ? "All" : $row['device_dep'];?></TD>
-				  <TD><?php echo $row['stickercolor'];?></TD>
                   </TR>
     <?php
             }   

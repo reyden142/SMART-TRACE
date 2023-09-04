@@ -14,7 +14,6 @@ session_start();
         <th>Date</th>
         <th>Time In</th>
 		<th>Time Out</th>
-        <th>Sticker Color</th>
       </tr>
     </thead>
     <tbody class="table-secondary">
@@ -95,13 +94,6 @@ session_start();
               $dev_uid = $_POST['dev_uid'];
               $_SESSION['searchQuery'] .= " AND device_uid='".$dev_uid."'";
           }
-		  
-		  //Stickercolor filter
-         // if ($_POST['stickercolor'] != 0) {
-          //    $stickercolor = $_POST['stickercolor'];
-           //   $_SESSION['searchQuery'] .= " AND device_uid='".$stickercolor."'";
-         // }
-        }
         
         if ($_POST['select_date'] == 1) {
             $Start_date = date("Y-m-d");
@@ -131,7 +123,6 @@ session_start();
                   <TD><?php echo $row['checkindate'];?></TD>
                   <TD><?php echo $row['timein'];?></TD>
                   <TD><?php echo $row['timeout'];?></TD>
-				  <TD><?php echo $row['stickercolor'];?></TD>
                   </TR>
       <?php
                 }
