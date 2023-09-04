@@ -23,8 +23,3 @@ def users(request):
 def users(request):
     return render(request, "logout.html")
 
-#hjbbjhbjh
-#ako ni
-#hhh
-#jhfhfahfadvnjjvjdvdvnndvdvdkhad
-#hfhkddkdf;g;fudbufjfjfjfjjjffjjfjfvhjkbfdjv
