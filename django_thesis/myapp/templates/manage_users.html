@@ -51,30 +51,6 @@
 	          	<input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
 
 
-				<select for="stickercolor" class="stickercolor" id="stickercolor" onchange="updateColor(this.value)" style="color: #001;">
-				<option value="None">Sticker Color</option>
-				<option value="Yellow">Yellow</option>
-				<option value="Orange">Orange</option>
-				<option value="Red">Red</option>
-				<option value="White">White</option>
-				<option value="Blue">Blue</option>
-				<option value="Green">Green</option>
-			</select>
-
-			<!-- add a hidden input field to hold the selected color -->
-			<input type="hidden" name="stickercolor" id="stickercolor_input">
-
-				<script>
-				function updateColor(color) {
-					// update the background color of the hidden input field
-					document.getElementById('stickercolor_input').style.backgroundColor = color;
-					//$stickercolor = color;
-					// set the value of the hidden input field to the selected color
-					document.getElementById('stickercolor_input').value ;
-				}
-				</script>
-
-
 
 			</fieldset>
 			<button type="button" name="user_add" class="user_add">Add User</button>
