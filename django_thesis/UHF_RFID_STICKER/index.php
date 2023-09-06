@@ -39,11 +39,9 @@ if (!isset($_SESSION['Admin-name'])) {
           <th>ID</th>
           <th>sex</th>
           <th>UHF RFID</th>
-           <th>Contact Number</th>
           <th>Date</th>
-           <th>Mac address</th>
-            <th>emergency contact</th>
           <th>Deparment</th>
+          <th>Birthdate</th>
 
         </tr>
       </thead>
@@ -70,9 +68,7 @@ if (!isset($_SESSION['Admin-name'])) {
                       <TD><?php echo $row['card_uid'];?></TD>
                       <TD><?php echo $row['user_date'];?></TD>
                       <TD><?php echo $row['device_dep'];?></TD>
-                      <TD><?php echo $row['Contact'];?></TD>
-                      <TD><?php echo $row['Mac address'];?></TD>
-                      <TD><?php echo $row['EmergencyContact'];?></TD>
+                      <TD><?php echo $row['Birthdate'];?></TD>
 
                       </TR>
         <?php

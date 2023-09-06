@@ -63,19 +63,23 @@ CREATE TABLE `devices` (
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+CREATE TABLE `users` (`id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL DEFAULT 'None',
-  `serialnumber` double NOT NULL DEFAULT '0',
+  `serialnumber` double NOT NULL DEFAULT 0,
   `sex` varchar(10) NOT NULL DEFAULT 'None',
-  `stickercolor` varchar(10) NOT NULL DEFAULT 'None',
   `email` varchar(50) NOT NULL DEFAULT 'None',
   `card_uid` varchar(30) NOT NULL,
-  `card_select` tinyint(1) NOT NULL DEFAULT '0',
+  `card_select` tinyint(1) NOT NULL DEFAULT 0,
   `user_date` date NOT NULL,
   `device_uid` varchar(20) NOT NULL DEFAULT '0',
   `device_dep` varchar(20) NOT NULL DEFAULT '0',
-  `add_card` tinyint(1) NOT NULL DEFAULT '0'
+  `add_card` tinyint(1) NOT NULL DEFAULT 0,
+  `Contact` varchar(20) NOT NULL DEFAULT 'None',
+  `EmergencyContact` varchar(20) NOT NULL DEFAULT 'None',
+  `ValidationPeriod` varchar(20) NOT NULL DEFAULT 'None',
+  `MedicalHistory` varchar(100) NOT NULL DEFAULT 'None',
+  `Birthdate` varchar(20) NOT NULL DEFAULT 'None',
+  `Macaddress` varchar(20) NOT NULL DEFAULT 'None'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

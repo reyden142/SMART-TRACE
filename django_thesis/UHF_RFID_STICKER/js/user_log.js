@@ -32,14 +32,9 @@ $(document).ready(function(){
     var time_sel = $(".time_sel:checked").val();
     var time_sel_start = $('#time_sel_start').val();
     var time_sel_end = $('#time_sel_end').val();
-    var Macaddress = $('#Birthdate').val();
-	var Macaddress = $('#Macaddress').val();
-	var Contact = $('#Contact').val();
-	var EmergencyContact = $('#EmergencyContact').val();
-	var ValidationPeriod = $('#ValidationPeriod').val();
-	var MedicalHistory = $('#MedicalHistory').val();
     var card_sel = $('#card_sel option:selected').val();
     var dev_uid = $('#dev_sel option:selected').val();
+    var dev_uid = $('#Birthdate').val();
     
     $.ajax({
       url: 'user_log_up.php',
@@ -51,14 +46,9 @@ $(document).ready(function(){
         'time_sel': time_sel,
         'time_sel_start': time_sel_start,
         'time_sel_end': time_sel_end,
-        'Birthdate': Birthdate,
-		'Macaddress': Macaddress,
-		'Contact': Contact,
-		'EmergencyContact': EmergencyContact,
-		'ValidationPeriod': ValidationPeriod,
-		'MedicalHistory': MedicalHistory,
         'card_sel': card_sel,
         'dev_uid': dev_uid,
+        'Birthdate': Birthdate,
       },
       success: function(response){
 
@@ -80,13 +70,9 @@ $(document).ready(function(){
             'time_sel': time_sel,
             'time_sel_start': time_sel_start,
             'time_sel_end': time_sel_end,
-			'Macaddress': Macaddress,
-		    'Contact': Contact,
-            'EmergencyContact': EmergencyContact,
-            'ValidationPeriod': ValidationPeriod,
-            'MedicalHistory': MedicalHistory,
             'dev_uid': dev_uid,
             'card_sel': card_sel,
+            'Birthdate': Birthdate,
             'select_date': 0,
           }
           }).done(function(data) {

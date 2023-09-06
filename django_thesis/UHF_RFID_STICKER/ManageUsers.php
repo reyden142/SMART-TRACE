@@ -59,7 +59,8 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="email" name="email" id="email" placeholder="Email">
 			    <label for="sex"><b> Sex:</b></label>
 			    <input type="radio" name="sex" class="sex" value="Female"> Female
-                <input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
+
+	          	<input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
@@ -73,28 +74,21 @@ if (!isset($_SESSION['Admin-name'])) {
                         $result = mysqli_stmt_init($conn);
                         if (!mysqli_stmt_prepare($result, $sql)) {
                             echo '<p class="error">SQL Error</p>';
-                        } 
+                        }
                         else{
                             mysqli_stmt_execute($result);
                             $resultl = mysqli_stmt_get_result($result);
                             while ($row = mysqli_fetch_assoc($resultl)){
                       ?>
                               <option value="<?php echo $row['device_uid'];?>"><?php echo $row['device_dep']; ?></option>
-
-                    <input type="text" name="Birthdate" id="Birthdate" placeholder="MM/DD/YYYY">
-                    <input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
-                    <input type="text" name="Contact number" id="Contact" placeholder="Contact">
-			        <input type="text" name="Emergency number" id="Emergency" placeholder="Emergency number">
-                    <input type="text" name="Validation Period" id="Validation Period" placeholder=" Validation Period">
-			        <input type="text" name="Medical History" id="Medical History" placeholder=" Medical History">
-
                       <?php
                             }
                         }
                       ?>
                     </select>
+                    <input type="text" name="Birthdate" id="Birthdate" placeholder="MM/DD/YYYY">
 
-				
+
 			</fieldset>
 			<button type="button" name="user_add" class="user_add">Add User</button>
 			<button type="button" name="user_upd" class="user_upd">Update User</button>
