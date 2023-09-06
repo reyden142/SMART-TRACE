@@ -70,6 +70,9 @@ if (!isset($_SESSION['Admin-name'])) {
                       <TD><?php echo $row['card_uid'];?></TD>
                       <TD><?php echo $row['user_date'];?></TD>
                       <TD><?php echo $row['device_dep'];?></TD>
+                      <TD><?php echo $row['Contact'];?></TD>
+                      <TD><?php echo $row['Mac address'];?></TD>
+                      <TD><?php echo $row['EmergencyContact'];?></TD>
 
                       </TR>
         <?php

@@ -57,9 +57,9 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="text" name="name" id="name" placeholder="Name">
 				<input type="text" name="number" id="number" placeholder="ID Number">
 				<input type="email" name="email" id="email" placeholder="Email">
-				<input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
-			    <input type="text" name="Contact number" id="Contact" placeholder="Contact">
-			    <input type="text" name="Emergency number" id="Emergency" placeholder="Macaddress">
+			    <label for="sex"><b> Sex:</b></label>
+			    <input type="radio" name="sex" class="sex" value="Female"> Female
+                <input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
@@ -80,13 +80,19 @@ if (!isset($_SESSION['Admin-name'])) {
                             while ($row = mysqli_fetch_assoc($resultl)){
                       ?>
                               <option value="<?php echo $row['device_uid'];?>"><?php echo $row['device_dep']; ?></option>
+
+                    <input type="text" name="Birthdate" id="Birthdate" placeholder="MM/DD/YYYY">
+                    <input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
+                    <input type="text" name="Contact number" id="Contact" placeholder="Contact">
+			        <input type="text" name="Emergency number" id="Emergency" placeholder="Emergency number">
+                    <input type="text" name="Validation Period" id="Validation Period" placeholder=" Validation Period">
+			        <input type="text" name="Medical History" id="Medical History" placeholder=" Medical History">
+
                       <?php
                             }
                         }
                       ?>
                     </select>
-				<input type="radio" name="sex" class="sex" value="Female"> Female
-	          	<input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
 
 				
 			</fieldset>

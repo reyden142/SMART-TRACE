@@ -32,7 +32,12 @@ $(document).ready(function(){
     var time_sel = $(".time_sel:checked").val();
     var time_sel_start = $('#time_sel_start').val();
     var time_sel_end = $('#time_sel_end').val();
-	var sticker_color = $('#sticker_color').val();
+    var Macaddress = $('#Birthdate').val();
+	var Macaddress = $('#Macaddress').val();
+	var Contact = $('#Contact').val();
+	var EmergencyContact = $('#EmergencyContact').val();
+	var ValidationPeriod = $('#ValidationPeriod').val();
+	var MedicalHistory = $('#MedicalHistory').val();
     var card_sel = $('#card_sel option:selected').val();
     var dev_uid = $('#dev_sel option:selected').val();
     
@@ -46,7 +51,12 @@ $(document).ready(function(){
         'time_sel': time_sel,
         'time_sel_start': time_sel_start,
         'time_sel_end': time_sel_end,
-		'sticker_color': sticker_color,
+        'Birthdate': Birthdate,
+		'Macaddress': Macaddress,
+		'Contact': Contact,
+		'EmergencyContact': EmergencyContact,
+		'ValidationPeriod': ValidationPeriod,
+		'MedicalHistory': MedicalHistory,
         'card_sel': card_sel,
         'dev_uid': dev_uid,
       },
@@ -70,7 +80,11 @@ $(document).ready(function(){
             'time_sel': time_sel,
             'time_sel_start': time_sel_start,
             'time_sel_end': time_sel_end,
-			'sticker_color': sticker_color,
+			'Macaddress': Macaddress,
+		    'Contact': Contact,
+            'EmergencyContact': EmergencyContact,
+            'ValidationPeriod': ValidationPeriod,
+            'MedicalHistory': MedicalHistory,
             'dev_uid': dev_uid,
             'card_sel': card_sel,
             'select_date': 0,

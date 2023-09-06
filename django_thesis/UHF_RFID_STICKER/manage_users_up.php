@@ -1,15 +1,19 @@
-<div class="table-responsive-sm" style="max-height: 870px;"> 
+<div class="table-responsive-sm" style="max-height: 870px;">
   <table class="table">
     <thead class="table-primary">
       <tr>
-        <th>Card UID</th>
+        <th>UHF RFID</th>
         <th>Name</th>
         <th>sex</th>
         <th>ID</th>
-        <th>Mac</th>
+        <th>Birthdate</th>
+        <th>Macaddress</th>
         <th>Contact</th>
+        <th>Emergency number</th>
+        <th>Validation Period</th>
+        <th>Medical History</th>
         <th>Date</th>
-        <th>Dep</th>
+
 
       </tr>
     </thead>
@@ -43,10 +47,13 @@
                   <TD><?php echo $row['username'];?></TD>
                   <TD><?php echo $row['sex'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
-                  <TD><?php echo $row['user_date'];?></TD>
-                  <TD><?php echo ($row['device_dep'] == "0") ? "All" : $row['device_dep'];?></TD>
-                  <TD><?php echo $row['MAC'];?></TD>
+                  <TD><?php echo $row['Birthdate'];?></TD>
+                  <TD><?php echo $row['Macaddress'];?></TD>
                   <TD><?php echo $row['Contact'];?></TD>
+                  <TD><?php echo $row['EmergencyContact'];?></TD>
+                  <TD><?php echo $row['ValidationPeriod'];?></TD>
+                  <TD><?php echo $row['MedicalHistory'];?></TD>
+                  <TD><?php echo $row['user_date'];?></TD>
                   </TR>
     <?php
             }   
