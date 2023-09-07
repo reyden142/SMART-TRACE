@@ -42,6 +42,8 @@ if (!isset($_SESSION['Admin-name'])) {
           <th>Date</th>
           <th>Deparment</th>
           <th>Birthdate</th>
+          <th>Contact</th>
+          <th>EmergencyContact</th>
 
         </tr>
       </thead>
@@ -69,6 +71,8 @@ if (!isset($_SESSION['Admin-name'])) {
                       <TD><?php echo $row['user_date'];?></TD>
                       <TD><?php echo $row['device_dep'];?></TD>
                       <TD><?php echo $row['Birthdate'];?></TD>
+                      <TD><?php echo $row['Contact'];?></TD>
+                      <TD><?php echo $row['EmergencyContact'];?></TD>
 
                       </TR>
         <?php

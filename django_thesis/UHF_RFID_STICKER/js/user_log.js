@@ -34,7 +34,9 @@ $(document).ready(function(){
     var time_sel_end = $('#time_sel_end').val();
     var card_sel = $('#card_sel option:selected').val();
     var dev_uid = $('#dev_sel option:selected').val();
-    var dev_uid = $('#Birthdate').val();
+    var Birthdate = $('#Birthdate').val();
+    var Contact = $('#Contact').val();
+    var EmergencyContact = $('#EmergencyContact').val();
     
     $.ajax({
       url: 'user_log_up.php',
@@ -49,6 +51,8 @@ $(document).ready(function(){
         'card_sel': card_sel,
         'dev_uid': dev_uid,
         'Birthdate': Birthdate,
+        'Contact': Contact,
+        'EmergencyContact': EmergencyContact,
       },
       success: function(response){
 
@@ -73,6 +77,8 @@ $(document).ready(function(){
             'dev_uid': dev_uid,
             'card_sel': card_sel,
             'Birthdate': Birthdate,
+            'Contact': Contact,
+            'EmergencyContact': EmergencyContact,
             'select_date': 0,
           }
           }).done(function(data) {

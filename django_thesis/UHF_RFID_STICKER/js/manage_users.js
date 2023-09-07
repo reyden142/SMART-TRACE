@@ -9,7 +9,9 @@ $(document).ready(function(){
     var sex = $(".sex:checked").val();
     //Additional Info
     var dev_uid = $('#dev_uid').val();
-    var Birthdate = $("Birthdate").val();
+    var Birthdate = $("#Birthdate").val();
+    var Contact = $("#Contact").val();
+    var EmergencyContact = $("#EmergencyContact").val();
     var dev_uid = $('#dev_sel option:selected').val();
     
     $.ajax({
@@ -24,6 +26,9 @@ $(document).ready(function(){
         'dev_uid': dev_uid,
         'sex': sex,
 		'Birthdate': Birthdate,
+	    'Contact': Contact,
+	    'EmergencyContact': EmergencyContact,
+
 
       },
       success: function(response){
@@ -35,6 +40,8 @@ $(document).ready(function(){
           $('#email').val('');
           $('#dev_sel').val('0');
 		  $('#Birthdate').val('');
+		  $('#Contact').val('');
+		  $('#EmergencyContact').val('');
 
 		  
           $('.alert_user').fadeIn(500);
@@ -68,6 +75,8 @@ $(document).ready(function(){
     //Additional Info
     var dev_uid = $('#dev_uid').val();
     var Birthdate = $("#Birthdate").val();
+    var Contact = $("#Contact").val();
+    var EmergencyContact = $("#EmergencyContact").val();
     var dev_uid = $('#dev_sel option:selected').val();
 
     $.ajax({
@@ -82,6 +91,8 @@ $(document).ready(function(){
         'dev_uid': dev_uid,
         'sex': sex,
 		'Birthdate': Birthdate,
+		'Contact': Contact,
+		'EmergencyContact': EmergencyContact,
       },
       success: function(response){
 
@@ -92,6 +103,8 @@ $(document).ready(function(){
           $('#email').val('');
           $('#dev_sel').val('0');
 		  $('#Birthdate').val('');
+		  $('#Contact').val('');
+		  $('#EmergencyContact').val('');
 
           $('.alert_user').fadeIn(500);
           $('.alert_user').html('<p class="alert alert-success">The selected User has been updated!</p>');
@@ -137,6 +150,8 @@ $(document).ready(function(){
 
               $('#dev_sel').val('0');
 			  $('#Birthdate').val('');
+			  $('#Contact').val('');
+			  $('#EmergencyContact').val('');
 			  
               $('.alert_user').fadeIn(500);
               $('.alert_user').html('<p class="alert alert-success">The selected User has been deleted!</p>');
@@ -211,6 +226,13 @@ $(document).ready(function(){
 		var user_Birthdate = {
           User_Birthdate : []
         };
+        var user_Contact = {
+          User_Contact : []
+        };
+        var user_EmergencyContact = {
+          User_EmergencyContact : []
+        };
+
 
         var len = response.length;
 
@@ -222,6 +244,8 @@ $(document).ready(function(){
             user_dev.User_dev.push(response[i].device_uid);
             user_sex.User_sex.push(response[i].sex);
 			user_Birthdate.User_Birthdate.push(response[i].Birthdate);
+			user_Contact.User_Contact.push(response[i].Contact);
+			user_EmergencyContact.User_EmergencyContact.push(response[i].EmergencyContact);
         }
         if (user_dev.User_dev == "All") {
           user_dev.User_dev = 0;
@@ -232,6 +256,8 @@ $(document).ready(function(){
         $('#email').val(user_email.User_email);
         $('#dev_sel').val(user_dev.User_dev);
 		$('#Birthdate').val(user_Birthdate.User_Birthdate);
+		$('#Contact').val(user_Contact.User_Contact);
+		$('#EmergencyContact').val(user_EmergencyContact.User_EmergencyContact);
 
 
 

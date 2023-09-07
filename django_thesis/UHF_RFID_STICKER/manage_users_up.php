@@ -8,6 +8,9 @@
         <th>ID</th>
         <th>Date</th>
         <th>Birthdate</th>
+        <th>Contact</th>
+        <th>EmergencyContact</th>
+
 
 
       </tr>
@@ -43,7 +46,9 @@
                   <TD><?php echo $row['sex'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['user_date'];?></TD>
-                   <TD><?php echo $row['Birthdate'];?></TD>
+                  <TD><?php echo $row['Birthdate'];?></TD>
+                  <TD><?php echo $row['Contact'];?></TD>
+                  <TD><?php echo $row['EmergencyContact'];?></TD>
                   </TR>
     <?php
             }   
