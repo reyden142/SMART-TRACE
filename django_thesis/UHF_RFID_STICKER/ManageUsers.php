@@ -89,6 +89,8 @@ if (!isset($_SESSION['Admin-name'])) {
                     <input type="text" name="Birthdate" id="Birthdate" placeholder="MM/DD/YYYY">
                     <input type="text" name="Contact" id="Contact" placeholder="Contact number">
                     <input type="text" name="EmergencyContact" id="EmergencyContact" placeholder="Emergency number">
+                    <input type="text" name="ValidationPeriod" id="ValidationPeriod" placeholder="Validation Period">
+                    <input type="text" name="MedicalHistory" id="MedicalHistory" placeholder="Medical History">
 
 			</fieldset>
 			<button type="button" name="user_add" class="user_add">Add User</button>

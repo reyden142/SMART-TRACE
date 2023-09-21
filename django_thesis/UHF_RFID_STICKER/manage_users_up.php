@@ -10,6 +10,8 @@
         <th>Birthdate</th>
         <th>Contact</th>
         <th>EmergencyContact</th>
+        <th>ValidationPeriod</th>
+        <th>MedicalHistory</th>
 
 
 
@@ -49,6 +51,8 @@
                   <TD><?php echo $row['Birthdate'];?></TD>
                   <TD><?php echo $row['Contact'];?></TD>
                   <TD><?php echo $row['EmergencyContact'];?></TD>
+                  <TD><?php echo $row['ValidationPeriod'];?></TD>
+                  <TD><?php echo $row['MedicalHistory'];?></TD>
                   </TR>
     <?php
             }   

@@ -37,6 +37,8 @@ $(document).ready(function(){
     var Birthdate = $('#Birthdate').val();
     var Contact = $('#Contact').val();
     var EmergencyContact = $('#EmergencyContact').val();
+    var ValidationPeriod = $('#ValidationPeriod').val();
+    var MedicalHistory = $('#MedicalHistory').val();
     
     $.ajax({
       url: 'user_log_up.php',
@@ -53,6 +55,8 @@ $(document).ready(function(){
         'Birthdate': Birthdate,
         'Contact': Contact,
         'EmergencyContact': EmergencyContact,
+        'ValidationPeriod': ValidationPeriod,
+        'MedicalHistory': MedicalHistory,
       },
       success: function(response){
 
@@ -79,6 +83,8 @@ $(document).ready(function(){
             'Birthdate': Birthdate,
             'Contact': Contact,
             'EmergencyContact': EmergencyContact,
+            'ValidationPeriod': ValidationPeriod,
+            'MedicalHistory': MedicalHistory,
             'select_date': 0,
           }
           }).done(function(data) {

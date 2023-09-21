@@ -12,6 +12,8 @@ $(document).ready(function(){
     var Birthdate = $("#Birthdate").val();
     var Contact = $("#Contact").val();
     var EmergencyContact = $("#EmergencyContact").val();
+    var ValidationPeriod = $("#ValidationPeriod").val();
+    var MedicalHistory = $("#MedicalHistory").val();
     var dev_uid = $('#dev_sel option:selected').val();
     
     $.ajax({
@@ -28,6 +30,8 @@ $(document).ready(function(){
 		'Birthdate': Birthdate,
 	    'Contact': Contact,
 	    'EmergencyContact': EmergencyContact,
+        'ValidationPeriod': ValidationPeriod,
+        'MedicalHistory': MedicalHistory,
 
 
       },
@@ -42,7 +46,8 @@ $(document).ready(function(){
 		  $('#Birthdate').val('');
 		  $('#Contact').val('');
 		  $('#EmergencyContact').val('');
-
+          $('#ValidationPeriod').val('');
+          $('#MedicalHistory').val('');
 		  
           $('.alert_user').fadeIn(500);
           $('.alert_user').html('<p class="alert alert-success">A new User has been successfully added</p>');
@@ -77,6 +82,8 @@ $(document).ready(function(){
     var Birthdate = $("#Birthdate").val();
     var Contact = $("#Contact").val();
     var EmergencyContact = $("#EmergencyContact").val();
+    var ValidationPeriod = $("#ValidationPeriod").val();
+    var MedicalHistory = $("#MedicalHistory").val();
     var dev_uid = $('#dev_sel option:selected').val();
 
     $.ajax({
@@ -93,6 +100,8 @@ $(document).ready(function(){
 		'Birthdate': Birthdate,
 		'Contact': Contact,
 		'EmergencyContact': EmergencyContact,
+        'ValidationPeriod': ValidationPeriod,
+        'MedicalHistory': MedicalHistory,
       },
       success: function(response){
 
@@ -105,7 +114,8 @@ $(document).ready(function(){
 		  $('#Birthdate').val('');
 		  $('#Contact').val('');
 		  $('#EmergencyContact').val('');
-
+          $('#ValidationPeriod').val('');
+          $('#MedicalHistory').val('');
           $('.alert_user').fadeIn(500);
           $('.alert_user').html('<p class="alert alert-success">The selected User has been updated!</p>');
         }
@@ -152,7 +162,8 @@ $(document).ready(function(){
 			  $('#Birthdate').val('');
 			  $('#Contact').val('');
 			  $('#EmergencyContact').val('');
-			  
+              $('#ValidationPeriod').val('');
+              $('#MedicalHistory').val('');
               $('.alert_user').fadeIn(500);
               $('.alert_user').html('<p class="alert alert-success">The selected User has been deleted!</p>');
             }
@@ -232,6 +243,12 @@ $(document).ready(function(){
         var user_EmergencyContact = {
           User_EmergencyContact : []
         };
+         var user_ValidationPeriod = {
+          User_ValidationPeriod : []
+        };
+           var user_MedicalHistory = {
+          User_MedicalHistory : []
+        };
 
 
         var len = response.length;
@@ -246,6 +263,8 @@ $(document).ready(function(){
 			user_Birthdate.User_Birthdate.push(response[i].Birthdate);
 			user_Contact.User_Contact.push(response[i].Contact);
 			user_EmergencyContact.User_EmergencyContact.push(response[i].EmergencyContact);
+            user_ValidationPeriod.User_ValidationPeriod.push(response[i].ValidationPeriod);
+            user_MedicalHistory.User_MedicalHistory.push(response[i].MedicalHistory);
         }
         if (user_dev.User_dev == "All") {
           user_dev.User_dev = 0;
@@ -258,6 +277,9 @@ $(document).ready(function(){
 		$('#Birthdate').val(user_Birthdate.User_Birthdate);
 		$('#Contact').val(user_Contact.User_Contact);
 		$('#EmergencyContact').val(user_EmergencyContact.User_EmergencyContact);
+        $('#ValidationPeriod').val(user_ValidationPeriod.User_ValidationPeriod);
+        $('#MedicalHistory').val(user_MedicalHistory.User_MedicalHistory);
+
 
 
 
