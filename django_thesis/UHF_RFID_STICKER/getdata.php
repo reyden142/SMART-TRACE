@@ -77,7 +77,7 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
                                     //*****************************************************
                                     //Logout
                                     else{
-                                        $sql="UPDATE users_logs SET timeout=?, card_out=1 WHERE card_uid=? AND checkindate=? AND card_out=0 ";
+                                        $sql="UPDATE users_logs SET timeout=?, card_out=1 WHERE card_uid=? AND checkindate=? AND card_out=0";
                                         $result = mysqli_stmt_init($conn);
                                         if (!mysqli_stmt_prepare($result, $sql)) {
                                             echo "SQL_Error_insert_logout1";
