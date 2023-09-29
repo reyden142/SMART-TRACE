@@ -43,7 +43,9 @@ if (!isset($_SESSION['Admin-name'])) {
           <th>Deparment</th>
           <th>Birthdate</th>
           <th>Contact</th>
-          <th>EmergencyContact</th>
+          <th>Emergency Contact</th>
+          <th>Validation Period</th>
+          <th>Medical History</th>
 
         </tr>
       </thead>

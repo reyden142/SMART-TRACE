@@ -55,11 +55,11 @@ td{
 
 .section {
   margin: 20px;
-  width: 800px;
+  width: 1500px;
   display: block;
   float: right;
   position: absolute;
-  top: 250px;
+  top: 1400px;
   right: 0;
   background-color: #f1e9c8;
   
@@ -83,16 +83,14 @@ td{
 }
 .form-style-5{
   max-width: 350px;
-  height: 800px;
+  height: 1010px;
   padding: 30px 20px;
-  background: #f4f7f8;
-  margin: 46px 20px;
   background: #f4f7f8;
   border-radius: 10px;
   font-family: Georgia, "Times New Roman", Times, serif;
   position: relative;
   top: -80px;
-  margin-bottom: 10px;
+  margin: 46px 20px 10px;
 }
 .form-style-5 fieldset{
   border: none;
@@ -116,22 +114,19 @@ td{
 .form-style-5 select,
 .form-style-5 input[type="time"] {
   font-family: Georgia, "Times New Roman", Times, serif;
-  background: rgba(255,255,255,.1);
-  border: none;
   border-radius: 4px;
   font-size: 14px;
-  margin: 0;
   outline: 0;
   padding: 10px;
   width: 100%;
   box-sizing: border-box; 
   -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box; 
-  background-color: #e8eeef;
+  -moz-box-sizing: border-box;
+  background: #e8eeef;
   color:#8a97a0;
   -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
   box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
-  margin-bottom: 30px;
+  margin: 0 0 30px;
   border: 1px solid #e8eeef;
   
 }
@@ -164,7 +159,7 @@ td{
   line-height: 30px;
   text-align: center;
   text-shadow: 0 1px 0 rgba(255,255,255,0.2);
-  border-radius: 15px 15px 15px 0px;
+  border-radius: 15px 15px 15px 0;
 }
 
 .form-style-5 button {
@@ -172,15 +167,13 @@ td{
   display: block;
   padding: 10px 39px 10px 39px;
   color: #FFF;
-  margin: 0 auto;
   background: #d91212;
   font-size: 16px;
   text-align: center;
   font-style: normal;
   width: 100%;
   border: 1px solid #d91221;
-  border-width: 1px 1px 3px;
-  margin-bottom: 10px;
+  margin: 0 auto 10px;
 }
 .form-style-5 button:hover {
   background: #d91212;
@@ -202,13 +195,16 @@ td{
     display: block;
     float: left;
     position: relative;
-    top: 0px;
-    right: 0px;
+    right: 0;
     width: 100%;
-    padding: 10px 20px;
     margin: 20px 2px;
     padding: 20px;
   }
+
+  .section {
+    top: 0;
+  }
+
   .section img {
     width: 15px;
     margin: 3px;
