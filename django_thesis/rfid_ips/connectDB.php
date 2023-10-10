@@ -3,7 +3,7 @@
 	$servername = "localhost";
     $username = "root";		//put your phpmyadmin username.(default is "root")
     $password = "";			//if your phpmyadmin has a password put it here.(default is "root")
-    $dbname = "UHF_RFID_STICKER";
+    $dbname = "rfid_ips";
     
 	$conn = mysqli_connect($servername, $username, $password, $dbname);
 	
