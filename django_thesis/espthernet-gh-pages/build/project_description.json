@@ -1,7 +1,7 @@
 {
     "version":            "1",
     "project_name":       "main",
-    "project_version":    "a119d92",
+    "project_version":    "d0e0851-dirty",
     "project_path":       "C:/Users/Admin/PycharmProjects/Thesis2.0/django_thesis/espthernet-gh-pages",
     "idf_path":           "C:/Espressif/frameworks/esp-idf-v5.1.1",
     "build_dir":          "C:/Users/Admin/PycharmProjects/Thesis2.0/django_thesis/espthernet-gh-pages/build",
@@ -790,7 +790,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/Admin/PycharmProjects/Thesis2.0/django_thesis/espthernet-gh-pages/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/Admin/PycharmProjects/Thesis2.0/django_thesis/espthernet-gh-pages/main/user_main.c" ],
+            "sources": [ "C:/Users/Admin/PycharmProjects/Thesis2.0/django_thesis/espthernet-gh-pages/main/reset.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {

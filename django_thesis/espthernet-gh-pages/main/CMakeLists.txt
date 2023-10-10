@@ -1,2 +1,2 @@
-idf_component_register(SRCS "user_main.c"
+idf_component_register(SRCS "reset.c"
                     INCLUDE_DIRS ".")
