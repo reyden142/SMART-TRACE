@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.4
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 06, 2020 at 03:47 PM
--- Server version: 10.1.37-MariaDB
--- PHP Version: 7.3.1
+-- Generation Time: Oct 10, 2023 at 08:24 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `rfidattendance`
+-- Database: `uhf_rfid_sticker`
 --
 
 -- --------------------------------------------------------
@@ -33,7 +32,7 @@ CREATE TABLE `admin` (
   `admin_name` varchar(30) NOT NULL,
   `admin_email` varchar(80) NOT NULL,
   `admin_pwd` longtext NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `admin`
@@ -54,8 +53,15 @@ CREATE TABLE `devices` (
   `device_dep` varchar(20) NOT NULL,
   `device_uid` text NOT NULL,
   `device_date` date NOT NULL,
-  `device_mode` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `device_mode` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `devices`
+--
+
+INSERT INTO `devices` (`id`, `device_name`, `device_dep`, `device_uid`, `device_date`, `device_mode`) VALUES
+(1, 'CEE', 'CEE', 'e33ecebe831f152a', '2023-09-25', 0);
 
 -- --------------------------------------------------------
 
@@ -66,17 +72,22 @@ CREATE TABLE `devices` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL DEFAULT 'None',
-  `serialnumber` double NOT NULL DEFAULT '0',
+  `serialnumber` double NOT NULL DEFAULT 0,
   `sex` varchar(10) NOT NULL DEFAULT 'None',
   `stickercolor` varchar(10) NOT NULL DEFAULT 'None',
   `email` varchar(50) NOT NULL DEFAULT 'None',
   `card_uid` varchar(30) NOT NULL,
-  `card_select` tinyint(1) NOT NULL DEFAULT '0',
+  `card_select` tinyint(1) NOT NULL DEFAULT 0,
   `user_date` date NOT NULL,
   `device_uid` varchar(20) NOT NULL DEFAULT '0',
   `device_dep` varchar(20) NOT NULL DEFAULT '0',
-  `add_card` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `add_card` tinyint(1) NOT NULL DEFAULT 0,
+  `Birthdate` varchar(20) NOT NULL DEFAULT 'dd/mm/yyyy',
+  `Contact` varchar(20) NOT NULL DEFAULT 'None',
+  `EmergencyContact` varchar(20) NOT NULL DEFAULT 'None',
+  `ValidationPeriod` varchar(20) NOT NULL DEFAULT 'dd/mm/yyyy',
+  `MedicalHistory` varchar(100) NOT NULL DEFAULT 'None'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -94,9 +105,9 @@ CREATE TABLE `users_logs` (
   `checkindate` date NOT NULL,
   `timein` time NOT NULL,
   `timeout` time NOT NULL,
-  `card_out` tinyint(1) NOT NULL DEFAULT '0',
+  `card_out` tinyint(1) NOT NULL DEFAULT 0,
   `stickercolor` varchar(10) NOT NULL DEFAULT 'None'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Indexes for dumped tables
@@ -140,13 +151,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `devices`
 --
 ALTER TABLE `devices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `users_logs`

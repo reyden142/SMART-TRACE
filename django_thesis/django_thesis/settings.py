@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'django_thesis.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'uhf_rfid_sticker',
+        'NAME': 'rfid_ips',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
