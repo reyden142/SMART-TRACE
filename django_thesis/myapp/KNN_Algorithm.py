@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 
 # Datasets
 
-file_path = r'C:\Users\pc\Desktop\ThesisCode\Thesis2.0\django_thesis\Dataset\diabetes.csv'
+file_path = r'C:\Users\Admin\PycharmProjects\Thesis2.0\django_thesis\Dataset\diabetes.csv'
 
 dataset = pd.read_csv(file_path) #insert location of the dataset file
 print(len(dataset))
