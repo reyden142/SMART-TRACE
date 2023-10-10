@@ -63,6 +63,7 @@
     <a href="ManageUsers.php">Register Users</a>
     <a href="UsersLog.php">Users Log</a>
     <a href="devices.php">Devices</a>
+
     <?php  
     	if (isset($_SESSION['Admin-name'])) {
     		echo '<a href="#" data-toggle="modal" data-target="#admin-account">'.$_SESSION['Admin-name'].'</a>';
