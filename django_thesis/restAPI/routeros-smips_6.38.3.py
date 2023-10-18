@@ -3,7 +3,7 @@ from librouteros import connect
 # Define your MikroTik router's IP address, username, and password
 router_ip = '192.168.204.1'
 username = 'admin'
-password = ''
+password = 'admin'
 
 try:
     # Connect to the router

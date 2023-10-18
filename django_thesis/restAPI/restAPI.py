@@ -7,10 +7,9 @@ import urllib3
 import ipaddress
 
 urllib3.disable_warnings()
-apiURL = 'https://192.168.204.1/rest'  # Please enter your IP address
-apiUsername = 'admin'  # Input your username here
-apiPassword = ''  # Input your password here
-
+apiURL = 'https://192.168.203.5/rest'  # Please enter your IP address
+apiUsername = 'thesis2.0'  # Input your username here
+apiPassword = 'admin'  # Input your password here
 
 def getInterface():
     response = requests.get(apiURL + '/interface', auth=HTTPBasicAuth(apiUsername, apiPassword), verify=False)
@@ -54,7 +53,10 @@ def capture_userInput():
     user_input = int(input(" \n\n Please enter a number(1-99)[Default is 99]: ") or 99)
     return (user_input)
 
-
+def addRSSIMacAddress():
+    response = requests.get(apiURL + '/interface wireless registration-table', auth=HTTPBasicAuth(apiUsername, apiPassword), verify=False)
+    for jo in response.json():
+        print(jo)
 def addIPaddressInterface():
     getInterface()
     i = 0
@@ -102,6 +104,9 @@ while user_input != 99:
         input("press any key to continue...")
     elif (user_input == 3):
         addIPaddressInterface()
+        input("press any key to continue...")
+    elif (user_input == 4):
+        addRSSIMacAddress()
         input("press any key to continue...")
     else:
         input("Your input has is not valid, press any key to continue...")
