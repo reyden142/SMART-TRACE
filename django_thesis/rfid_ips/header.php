@@ -63,6 +63,7 @@
     <a href="ManageUsers.php">Register Users</a>
     <a href="UsersLog.php">Users Log</a>
     <a href="devices.php">Devices</a>
+    <a href="map.php">Map</a>
 
     <?php  
     	if (isset($_SESSION['Admin-name'])) {
@@ -76,6 +77,7 @@
     <a href="javascript:void(0);" class="icon" onclick="navFunction()">
 	  <i class="fa fa-bars"></i></a>
 </div>
+
 <div class="up_info1 alert-danger"></div>
 <div class="up_info2 alert-success"></div>
 </header>

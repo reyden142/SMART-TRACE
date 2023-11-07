@@ -1,0 +1,7 @@
+{
+  "name": "rfid_ips",
+  "version": "1.0.0",
+  "require": {
+    "pear2/net_routeros": "dev-master"
+  }
+}
