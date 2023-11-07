@@ -86,7 +86,8 @@ if (!isset($_SESSION['Admin-name'])) {
                         }
                       ?>
                     </select>
-                    <input type="text" name="Birthdate" id="Birthdate" placeholder="MM/DD/YYYY">
+                    <input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
+                    <input type="text" name="Birthdate" id="Birthdate" placeholder="Birthdate">
                     <input type="text" name="Contact" id="Contact" placeholder="Contact number">
                     <input type="text" name="EmergencyContact" id="EmergencyContact" placeholder="Emergency number">
                     <input type="text" name="ValidationPeriod" id="ValidationPeriod" placeholder="Validation Period">

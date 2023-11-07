@@ -55,7 +55,7 @@ if (isset($_SESSION['Admin-name'])) {
                         Wrong password!!
                       </div>';
             }
-            elseif ($_GET['error'] == "nouser") {
+            elseif ($_GET['error'] == "no user") {
                 echo '<div class="alert alert-danger">
                         This E-mail does not exist!!
                       </div>';

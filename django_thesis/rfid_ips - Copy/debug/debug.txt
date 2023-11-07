@@ -1,0 +1,127 @@
+
+Warning: Undefined array key "sex" in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 104
+1
+
+1 User
+
+
+
+				<?php echo "     Sticker Color: " ;?>
+				<input type="color" name="color" id="color" placeholder="Sticker Color" onchange="updateColor(this.value)">
+					<option value="">Sticker Color</option>
+					<option value="#ff0000">Red</option>
+					<option value="#00ff00">Green</option>
+					<option value="#0000ff">Blue</option>
+				</input>
+				<input type="text" name="my_input" id="my_input" style="width: 100px; height: 30px;">
+
+				<script>
+				function updateColor(color) {
+				  document.getElementById('my_input').style.backgroundColor = color;
+				}
+				</script>
+				
+				<label for="color-picker">Choose a color:</label>
+			<input type="color" id="color-picker" name="color-picker" value="#ff0000">
+
+Warning: Undefined array key "stickercolor" in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 106
+There's no selected User to be updated!
+
+Warning: Undefined array key "stickercolor" in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 106
+
+Fatal error: Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php:170 Stack trace: #0 C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php(170): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'Shen Wa Lai', '532312', 'Female', NULL, 's.lai.532312@um...', 'bc9fe018a6a01f2...', 'CEE', '3') #1 {main} thrown in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 170
+
+
+
+
+
+Warning: Undefined array key "stickercolor" in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 106
+
+Fatal error: Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php:170 Stack trace: #0 C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php(170): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'Edwin Ligan Jr.', '423122', 'Male', NULL, 'e.ligan.423122@...', 'bc9fe018a6a01f2...', 'CEE', '2') #1 {main} thrown in C:\xampp_2\htdocs\rfidattendance\manage_users_conf.php on line 170
+
+
+<select type="text" name="stickercolor" id="stickercolor" placeholder="stickercolor" onchange="updateColor(this.value)">
+					<option value="0">Sticker Color</option>
+					<option onchange="updateText(this.value)" value="#ffff00">Yellow</option>
+					<option onchange="updateText(this.value)" value="#ff8000">Orange</option>
+					<option onchange="updateText(this.value)" value="#ff0000">Red</option>
+					<option onchange="updateText(this.value)" value="#ffffff">White</option>
+					<option onchange="updateText(this.value)" value="#0000ff">Blue</option>
+					<option onchange="updateText(this.value)" value="#00cc00">Green</option>
+					
+					
+				</select>
+				
+
+				<script>
+				function updateColor(color) {
+				  document.getElementById('stickercolor').style.backgroundColor = color;
+				}
+				</script>
+				
+				<script>
+				function updateText(text) {
+				  document.getElementById('my_input').style.backgroundColor = text;
+				}
+				</script>
+
+
+
+
+
+
+
+Warning: Undefined array key "stickercolor" in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 14
+
+Fatal error: Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'edwin ligan jr', '0123', 'Male', NULL, 'j.ligan.476925@...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+
+
+Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'REYDEN', '123', 'Male', NULL, 'r.cagata.5555@u...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+1
+
+Fatal error: Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'edwin ligan jr', '123', 'Male', NULL, 'j.ligan.476925@...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+
+
+
+Fatal error: Uncaught ArgumentCountError: The number of variables must match the number of parameters in the prepared statement in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'REYDEN', '1234', 'Male', 'r.cagata.5555@u...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+
+
+
+
+		<select id="stickercolor" onchange="updateColor(this.value)">
+				<option value="None">Sticker Color</option>
+				<option value="#ffff00">Yellow</option>
+				<option value="#ff8000">Orange</option>
+				<option value="#ff0000">Red</option>
+				<option value="#ffffff">White</option>
+				<option value="#0000ff">Blue</option>
+				<option value="#00cc00">Green</option>
+			</select>
+
+			<!-- add a hidden input field to hold the selected color -->
+			<input type="hidden" name="stickercolor" id="stickercolor_input">
+
+				<script>
+				function updateColor(color) {
+					// update the background color of the hidden input field
+					document.getElementById('stickercolor_input').style.backgroundColor = color;
+					// set the value of the hidden input field to the selected color
+					document.getElementById('stickercolor_input').value = color;
+				}
+				</script>
+				
+
+Fatal error: Uncaught ArgumentCountError: The number of variables must match the number of parameters in the prepared statement in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'Reyden', '1234', 'Male', 'r.cagata.5555@u...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+
+Fatal error: Uncaught ArgumentCountError: The number of variables must match the number of parameters in the prepared statement in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:68 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(68): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'Reyden', '0123', 'Male', 'r.cagata.5555@u...', 'e03d2fc473c592c...', 'CEE-BE', '2') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 68
+
+
+
+Parse error: syntax error, unexpected token ";" in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 14
+
+
+
+
+Warning: Undefined array key "stickercolor" in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 106
+
+Fatal error: Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php:170 Stack trace: #0 C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php(170): mysqli_stmt_bind_param(Object(mysqli_stmt), 'sdssssi', 'REYDEN', '1234', 'Male', NULL, 'r.cagata.5555@u...', 'e03d2fc473c592c...', 'CEE-BE', '1') #1 {main} thrown in C:\xampp\htdocs\UHF_RFID_STICKER\manage_users_conf.php on line 170
