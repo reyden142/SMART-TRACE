@@ -10,7 +10,7 @@
 	<div class="logo">
 	<img class ="image" src="img/RFID_STICKER_LOGO.jpg" alt="RFID Sticker Logo">
 	</div>
-		<div class="a" href="index.php">UM RFID CAR PASS STICKER</a>
+		<div class="a" href="index.php">UM Smart-Trace</a>
 		<div class="b" href="index.php"> College of Engineering Education</div>
 		<div class="c" href="index.php"> Electronics Engineering</div>
 </div>

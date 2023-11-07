@@ -2,51 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name = "viewport"
-        content = "width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>{% block title %}SMART-TRACE{% endblock %}</title>
-    <!-- Bootstrap CSS -->
-    <link
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        rel="stylesheet"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SMART-TRACE THESIS</title>
+    <style>
+        body {
+            background-color: #007BFF; /* Set the background color (UM color) */
+            color: white; /* Set text color to white */
+            text-align: center; /* Center-align text */
+        }
+        .um-logo {
+            margin: 0 auto;
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-         <a class="navbar-brand" href="#">SMART-TRACE THESIS </a>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href={% url 'home' %}>Home</a>
-                </li>
-                <li class="nav- item">
-                    <a class="nav-link" href="http://localhost/rfid_ips/index.php">Users</a>
-                </li>
-                <li class="gutnav-item">
-                    <a class="nav-link" href="http://localhost/rfid_ips/ManageUsers.php">Manage Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Users Log</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Map</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="container">{% block content %} {% endblock %}</div>
-
-    <!-- jQuery and Bootstrap Bundle (inludes Popper) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.css"></script>
-
-
+    <img src="RFID_STICKER_LOGO.jpg" alt="UM Logo" class="um-logo">
+    <h1>Welcome to SMART-TRACE THESIS!</h1>
+    <p>
+        Smart Trace is an innovative solution that revolutionizes the way we track and manage data.
+        It provides a seamless experience for data management and analysis.
+    </p>
+    <form action="http://localhost/rfid_ips/login.php">
+        <button type="submit">Click here to start</button>
+    </form>
 </body>
 </html>
