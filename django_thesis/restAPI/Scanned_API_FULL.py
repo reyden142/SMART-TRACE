@@ -1,5 +1,4 @@
 import paramiko
-import re
 import csv
 import time
 import mysql.connector
@@ -17,10 +16,6 @@ db_config = {
     "password": "",
     "database": "rfid_ips"
 }
-
-# List of specific MAC addresses to filter
-specific_mac_addresses = ["96:3F:99:F2:6B:75", "F6:80:45:8E:AB:E7",
-                          "8C:DE:F9:AA:E0:1C", "7A:89:6F:19:85:FF"]
 
 
 def connect_to_database():
@@ -54,53 +49,55 @@ def main():
     while True:
         try:
             ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(router_ip, username=username, password=password)
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Add the missing closing parenthesis
+            try:
+                ssh.connect(router_ip, username=username, password=password)
 
-            # Define the CAP interface names ('cap1' and 'cap2')
-            cap_interfaces = ['cap1', 'cap2']
+                # Define the CAP interface names ('cap1' and 'cap2')
+                cap_interfaces = ['cap1', 'cap2']
 
-            # Create a list to store data from both CAP interfaces
-            data = []
+                # Create a list to store data from both CAP interfaces
+                data = []
 
-            pattern = r'(\S+)\s+(\S+)\s+\S+\s+(-\d+)\s+'
+                for cap_interface in cap_interfaces:
+                    # Create the command to retrieve CAPsMAN registration table data
+                    command = f'/caps-man/registration-table/print where interface="{cap_interface}"'
 
-            for cap_interface in cap_interfaces:
-                # Create the command
-                command = f'/caps-man/interface/scan {cap_interface}'
+                    # Execute the command
+                    stdin, stdout, stderr = ssh.exec_command(command)
 
-                # Execute the command
-                stdin, stdout, stderr = ssh.exec_command(command)
+                    output = stdout.read().decode()
+                    print(f"Output for {cap_interface}:\n{output}")
 
-                # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(1)  # You can adjust the sleep duration
+                    # Process the output to extract data
+                    lines = output.split('\n')
+                    for line in lines:
+                        if line.strip():
+                            columns = line.split()
+                            mac_address = columns[0]
+                            ssid = columns[1]
+                            signal_strength = columns[2]
+                            data.append((mac_address, ssid, signal_strength, cap_interface))
 
-                output = stdout.read(1024).decode()
-                print(f"Output for {cap_interface}:\n{output}")  # Add this line for debugging
+                # Connect to the database
+                connection = connect_to_database()
 
-                lines = output.splitlines()
+                # Transfer data to the database
+                if connection:
+                    transfer_to_database(data, connection)
 
-            # Create and open a CSV file for writing
-            with open('scanned_aps.csv', 'w', newline='') as csv_file:
-                csv_writer = csv.DictWriter(csv_file, fieldnames=['MAC', 'SSID', 'Signal_Strength', 'Source'])
-                csv_writer.writeheader()
+                ssh.close()
 
-                # Write the data to the CSV file
-                for row in data:
-                    csv_writer.writerow({'MAC': row[0], 'SSID': row[1], 'Signal_Strength': row[2], 'Source': row[3]})
+            except Exception as e:
+                print(f"Error: {e}")
 
-            # Connect to the database
-            connection = connect_to_database()
+            # Add a delay before the next iteration
+            time.sleep(5)  # Adjust the delay as needed (e.g., 60 seconds)
 
-            # Transfer data to the database
-            if connection:
-                transfer_to_database(data, connection)
+        except KeyboardInterrupt:
+            # Handle Ctrl+C to exit the loop gracefully
+            break
 
-            ssh.close()
-
-        except Exception as e:
-            print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
-
