@@ -19,9 +19,10 @@ db_config = {
 }
 
 # List of specific MAC addresses to filter
-specific_mac_addresses = ["96:3F:99:F2:6B:75", "F6:80:45:8E:AB:E7",
-                          "8C:DE:F9:AA:E0:1C", "7A:89:6F:19:85:FF",
-                          "82:B1:61:E7:B5:C4"]
+specific_mac_addresses = ["C2:D2:0C:49:2D:89",
+                          "A6:3C:4C:E2:1B:5D",
+                          "66:49:7D:0A:CF:76",
+                          "FA:C0:A6:71:FA:ED"]
 
 
 def connect_to_database():
@@ -33,7 +34,6 @@ def connect_to_database():
     except Error as e:
         print(f"Error: {e}")
     return None
-
 
 def transfer_to_database(data, connection):
     if connection:
@@ -59,7 +59,7 @@ def main():
             ssh.connect(router_ip, username=username, password=password)
 
             # Define the CAP interface names ('cap1' and 'cap2')
-            cap_interfaces = ['cap1', 'cap2']
+            cap_interfaces = ['cap1']
 
             # Create a list to store data from both CAP interfaces
             data = []
@@ -68,13 +68,10 @@ def main():
 
             for cap_interface in cap_interfaces:
                 # Create the command
-                command = f'/caps-man/interface/scan {cap_interface}'
+                command = f'/caps-man/interface/scan freeze-frame-interval=4 {cap_interface}'
 
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
-
-                # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(10)  # You can adjust the sleep duration
 
                 output = stdout.read(1024).decode()
                 lines = output.splitlines()
@@ -93,12 +90,9 @@ def main():
                         # Check if the MAC address is in the specific MAC addresses list
                         if mac_address in specific_mac_addresses:
                             # Check if an entry for this SSID already exists
-                            if ssid in latest_results:
-                                # Update the entry if the new result has a stronger signal
-                                if signal_strength > latest_results[ssid][2]:
-                                    latest_results[ssid] = (mac_address, ssid, signal_strength, cap_interface)
-                            else:
-                                latest_results[ssid] = (mac_address, ssid, signal_strength, cap_interface)
+                            latest_results[ssid] = (mac_address, ssid, signal_strength, cap_interface)
+                            # Wait for the scan to complete, adjust the sleep time as needed
+                            time.sleep(2)  # You can adjust the sleep duration
 
                 current_data.extend(latest_results.values())
                 data.extend(current_data)
