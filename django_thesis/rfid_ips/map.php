@@ -108,10 +108,11 @@ if (!isset($_SESSION['Admin-name'])) {
       L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aF7HhncV5bhT2pqqWdRV`,{ //style URL
         tileSize: 512,
         zoomOffset: -1,
-        minZoom: 1,
+        minZoom: 20,
         attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
         crossOrigin: true
       }).addTo(map);
+
 
       var myGeoJSON = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[125.59640375, 7.06583173], [125.59632507, 7.06562943], [125.59634742, 7.06556644], [125.59637603, 7.06556378], [125.59639928, 7.06551586], [125.59637156, 7.06544222], [125.59684363, 7.06527896], [125.59699652, 7.06568533], [125.59704569, 7.0657084], [125.59718248, 7.0656596], [125.59725222, 7.06585037], [125.59698311, 7.06594619], [125.59699115, 7.06598168], [125.59662011, 7.06611566], [125.59658167, 7.06602072], [125.5966228, 7.06600653], [125.59664604, 7.06593288], [125.59640375, 7.06583173]]]}, "id": "434c991f-7512-42d6-a587-deac996c0250", "properties": {"name": "BE_Building", "BE_Building": ""}}]}
       L.geoJSON(myGeoJSON).addTo(map)
