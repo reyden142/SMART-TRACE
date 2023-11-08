@@ -19,7 +19,8 @@ db_config = {
 }
 
 # List of specific MAC addresses to filter
-specific_mac_addresses = ["C2:D2:0C:49:2D:89"]
+specific_mac_addresses = ["BE:58:9E:2E:1C:28",
+                          "C2:D2:0C:49:2D:89"]
 
 
 def connect_to_database():
@@ -65,7 +66,7 @@ def main():
 
             for cap_interface in cap_interfaces:
                 # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=4 {cap_interface}'
+                command = f'/caps-man/interface/scan freeze-frame-interval=6 {cap_interface}'
 
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
@@ -104,7 +105,7 @@ def main():
                 print(f"data {cap_interface}:", current_data)
 
             # Create and open a CSV file for writing
-            with open('scanned_aps.csv', 'w', newline='') as csv_file:
+            with open('scanned_aps_cap3.csv', 'w', newline='') as csv_file:
                 csv_writer = csv.DictWriter(csv_file, fieldnames=['MAC', 'SSID', 'Signal_Strength', 'Source'])
                 csv_writer.writeheader()
 

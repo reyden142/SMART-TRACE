@@ -17,6 +17,8 @@ db_config = {
     "database": "rfid_ips"
 }
 
+# Channel you want to filter
+channel_to_filter = '2417/20/gn'
 
 def connect_to_database():
     try:
@@ -27,7 +29,6 @@ def connect_to_database():
     except Error as e:
         print(f"Error: {e}")
     return None
-
 
 def transfer_to_database(data, connection):
     if connection:
@@ -44,12 +45,11 @@ def transfer_to_database(data, connection):
         finally:
             cursor.close()
 
-
 def main():
     while True:
         try:
             ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Add the missing closing parenthesis
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
                 ssh.connect(router_ip, username=username, password=password)
 
@@ -77,7 +77,8 @@ def main():
                             mac_address = columns[0]
                             ssid = columns[1]
                             signal_strength = columns[2]
-                            data.append((mac_address, ssid, signal_strength, cap_interface))
+                            if ssid == channel_to_filter:  # Check if the ssid matches the channel you want
+                                data.append((mac_address, ssid, signal_strength, cap_interface))
 
                 # Connect to the database
                 connection = connect_to_database()
@@ -97,7 +98,6 @@ def main():
         except KeyboardInterrupt:
             # Handle Ctrl+C to exit the loop gracefully
             break
-
 
 if __name__ == "__main__":
     main()
