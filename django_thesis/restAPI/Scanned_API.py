@@ -20,7 +20,8 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["96:3F:99:F2:6B:75", "F6:80:45:8E:AB:E7",
-                          "8C:DE:F9:AA:E0:1C", "7A:89:6F:19:85:FF"]
+                          "8C:DE:F9:AA:E0:1C", "7A:89:6F:19:85:FF",
+                          "82:B1:61:E7:B5:C4"]
 
 
 def connect_to_database():
@@ -73,7 +74,7 @@ def main():
                 stdin, stdout, stderr = ssh.exec_command(command)
 
                 # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(20)  # You can adjust the sleep duration
+                time.sleep(10)  # You can adjust the sleep duration
 
                 output = stdout.read(1024).decode()
                 lines = output.splitlines()

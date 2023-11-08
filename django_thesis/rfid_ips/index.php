@@ -26,7 +26,8 @@ if (!isset($_SESSION['Admin-name'])) {
 </head>
 <body>
 
-<?php include'header.php'; ?> 
+<?php include'header.php'; ?>
+
 <main>
 <section>
   <h1 class="slideInDown animated">Here are all the Users</h1>

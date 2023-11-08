@@ -73,7 +73,7 @@ def main():
                 stdin, stdout, stderr = ssh.exec_command(command)
 
                 # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(1)  # You can adjust the sleep duration
+                time.sleep(10)  # You can adjust the sleep duration
 
                 output = stdout.read(1024).decode()
                 print(f"Output for {cap_interface}:\n{output}")  # Add this line for debugging
