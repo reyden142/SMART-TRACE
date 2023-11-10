@@ -1,26 +1,4 @@
 <?php
-// Include the database connection code from 'connectDB.php'
-require 'connectDB.php';
-
-// Array to store CSV file paths
-$csvFiles = [
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap1.csv',
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap2.csv',
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap3.csv',
-];
-
-// Function to read CSV file and return data as an array
-function readCSV($csvFile)
-{
-    $csvData = [];
-    if (($handle = fopen($csvFile, "r")) !== FALSE) {
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            $csvData[] = $data;
-        }
-        fclose($handle);
-    }
-    return $csvData;
-}
 
 session_start();
 if (!isset($_SESSION['Admin-name'])) {
@@ -46,53 +24,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
     <main>
     <h1 class="slideInDown animated">Map</h1>
-    <div class="form-style-5 slideInDown animated">
-        <form enctype="multipart/form-data">
-            <div class="alert_user"></div>
-            <fieldset>
-                <legend><span class="number">1</span> Online User</legend>
-                <?php
-                foreach ($csvFiles as $csvFile) {
-                    $csvData = readCSV($csvFile);
-                    echo '<h3>Data from ' . basename($csvFile) . '</h3>';
-                    echo '<table class="tbl-content">';
-                    echo '<thead>';
-                    echo '<tr><th>MAC</th><th>SSID</th><th>Signal Strength</th><th>Source</th><th>User Name</th></tr>';
-                    echo '</thead>';
-                    echo '<tbody>';
-                    foreach ($csvData as $row) {
-                        echo '<tr>';
-                        foreach ($row as $cell) {
-                            echo '<td>' . htmlspecialchars($cell) . '</td>';
-                        }
 
-                        // Fetch and display user name based on MAC address
-                        $macAddress = $row[0]; // Assuming MAC address is in the first column
-
-                        // Query the database to retrieve the user's username
-                        $query = "SELECT username FROM users WHERE Macaddress = ?";
-                        $stmt = $conn->prepare($query);
-                        $stmt->bind_param("s", $macAddress);
-                        $stmt->execute();
-                        $stmt->bind_result($username);
-                        $stmt->fetch();
-                        $stmt->close();
-
-                        if ($username) {
-                            echo '<td>' . $username . '</td>';
-                        } else {
-                            echo '<td>No User Found</td>';
-                        }
-
-                        echo '</tr>';
-                    }
-                    echo '</tbody>';
-                    echo '</table>';
-                }
-                ?>
-            </fieldset>
-        </form>
-    </div>
         <section id="map" aria-label="Map" role="region" position="absolute" >
             <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
@@ -108,6 +40,9 @@ if (!isset($_SESSION['Admin-name'])) {
     <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
 
     <script>
+        // Declare isAdding outside the script block
+        var isAdding = false;
+
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
         const map = L.map('map').setView([7.06569722, 125.59678861], 14);
@@ -234,63 +169,197 @@ if (!isset($_SESSION['Admin-name'])) {
 
         var bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
-        L.control.scale({
-            metric: true,
-            imperial: false,
-            position: 'topright'
-        }).addTo(map);
+    // Create a layer group to store the markers
+    var markerLayer = L.layerGroup().addTo(map);
 
-        if(!navigator.geolocation) {
-        console.log("Your browser doesn't support geolocation feature!")
-        } else {
-            setInterval(() => {
-                navigator.geolocation.getCurrentPosition(getPosition)
-            }, 5000);
-        }
+    // The CSS to style the custom marker
+    var customMarkerStyle = `
+      .custom-icon {
+        width: 32px;
+        height: 32px;
+        margin-left: -16px;
+        margin-top: -32px;
+        text-align: center;
+      }
+      .marker-icon {
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: grab;
+      }
+    `;
 
-    var marker, circle;
+    // Create a custom CSS style for the marker
+    var customIconStyle = L.divIcon({
+        className: 'custom-icon',
+        html: '<div class="marker-icon" style="background-color: blue;"></div>',
+        draggable: true // Enable dragging
+    });
 
-    function getPosition(position){
-        // console.log(position)
-        var lat = position.coords.latitude
-        var long = position.coords.longitude
-        var accuracy = position.coords.accuracy
+    // Include the custom marker style in the map's CSS
+    var customMarkerStyleElement = document.createElement('style');
+    customMarkerStyleElement.type = 'text/css';
+    customMarkerStyleElement.appendChild(document.createTextNode(customMarkerStyle));
+    document.head.appendChild(customMarkerStyleElement);
 
-        if(marker) {
-            map.removeLayer(marker)
-        }
+    var marker = null; // Initialize marker variable
+    var isAdding = false; // Flag to track whether we are adding markers
 
-        if(circle) {
-            map.removeLayer(circle)
-        }
+    // Function to create a popup with latitude and longitude
+    function createPopup(latlng) {
+        const lat = latlng.lat;
+        const lng = latlng.lng;
 
-        marker = L.marker([lat, long])
-        circle = L.circle([lat, long], {radius: accuracy})
+        // Create a popup and set its content
+        const popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
+        var popup = L.popup()
+            .setLatLng(latlng)
+            .setContent(popupContent);
 
-        var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+        // Open the popup on the map
+        popup.openOn(map);
+    }
 
-        //map.fitBounds(featureGroup.getBounds())
 
-        console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
-        }
 
-    map.on('click', function (e) {
-    const latlng = e.latlng;
-    const lat = latlng.lat;
-    const lng = latlng.lng;
+     map.on('click', function (e) {
+        // Create a blue icon marker at the clicked location
+        var marker = L.marker(e.latlng, { icon: customIconStyle });
 
-    // Create a popup and set its content
-    const popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
-    const popup = L.popup()
-        .setLatLng(latlng)
-        .setContent(popupContent);
+        // Add the marker to the marker layer
+        markerLayer.addLayer(marker);
 
-    // Open the popup on the map
-    popup.openOn(map);
+        // Make the marker draggable
+        marker.dragging.enable();
+
+        // Handle dragend event to update marker position and open popup
+        marker.on('dragend', function (event) {
+            var marker = event.target;
+            var position = marker.getLatLng();
+            console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
+
+            // Update the popup position
+            createPopup(position);
+            updateMarkersInStorage();
+        });
+
+        // Open popup on marker click
+        marker.on('click', function (event) {
+            var marker = event.target;
+            var position = marker.getLatLng();
+            createPopup(position);
+        });
+
+        updateMarkersInStorage();
     });
 
 
+    // Add a scale control
+    L.control.scale({
+        metric: true,
+        imperial: false,
+        position: 'topright'
+    }).addTo(map);
 
-    </script>
+
+    // Button to toggle adding markers
+    const addButton = document.createElement('button');
+        addButton.textContent = 'Add Blue Icons';
+        addButton.id = 'addButton';
+        addButton.addEventListener('click', function () {
+            isAdding = !isAdding;
+            addButton.textContent = isAdding ? 'Stop Adding' : 'Add Blue Icons';
+        });
+
+    addButton.style.position = 'absolute';
+    addButton.style.top = '300px';
+    addButton.style.right = '200px';
+
+    // Button to save markers
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save Markers';
+    saveButton.style.position = 'absolute';
+    saveButton.style.top = '350px';
+    saveButton.style.right = '208px';
+    saveButton.addEventListener('click', function () {
+        updateMarkersInStorage();
+        alert('Markers saved!');
+    });
+
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset Markers';
+    resetButton.style.position = 'absolute';
+    resetButton.style.top = '400px';
+    resetButton.style.right = '204px';
+    resetButton.addEventListener('click', function () {
+        resetMarkers();
+    });
+
+    function resetMarkers() {
+    // Ask for confirmation
+    var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
+
+    if (confirmReset) {
+        // Remove all markers from the marker layer
+        markerLayer.clearLayers();
+
+        // Clear markers from local storage
+        localStorage.removeItem('markers');
+    }
+}
+
+     // Load markers from local storage if available
+        var storedMarkers = localStorage.getItem('markers');
+        if (storedMarkers) {
+            var parsedMarkers = JSON.parse(storedMarkers);
+            parsedMarkers.forEach(function (markerData) {
+                var latlng = L.latLng(markerData.lat, markerData.lng);
+                createMarker(latlng); // Pass latlng to createMarker function
+            });
+        }
+
+        function createMarker(latlng) {
+            // Create a blue icon marker at the specified location
+            var marker = L.marker(latlng, { icon: customIconStyle });
+
+            // Add the marker to the marker layer
+            markerLayer.addLayer(marker);
+
+            // Make the marker draggable
+            marker.dragging.enable();
+
+            // Handle dragend event to update marker position
+            marker.on('dragend', function (event) {
+                var marker = event.target;
+                var position = marker.getLatLng();
+                updateMarkersInStorage();
+            });
+
+            updateMarkersInStorage();
+        }
+
+    function updateMarkersInStorage() {
+        // Get all marker data
+        var markers = markerLayer.getLayers().map(function (marker) {
+            return {
+                lat: marker.getLatLng().lat,
+                lng: marker.getLatLng().lng
+            };
+        });
+
+        // Save markers to local storage
+        localStorage.setItem('markers', JSON.stringify(markers));
+    }
+
+
+
+
+    // Add the button to the page body
+    document.body.appendChild(addButton);
+    document.body.appendChild(saveButton);
+    document.body.appendChild(resetButton);
+</script>
+
 </body>
 </html>

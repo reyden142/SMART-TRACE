@@ -7,12 +7,20 @@
 </head>
 <header>
 <div class="header">
-	<div class="logo">
-	<img class ="image" src="img/RFID_STICKER_LOGO.jpg" alt="RFID Sticker Logo">
-	</div>
-		<div class="a" href="index.php">UM Smart-Trace</a>
+
+	<img id="logo" src="img/RFID SMART-TRACE.png" alt="RFID Sticker Logo">
+    <style>
+        #logo {
+            position: relative;
+            width: 400px; /* You can adjust the percentage as needed */
+        }
+    </style>
+
+    <div>
+		<div class="a" href="index.php">UM Smart-Trace</div>
 		<div class="b" href="index.php"> College of Engineering Education</div>
 		<div class="c" href="index.php"> Electronics Engineering</div>
+	</div>
 </div>
 <?php  
   if (isset($_GET['error'])) {

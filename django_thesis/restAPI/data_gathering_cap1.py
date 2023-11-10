@@ -1,5 +1,4 @@
 import paramiko
-import csv
 import time
 import mysql.connector
 from mysql.connector import Error
@@ -49,12 +48,12 @@ def main():
     while True:
         try:
             ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy()
             try:
                 ssh.connect(router_ip, username=username, password=password)
 
                 # Define the CAP interface names ('cap1' and 'cap2')
-                cap_interfaces = ['cap1', 'cap2']
+                cap_interfaces = ['cap1']
 
                 # Create a list to store data from both CAP interfaces
                 data = []
