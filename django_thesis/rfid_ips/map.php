@@ -59,7 +59,7 @@ if (!isset($_SESSION['Admin-name'])) {
                     echo '<thead>';
                     echo '<tr><th>MAC</th><th>SSID</th><th>Signal Strength</th><th>Source</th><th>User Name</th></tr>';
                     echo '</thead>';
-                    echo '<tbody>';
+                    echo '<tbody>'; 
                     foreach ($csvData as $row) {
                         echo '<tr>';
                         foreach ($row as $cell) {
