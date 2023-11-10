@@ -49,7 +49,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
         // Set the maxZoom and minZoom properties
         map.options.maxZoom = 25; // Adjust this value as needed for your requirements
-        map.options.minZoom = 15; // Adjust this value as needed
+        map.options.minZoom = 17; // Adjust this value as needed
 
 
         L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aF7HhncV5bhT2pqqWdRV`, {
@@ -203,9 +203,6 @@ if (!isset($_SESSION['Admin-name'])) {
     customMarkerStyleElement.appendChild(document.createTextNode(customMarkerStyle));
     document.head.appendChild(customMarkerStyleElement);
 
-    var marker = null; // Initialize marker variable
-    var isAdding = false; // Flag to track whether we are adding markers
-
     // Function to create a popup with latitude and longitude
     function createPopup(latlng) {
         const lat = latlng.lat;
@@ -224,35 +221,25 @@ if (!isset($_SESSION['Admin-name'])) {
 
 
      map.on('click', function (e) {
-        // Create a blue icon marker at the clicked location
-        var marker = L.marker(e.latlng, { icon: customIconStyle });
-
-        // Add the marker to the marker layer
-        markerLayer.addLayer(marker);
-
-        // Make the marker draggable
-        marker.dragging.enable();
-
-        // Handle dragend event to update marker position and open popup
-        marker.on('dragend', function (event) {
-            var marker = event.target;
-            var position = marker.getLatLng();
-            console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
-
-            // Update the popup position
-            createPopup(position);
-            updateMarkersInStorage();
+            if (isAdding) {
+                var marker = L.marker(e.latlng, { icon: customIconStyle });
+                markerLayer.addLayer(marker);
+                marker.dragging.enable();
+                marker.on('dragend', function (event) {
+                    var marker = event.target;
+                    var position = marker.getLatLng();
+                    console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
+                    createPopup(position);
+                    updateMarkersInStorage();
+                });
+                marker.on('click', function (event) {
+                    var marker = event.target;
+                    var position = marker.getLatLng();
+                    createPopup(position);
+                });
+                updateMarkersInStorage();
+            }
         });
-
-        // Open popup on marker click
-        marker.on('click', function (event) {
-            var marker = event.target;
-            var position = marker.getLatLng();
-            createPopup(position);
-        });
-
-        updateMarkersInStorage();
-    });
 
 
     // Add a scale control
@@ -296,6 +283,27 @@ if (!isset($_SESSION['Admin-name'])) {
         resetMarkers();
     });
 
+    const renameButton = document.createElement('button');
+    renameButton.textContent = 'Rename Marker';
+    renameButton.style.position = 'absolute';
+    renameButton.style.top = '450px';
+    renameButton.style.right = '200px';
+
+    let selectedMarker = null;
+
+    renameButton.addEventListener('click', function () {
+        if (selectedMarker) {
+            var newName = prompt('Enter the new name for this location:', selectedMarker.options.title);
+            if (newName !== null) {
+                selectedMarker.options.title = newName;
+                updateMarkersInStorage();
+            }
+        } else {
+            alert('Select a marker to rename.');
+        }
+    });
+
+
     function resetMarkers() {
     // Ask for confirmation
     var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
@@ -307,58 +315,52 @@ if (!isset($_SESSION['Admin-name'])) {
         // Clear markers from local storage
         localStorage.removeItem('markers');
     }
-}
+    }
 
      // Load markers from local storage if available
         var storedMarkers = localStorage.getItem('markers');
         if (storedMarkers) {
-            var parsedMarkers = JSON.parse(storedMarkers);
-            parsedMarkers.forEach(function (markerData) {
-                var latlng = L.latLng(markerData.lat, markerData.lng);
-                createMarker(latlng); // Pass latlng to createMarker function
-            });
+            var confirmReload = confirm('Do you want to load the saved markers?');
+            if (confirmReload) {
+                var parsedMarkers = JSON.parse(storedMarkers);
+                parsedMarkers.forEach(function (markerData) {
+                    var latlng = L.latLng(markerData.lat, markerData.lng);
+                    var marker = L.marker(latlng, { icon: customIconStyle });
+                    markerLayer.addLayer(marker);
+                    marker.dragging.enable();
+                    marker.on('dragend', function (event) {
+                        var marker = event.target;
+                        var position = marker.getLatLng();
+                        updateMarkersInStorage();
+                    });
+                    updateMarkersInStorage();
+                });
+            } else {
+                localStorage.removeItem('markers');
+            }
         }
 
-        function createMarker(latlng) {
-            // Create a blue icon marker at the specified location
-            var marker = L.marker(latlng, { icon: customIconStyle });
-
-            // Add the marker to the marker layer
-            markerLayer.addLayer(marker);
-
-            // Make the marker draggable
-            marker.dragging.enable();
-
-            // Handle dragend event to update marker position
-            marker.on('dragend', function (event) {
-                var marker = event.target;
-                var position = marker.getLatLng();
-                updateMarkersInStorage();
+        function updateMarkersInStorage() {
+            var markers = markerLayer.getLayers().map(function (marker) {
+                return {
+                    lat: marker.getLatLng().lat,
+                    lng: marker.getLatLng().lng
+                };
             });
-
-            updateMarkersInStorage();
+            localStorage.setItem('markers', JSON.stringify(markers));
         }
 
-    function updateMarkersInStorage() {
-        // Get all marker data
-        var markers = markerLayer.getLayers().map(function (marker) {
-            return {
-                lat: marker.getLatLng().lat,
-                lng: marker.getLatLng().lng
-            };
-        });
-
-        // Save markers to local storage
-        localStorage.setItem('markers', JSON.stringify(markers));
-    }
-
-
-
+        window.onbeforeunload = function (event) {
+            if (markerLayer.getLayers().length > 0) {
+                return 'You have unsaved markers. Do you really want to leave?';
+            }
+        };
 
     // Add the button to the page body
     document.body.appendChild(addButton);
     document.body.appendChild(saveButton);
     document.body.appendChild(resetButton);
+    document.body.appendChild(renameButton);
 </script>
 
 </body>
