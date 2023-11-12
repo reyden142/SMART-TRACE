@@ -1,17 +1,92 @@
 <?php
+// Include the database connection code from 'connectDB.php'
+require 'connectDB.php';
 
 session_start();
+
 if (!isset($_SESSION['Admin-name'])) {
     header("location: login.php");
 }
+
+if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
+    // Save markers to the database
+    $markers = json_decode($_POST['markers'], true);
+
+    foreach ($markers as $marker) {
+        $lat = $marker['lat'];
+        $lng = $marker['lng'];
+        $title = $marker['title']; // Assuming 'name' is a unique identifier
+
+        // Check if the marker already exists in the database
+        $query = "SELECT * FROM markers WHERE title = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, 's', $title);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Error executing query: " . mysqli_error($conn);
+        }
+
+        // If the marker exists, update its position
+        if (mysqli_num_rows($result) > 0) {
+            $updateQuery = "UPDATE markers SET lat = ?, lng = ? WHERE title = ?";
+            $updateStmt = mysqli_prepare($conn, $updateQuery);
+            mysqli_stmt_bind_param($updateStmt, 'dds', $lat, $lng, $title);
+            mysqli_stmt_execute($updateStmt);
+
+            if (!$updateStmt) {
+                echo "Error updating marker: " . mysqli_error($conn);
+            }
+        } else {
+            // If the marker doesn't exist, insert a new record
+            $insertQuery = "INSERT INTO markers (title, lat, lng) VALUES (?, ?, ?)";
+            $insertStmt = mysqli_prepare($conn, $insertQuery);
+            mysqli_stmt_bind_param($insertStmt, 'sdd', $title, $lat, $lng);
+            mysqli_stmt_execute($insertStmt);
+
+            if (!$insertStmt) {
+                echo "Error inserting marker: " . mysqli_error($conn);
+            }
+        }
+    }
+
+    echo "Markers saved successfully!";
+} elseif (isset($_POST['loadButton'])) {
+    // Load markers from the database
+    $markers = array();
+
+    $query = "SELECT * FROM markers";
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $markers[] = array(
+                'title' => $row['title'],
+                'lat' => $row['lat'],
+                'lng' => $row['lng']
+            );
+        }
+
+        // Return the data as JSON
+        echo json_encode($markers);
+    } else {
+        echo "Error retrieving data from the database";
+    }
+} else {
+    echo "Invalid request";
+}
+
 ?>
+
+
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Map</title>
 
-    <link rel="stylesheet" type="text/css" href="css/map.css">
+    <link rel="stylesheet" type="text/css" href="css/map_test.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
@@ -42,6 +117,11 @@ if (!isset($_SESSION['Admin-name'])) {
     <script>
         // Declare isAdding outside the script block
         var isAdding = false;
+
+        // Declare markers as a global variable
+        var markers = [];
+
+        console.log("Markers:", markers);
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
@@ -203,45 +283,6 @@ if (!isset($_SESSION['Admin-name'])) {
     customMarkerStyleElement.appendChild(document.createTextNode(customMarkerStyle));
     document.head.appendChild(customMarkerStyleElement);
 
-    // Function to create a popup with latitude and longitude
-    function createPopup(latlng) {
-        const lat = latlng.lat;
-        const lng = latlng.lng;
-
-        // Create a popup and set its content
-        const popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
-        var popup = L.popup()
-            .setLatLng(latlng)
-            .setContent(popupContent);
-
-        // Open the popup on the map
-        popup.openOn(map);
-    }
-
-
-
-     map.on('click', function (e) {
-            if (isAdding) {
-                var marker = L.marker(e.latlng, { icon: customIconStyle });
-                markerLayer.addLayer(marker);
-                marker.dragging.enable();
-                marker.on('dragend', function (event) {
-                    var marker = event.target;
-                    var position = marker.getLatLng();
-                    console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
-                    createPopup(position);
-                    updateMarkersInStorage();
-                });
-                marker.on('click', function (event) {
-                    var marker = event.target;
-                    var position = marker.getLatLng();
-                    createPopup(position);
-                });
-                updateMarkersInStorage();
-            }
-        });
-
-
     // Add a scale control
     L.control.scale({
         metric: true,
@@ -249,6 +290,172 @@ if (!isset($_SESSION['Admin-name'])) {
         position: 'topright'
     }).addTo(map);
 
+// CODE FOR THE POPUP LATITUDE, LONGITUDE, AND BLUE ICON NAMES /////////////////////////////////////////////////////
+
+    // Function to create a popup with latitude, longitude, and delete option
+    function createPopup(latlng, title) {
+        const lat = latlng.lat;
+        const lng = latlng.lng;
+
+        // Create a popup
+        var popup = L.popup()
+            .setLatLng(latlng);
+
+        // Initialize popupContent
+        let popupContent = "Latitude: " + lat + "<br>Longitude: " + lng + "<br>Name: " + title + "<br><button onclick='deleteMarker(\"" + title + "\", " + latlng.lat + "," + latlng.lng + ")'";
+
+        // Check if title is 'undefined', update popupContent accordingly
+        if (typeof title === 'undefined') {
+            popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
+        }
+
+        // Set the content of the popup
+        popup.setContent(popupContent);
+
+        // Add the marker reference to the popup for access in the delete function
+        popup.marker = title;
+
+        // Open the popup on the map
+        popup.openOn(map);
+
+        // Add the delete button inside the popup
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete Marker';
+        deleteButton.addEventListener('click', function () {
+            const markerToDelete = findMarkerByName(title);
+
+            if (markerToDelete) {
+                deleteMarker(markerToDelete);
+            } else {
+                // Provide a user-friendly message or handle the situation accordingly
+                alert('Marker with name ' + title + ' not found.');
+                console.warn('Marker not found:', title);
+            }
+        });
+
+
+
+        // Append the delete button to the popup
+        popup._contentNode.appendChild(deleteButton);
+    }
+
+
+
+// DELETING OF THE BLUE ICON //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Function to delete a marker
+    function deleteMarker(marker) {
+        if (marker && marker.options) {
+            const title = marker.options.title;
+            const lat = marker.getLatLng().lat;
+            const lng = marker.getLatLng().lng;
+
+            // Remove the marker from the marker layer
+            markerLayer.removeLayer(marker);
+
+            // Update the marker in local storage
+            updateMarkersInStorage();
+
+            // Update the marker in the database
+            deleteMarkerInDatabase(title, lat, lng);
+        } else {
+            console.error('Invalid marker object:', marker);
+        }
+    }
+
+
+    // Button to toggle deleting mode
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete Blue Icons';
+    deleteButton.style.position = 'absolute';
+    deleteButton.style.top = '500px';
+    deleteButton.style.right = '200px';
+    deleteButton.addEventListener('click', function () {
+        if (deleteMode) {
+            alert('Click on a marker to delete it.');
+            map.on('click', handleDeleteClick);
+        } else {
+            map.off('click', handleDeleteClick);
+        }
+        deleteMode = !deleteMode;
+        deleteButton.textContent = deleteMode ? 'Stop Deleting' : 'Delete Blue Icons';
+    });
+
+    // Function to handle deleting on map click
+    function handleDeleteClick(e) {
+        if (deleteMode) {
+            var marker = findMarkerByLatLng(e.latlng);
+            if (marker) {
+                deleteMarker(marker);
+            } else {
+                alert('Click on an existing marker to delete it.');
+            }
+        }
+    }
+
+// RESET BUTTON FOR THE BLUE ICONS /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Function to reset the blue icons
+function resetMarkers() {
+    // Ask for confirmation
+    var confirmReset = confirm('Are you sure you want to reset the blue icons? This action cannot be undone.');
+
+    if (confirmReset) {
+        // Remove all markers from the marker layer
+        markerLayer.clearLayers();
+
+        // Clear markers from local storage
+        localStorage.removeItem('markers');
+
+        // Reset markersSaved when markers are reset
+        markersSaved = false;
+
+        // Reset the button text
+        saveButton.textContent = 'Save Markers';
+
+        // Reset the delete mode
+        deleteMode = false;
+        deleteButton.textContent = 'Delete Blue Icons';
+
+        // Turn off the delete mode event listener
+        map.off('click', handleDeleteClick);
+    }
+}
+
+    const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset Markers';
+        resetButton.style.position = 'absolute';
+        resetButton.style.top = '400px';
+        resetButton.style.right = '204px';
+        resetButton.addEventListener('click', function () {
+            resetMarkers();
+        });
+
+        function resetMarkers() {
+            // Check if markers are saved, and reset markersSaved without prompting if they are
+            if (markersSaved) {
+                markersSaved = false; // Reset markersSaved when markers are reset
+                saveButton.textContent = 'Save Markers'; // Reset the button text
+            } else {
+                var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
+
+                if (!confirmReset) {
+                    return;
+                }
+            }
+
+            // Remove all markers from the marker layer
+            markerLayer.clearLayers();
+
+            // Clear markers from local storage
+            localStorage.removeItem('markers');
+        }
+
+    resetButton.addEventListener('click', function () {
+            resetMarkers();
+    });
+
+// ADD BLUE ICONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Button to toggle adding markers
     const addButton = document.createElement('button');
@@ -263,85 +470,272 @@ if (!isset($_SESSION['Admin-name'])) {
     addButton.style.top = '300px';
     addButton.style.right = '200px';
 
-    // Button to save markers
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save Markers';
-    saveButton.style.position = 'absolute';
-    saveButton.style.top = '350px';
-    saveButton.style.right = '208px';
-    saveButton.addEventListener('click', function () {
-        updateMarkersInStorage();
-        alert('Markers saved!');
-    });
+    // Modify the click event listener to handle renaming
+    map.on('click', function (e) {
+        if (isAdding) {
+            // Prompt the user for the name of the location
+            var locationName = prompt('Enter the name for this location:');
 
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Markers';
-    resetButton.style.position = 'absolute';
-    resetButton.style.top = '400px';
-    resetButton.style.right = '204px';
-    resetButton.addEventListener('click', function () {
-        resetMarkers();
-    });
+            // Create a blue icon marker at the clicked location with the specified name
+            var marker = L.marker(e.latlng, {
+                icon: customIconStyle,
+                title: locationName
+            });
 
-    const renameButton = document.createElement('button');
-    renameButton.textContent = 'Rename Marker';
-    renameButton.style.position = 'absolute';
-    renameButton.style.top = '450px';
-    renameButton.style.right = '200px';
+            // Set the name as the marker's title
+            marker.options.title = locationName;
+            console.log("locationName: ", locationName);
 
-    let selectedMarker = null;
+            // Add the marker to the marker layer
+            markerLayer.addLayer(marker);
 
-    renameButton.addEventListener('click', function () {
-        if (selectedMarker) {
-            var newName = prompt('Enter the new name for this location:', selectedMarker.options.title);
-            if (newName !== null) {
-                selectedMarker.options.title = newName;
+            // Make the marker draggable
+            marker.dragging.enable();
+
+            // Declare position variable outside the dragend event handler
+            var position;
+
+            // Handle dragend event to update marker position and open popup
+            marker.on('dragend', function (event) {
+                marker = event.target;
+                position = marker.getLatLng();
+                console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
+
+                // Update the popup position
+                createPopup(position, marker.options.title); // Pass the title to createPopup
+                updateMarkerInDatabase(marker.options.title, position.lat, position.lng); // Update marker in the database
                 updateMarkersInStorage();
-            }
-        } else {
-            alert('Select a marker to rename.');
+            });
+
+            // Open popup on marker click
+            marker.on('click', function (event) {
+                // Use the position variable declared in the outer scope
+                createPopup(position, marker.options.title);
+            });
+
+            // Update the popup position
+            createPopup(e.latlng, locationName);
+            updateMarkerInDatabase(marker.options.title, e.latlng.lat, e.latlng.lng); // Update marker in the database
         }
     });
 
 
-    function resetMarkers() {
-    // Ask for confirmation
-    var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
 
-    if (confirmReset) {
-        // Remove all markers from the marker layer
-        markerLayer.clearLayers();
 
-        // Clear markers from local storage
-        localStorage.removeItem('markers');
+    markerLayer.eachLayer(function (marker) {
+    var latlng = marker.getLatLng();
+    var title = marker.options.title; // Assuming you set the title as the name
+    markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+    });
+
+    // Helper function to find a marker by its coordinates
+    function findMarkerByLatLng(latlng) {
+        var markers = markerLayer.getLayers();
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].getLatLng().equals(latlng)) {
+                return markers[i];
+            }
+        }
+        return null;
     }
+
+    // Function to find a marker by its title
+    function findMarkerByName(title) {
+        var markers = markerLayer.getLayers();
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].options.title === title) {
+                console.log("markers:", markers[i]);
+                return markers[i];
+            }
+        }
+        return null;
     }
 
-     // Load markers from local storage if available
-        var storedMarkers = localStorage.getItem('markers');
-        if (storedMarkers) {
-            var confirmReload = confirm('Do you want to load the saved markers?');
-            if (confirmReload) {
-                var parsedMarkers = JSON.parse(storedMarkers);
-                parsedMarkers.forEach(function (markerData) {
-                    var latlng = L.latLng(markerData.lat, markerData.lng);
-                    var marker = L.marker(latlng, { icon: customIconStyle });
-                    markerLayer.addLayer(marker);
-                    marker.dragging.enable();
-                    marker.on('dragend', function (event) {
-                        var marker = event.target;
-                        var position = marker.getLatLng();
-                        updateMarkersInStorage();
-                    });
+// SAVED BUTTON //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   // Updated variable to track whether markers are saved
+        var markersSaved = false;
+
+        // Button to save markers
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save Markers';
+        saveButton.style.position = 'absolute';
+        saveButton.style.top = '350px';
+        saveButton.style.right = '208px';
+        saveButton.addEventListener('click', function () {
+            updateMarkersInStorage();
+            markersSaved = true; // Set markersSaved to true when markers are saved
+            saveButton.textContent = 'Saved'; // Change the button text to 'Saved'
+
+            // Reset the button text after 3 seconds
+            setTimeout(function () {
+                saveButton.textContent = 'Save Markers';
+                markersSaved = false; // Reset markersSaved after resetting the button text
+            }, 3000);
+        });
+
+   // Update the existing event listener
+   saveButton.addEventListener('click', function () {
+            saveMarkers();
+            updateMarkersInStorage();
+            markersSaved = true;
+            saveButton.textContent = 'Saved';
+            setTimeout(function () {
+                saveButton.textContent = 'Save Markers';
+                markersSaved = false;
+            }, 3000);
+   });
+
+   // Function to save markers
+   function saveMarkers() {
+        var markers = [];
+        markerLayer.eachLayer(function (marker) {
+            var latlng = marker.getLatLng();
+            var title = marker.options.title; // Assuming you set the title as the name
+            markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+        });
+
+        console.log("AJAX URL:", "map_test.php");
+        // AJAX request to save markers to the database
+        $.ajax({
+            type: "POST",
+            url: "map_test.php", // Replace with the actual filename
+            data: { saveButton: true, markers: JSON.stringify(markers) },
+            success: function (response) {
+                alert(response); // Display the server response
+                // Optionally, update the button text or perform other actions
+            },
+            error: function (xhr, status, error) {
+                console.error("Error saving markers:", error);
+                console.log(xhr.responseText); // Log the full response for debugging
+            }
+        });
+   }
+
+// LOAD MARKER /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// Declare addMarker function
+function addMarker(lat, lng, title) {
+    // Create a blue icon marker at the specified location with the specified name
+    var marker = L.marker([lat, lng], {
+        icon: customIconStyle,
+        title: title
+    }).addTo(map);
+
+    // Make the marker draggable
+    marker.dragging.enable();
+
+    // Declare position variable outside the dragend event handler
+    var position;
+
+    // Handle dragend event to update marker position and open popup
+    marker.on('dragend', function (event) {
+        marker = event.target;
+        position = marker.getLatLng();
+        console.log('Marker was dragged to: Lat: ' + position.lat + ', Long: ' + position.lng);
+
+        // Update the popup position
+        createPopup(position, title); // Pass the title to createPopup
+        updateMarkerInDatabase(title, position.lat, position.lng); // Update marker in the database
+        updateMarkersInStorage();
+    });
+
+    // Open popup on marker click
+    marker.on('click', function (event) {
+        // Use the position variable declared in the outer scope
+        createPopup(position, title);
+    });
+
+    // Update the popup position
+    createPopup({ lat: lat, lng: lng }, title);
+    updateMarkerInDatabase(title, lat, lng); // Update marker in the database
+    updateMarkersInStorage();
+}
+
+// Modify the click event listener to handle adding markers
+map.on('click', function (e) {
+    if (isAdding) {
+        // Prompt the user for the name of the location
+        var locationName = prompt('Enter the name for this location:');
+
+        // Call the addMarker function to add the marker
+        addMarker(e.latlng.lat, e.latlng.lng, locationName);
+    }
+});
+
+
+
+// DATABASE ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   // Function to update the marker in the database
+   function updateMarkerInDatabase(title, lat, lng) {
+        console.log("Updating marker:", title, lat, lng);
+
+        // AJAX request to update the marker in the database
+        $.ajax({
+            type: "POST",
+            url: "map_update_marker.php", // Replace with the actual filename or endpoint
+            data: { title: title, lat: lat, lng: lng },
+            success: function (response) {
+                console.log("Marker updated in the database:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error updating marker in the database:", error);
+                console.log(xhr.responseText); // Log the full response for debugging
+            }
+        });
+   }
+
+    // Function to delete a marker from the database
+    function deleteMarkerInDatabase(title, lat, lng) {
+        // AJAX request to delete the marker from the database
+        $.ajax({
+            type: "POST",
+            url: "delete_marker.php", // Replace with the actual filename or endpoint
+            data: { title: title, lat: lat, lng: lng }, // Match keys with PHP script
+            success: function (response) {
+                console.log("Marker deleted from the database:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error deleting marker from the database:", error);
+                console.log(xhr.responseText); // Log the full response for debugging
+            }
+        });
+    }
+
+
+   // Load markers from local storage if available, only if markers are not saved
+   var storedMarkers = localStorage.getItem('markers');
+   if (storedMarkers && !markersSaved) {
+        var confirmReload = confirm('Do you want to load the saved markers?');
+        if (confirmReload) {
+            var parsedMarkers = JSON.parse(storedMarkers);
+            parsedMarkers.forEach(function (markerData) {
+                var latlng = L.latLng(markerData.lat, markerData.lng);
+                var marker = L.marker(latlng, {
+                    icon: customIconStyle,
+                    title: markerData.title // Access the GeoJSON property for the marker name
+                });
+                markerLayer.addLayer(marker);
+                marker.dragging.enable();
+                marker.on('dragend', function (event) {
+                    var marker = event.target;
+                    var position = marker.getLatLng();
+                    updateMarkerInDatabase(marker.options.title, position.lat, position.lng); // Update marker in the database
                     updateMarkersInStorage();
                 });
-            } else {
-                localStorage.removeItem('markers');
-            }
+            });
+            updateMarkersInStorage();
+        } else {
+            localStorage.removeItem('markers');
         }
+   }
 
-        function updateMarkersInStorage() {
-            var markers = markerLayer.getLayers().map(function (marker) {
+   function updateMarkersInStorage() {
+
+        var markers = markerLayer.getLayers().map(function (marker) {
                 return {
                     lat: marker.getLatLng().lat,
                     lng: marker.getLatLng().lng
@@ -354,14 +748,65 @@ if (!isset($_SESSION['Admin-name'])) {
             if (markerLayer.getLayers().length > 0) {
                 return 'You have unsaved markers. Do you really want to leave?';
             }
-        };
+   };
 
-    // Add the button to the page body
-    document.body.appendChild(addButton);
-    document.body.appendChild(saveButton);
-    document.body.appendChild(resetButton);
-    document.body.appendChild(renameButton);
+   // Load markers from the database
+    function loadMarkersFromDatabase() {
+        // AJAX request to load markers from the database
+        $.ajax({
+            type: "POST",
+            url: "map_load_marker.php",
+            data: { loadButton: true },
+            success: function (response) {
+                console.log("Response from the server:", response);
+
+                try {
+                    // Parse the JSON response
+                    var databaseMarkers = JSON.parse(response.trim());
+
+                    // Log the structure of the first marker's data
+                    if (databaseMarkers.length > 0) {
+                        console.log("First marker's data:", databaseMarkers[0]);
+                    } else {
+                        console.log("No markers returned from the database.");
+                    }
+
+                    // Add markers to the map
+                    databaseMarkers.forEach(function (markerData) {
+                        addMarker(markerData.lat, markerData.lng, markerData.title);
+                    });
+                } catch (parseError) {
+                    console.error("Error parsing JSON:", parseError);
+                    console.log("Invalid JSON string:", response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading markers from the database:", error);
+                console.log(xhr.responseText); // Log the full response for debugging
+            }
+        });
+    }
+
+
+
+// Call the function to load markers from the database
+loadMarkersFromDatabase();
+
+// BUTTONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Add the button to the page body
+document.body.appendChild(addButton);
+document.body.appendChild(saveButton);
+document.body.appendChild(resetButton);
+
+
+console.log("storedMarkers:", storedMarkers);
+console.log("markersSaved:", markersSaved);
+
 </script>
 
 </body>
 </html>
+
+
+
