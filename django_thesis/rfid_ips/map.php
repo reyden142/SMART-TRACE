@@ -240,6 +240,27 @@ if (!isset($_SESSION['Admin-name'])) {
             position: 'topright'
         }).addTo(map);
 
+        // The CSS to style the custom marker
+    var customMarkerStyle = `
+      .custom-icon {
+        width: 32px;
+        height: 32px;
+        margin-left: -16px;
+        margin-top: -32px;
+        text-align: center;
+      }
+      .marker-icon {
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: grab;
+      }
+    `;
+
+
+        // OLD CODE
+        /*
         if(!navigator.geolocation) {
         console.log("Your browser doesn't support geolocation feature!")
         } else {
@@ -272,7 +293,51 @@ if (!isset($_SESSION['Admin-name'])) {
         //map.fitBounds(featureGroup.getBounds())
 
         console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
+        }*/
+
+    // Load the final_predicted_values_aggregated.csv file
+    const csvFilePath = 'css/final_predicted_values_aggregated.csv';
+
+    // Inject the custom marker CSS into the document
+    const style = document.createElement('style');
+    style.innerHTML = customMarkerStyle;
+    document.head.appendChild(style);
+
+    // Create a custom CSS style for the marker
+    const customIconStyle = L.divIcon({
+        className: 'custom-icon',
+        html: '<div class="marker-icon" style="background-color: blue;"></div>',
+        draggable: true // Enable dragging
+    });
+
+    // Function to add markers to the map
+    function addMarkers(data) {
+      data.forEach(row => {
+        const lat = parseFloat(row.lat);
+        const lng = parseFloat(row.lng);
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          L.marker([lat, lng], { icon: customIconStyle }).addTo(map)
+            .bindPopup(`<b>${row.predicted_floorid}</b><br>Latitude: ${lat}<br>Longitude: ${lng}`);
         }
+      });
+    }
+
+    // Read the CSV file and add markers
+    async function readCSV() {
+      const response = await fetch(csvFilePath);
+      const data = await response.text();
+
+      // Parse CSV data and add markers
+      const csvData = Papa.parse(data, { header: true });
+      addMarkers(csvData.data);
+    }
+
+    // Include PapaParse library for CSV parsing
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js';
+    script.onload = readCSV;
+    document.head.appendChild(script);
 
     map.on('click', function (e) {
     const latlng = e.latlng;

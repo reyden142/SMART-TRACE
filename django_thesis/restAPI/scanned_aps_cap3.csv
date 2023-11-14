@@ -1,2 +1,2 @@
-MAC,SSID,Signal_Strength,Source
-BE:58:9E:2E:1C:28,AP2,-68,cap3
+mac_address,ssid,channel,signal_strength,source,timestamp
+FE:47:AD:D7:13:E2,C1,2457,-67,cap3,2023-11-14 20:54:39
