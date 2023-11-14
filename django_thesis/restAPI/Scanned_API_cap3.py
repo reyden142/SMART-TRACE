@@ -21,15 +21,16 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
-                          "1E:03:B6:E0:9E:3C", #C2
+                          "06:8D:30:36:72:08", #C2
                           "56:3A:A2:F8:0C:63", #C3
-                          "B6:6A:AD:C1:CF:19", #C4
+                          #"B6:6A:AD:C1:CF:19", #C4
                           "F6:CE:87:F2:06:21", #C5
                           "02:9D:2F:8D:49:90", #C6
                           "A2:89:5E:B6:E7:58", #C7
                           "7A:6B:C2:5A:7B:88", #C8
                           "56:DE:9D:83:4D:C6", #C9
-                          "52:39:94:90:76:D2" #C10
+                          "52:39:94:90:76:D2", #C10
+                          "8E:B0:7A:54:55:A6", #C11
                           ]
 
 def connect_to_database():
@@ -60,11 +61,14 @@ def transfer_to_database(data, connection, floorid):
             finally:
                 cursor.close()
 
+
+
+
 def main():
     while True:
         try:
             # Define the floorid here or retrieve it as needed
-            floorid = 170  # You can adjust the floorid as needed
+            floorid = 116  # You can adjust the floorid as needed
 
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -80,18 +84,18 @@ def main():
 
             for cap_interface in cap_interfaces:
                 # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=7 {cap_interface}'
+                command = f'/caps-man/interface/scan freeze-frame-interval=8 {cap_interface}'
 
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
 
-                output = stdout.read(1024).decode()
+                output = stdout.read(2048).decode()
                 lines = output.splitlines()
 
-                # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(3)  # You can adjust the sleep duration
-
                 print(f"unprocessed data {cap_interface}:", output)
+
+                # Wait for the scan to complete, adjust the sleep time as needed
+                time.sleep(1)  # You can adjust the sleep duration
 
                 if "failure: already running" not in output:
                     # Data collection and processing for the current CAP interface
@@ -142,10 +146,15 @@ def main():
                 if connection:
                     transfer_to_database(data, connection, floorid)
 
-            ssh.close()
-
+        except paramiko.AuthenticationException:
+            print("Authentication failed. Please check your credentials.")
+        except paramiko.SSHException as e:
+            print(f"SSH connection failed: {str(e)}")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"An unexpected error occurred: {str(e)}")
+        finally:
+            # Close the SSH connection
+            ssh.close()
 
 if __name__ == "__main__":
     main()
