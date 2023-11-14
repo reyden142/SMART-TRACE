@@ -289,8 +289,6 @@ if (!isset($_SESSION['Admin-name'])) {
     popup.openOn(map);
     });
 
-
-
     </script>
 </body>
 </html>
