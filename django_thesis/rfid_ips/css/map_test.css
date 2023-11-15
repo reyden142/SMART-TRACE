@@ -326,6 +326,74 @@ td{
   }
 }
 
+@media (max-width: 2560px) {
+
+  #map {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 50%;
+  touch-action: none;
+  }
+
+  .form-style-5{
+  max-width: 100%;
+  height: 70%;
+  padding: 30px 20px;
+  background: #f4f7f8;
+  border-radius: 30px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+
+  top: 80%;
+  position: absolute;
+  right: 40px;
+  }
+
+  th{
+  padding: 0px;
+  text-align: center !important;
+  font-weight: 500;
+  font-size: 120%;
+  color: #333;
+  text-transform: uppercase;
+  border: none !important;
+  background-color: #fff !important;
+  }
+
+  td{
+    padding: 0px;
+    text-align: center;
+    font-weight: 300;
+    font-size: 85%;
+    color: #fff;
+    border-bottom: solid 2px rgb(78 21 21 / 10%);
+    background: #d91212;
+
+  }
+
+
+  .reset-button {
+    position: absolute;
+    top: 450px;
+    right: 10%;
+  }
+
+  .add-button {
+      position: absolute;
+      top: 350px;
+      right: 10%;
+  }
+
+  .save-button {
+      position: absolute;
+      top: 400px;
+      right: 10%;
+  }
+
+}
+
 /* CSS styles for laptops and desktops */
 @media (min-width: 1025px) {
   /* These styles will be applied to devices with a minimum width of 1025px (laptops and desktops) */

@@ -50,7 +50,7 @@ def transfer_to_database(data, connection, floorid):
             cursor = connection.cursor()
             try:
                 # Insert data into the database, including the timestamp
-                insert_query = "INSERT INTO ap_data (mac_address, ssid, signal_strength, channel, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                insert_query = "INSERT INTO ap_data (mac_address, ssid, Channel, signal_strength, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 current_timestamp = datetime.now()  # Capture the current timestamp
                 data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], floorid, current_timestamp) for row in data]
                 cursor.executemany(insert_query, data_with_timestamp)
@@ -125,20 +125,6 @@ def main():
                     print(f"data {cap_interface}:", current_data)
 
             if "failure: already running" not in output:  # Check the condition here as well
-                # Create and open a CSV file for writing
-                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
-                    fieldnames = ['MAC', 'SSID', 'Signal_Strength', 'Channel', 'Source',
-                                  'Timestamp']  # Add 'Timestamp' to fieldnames
-                    csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                    csv_writer.writeheader()
-
-                    # Write the data to the CSV file
-                    for row in data:
-                        # Convert the timestamp to a string for CSV
-                        timestamp_str = row[5].strftime('%Y-%m-%d %H:%M:%S')
-                        csv_writer.writerow(
-                            {'MAC': row[0], 'SSID': row[1], 'Signal_Strength': row[2], 'Channel': row[3], 'Source': row[4],
-                             'Timestamp': timestamp_str})
 
                 # Connect to the database
                 connection = connect_to_database()
