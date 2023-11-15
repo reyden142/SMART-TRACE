@@ -295,49 +295,72 @@ if (!isset($_SESSION['Admin-name'])) {
         console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
         }*/
 
-    // Load the final_predicted_values_aggregated.csv file
-    const csvFilePath = 'css/final_predicted_values_aggregated.csv';
+        // Load the final_predicted_values_aggregated.csv file with a timestamp to prevent caching
+        const csvFilePath = 'css/final_predicted_values_aggregated.csv?' + Date.now();
 
-    // Inject the custom marker CSS into the document
-    const style = document.createElement('style');
-    style.innerHTML = customMarkerStyle;
-    document.head.appendChild(style);
+        // Inject the custom marker CSS into the document
+        const style = document.createElement('style');
+        style.innerHTML = customMarkerStyle;
+        document.head.appendChild(style);
 
-    // Create a custom CSS style for the marker
-    const customIconStyle = L.divIcon({
-        className: 'custom-icon',
-        html: '<div class="marker-icon" style="background-color: blue;"></div>',
-        draggable: true // Enable dragging
-    });
+        // Create a custom CSS style for the marker
+        const customIconStyle = L.divIcon({
+          className: 'custom-icon',
+          html: '<div class="marker-icon" style="background-color: blue;"></div>',
+          draggable: true // Enable dragging
+        });
 
-    // Function to add markers to the map
-    function addMarkers(data) {
-      data.forEach(row => {
-        const lat = parseFloat(row.lat);
-        const lng = parseFloat(row.lng);
+        // Function to add markers to the map
+        function addMarkers(data) {
+          // Clear existing markers
+          map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+              map.removeLayer(layer);
+            }
+          });
 
-        if (!isNaN(lat) && !isNaN(lng)) {
-          L.marker([lat, lng], { icon: customIconStyle }).addTo(map)
-            .bindPopup(`<b>${row.predicted_floorid}</b><br>Latitude: ${lat}<br>Longitude: ${lng}`);
+          data.forEach(row => {
+            const lat = parseFloat(row.lat);
+            const lng = parseFloat(row.lng);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+              L.marker([lat, lng], { icon: customIconStyle }).addTo(map)
+                .bindPopup(`<b>${row.predicted_floorid}</b><br>Latitude: ${lat}<br>Longitude: ${lng}`);
+            }
+          });
         }
-      });
-    }
 
-    // Read the CSV file and add markers
-    async function readCSV() {
-      const response = await fetch(csvFilePath);
-      const data = await response.text();
+        // Function to fetch and update CSV data
+        async function updateCSV() {
+          console.log('Updating CSV...');
+          try {
+            const response = await fetch(csvFilePath);
+            if (response.ok) {
+              const data = await response.text();
 
-      // Parse CSV data and add markers
-      const csvData = Papa.parse(data, { header: true });
-      addMarkers(csvData.data);
-    }
+              // Parse CSV data and add markers
+              const csvData = Papa.parse(data, { header: true });
+              addMarkers(csvData.data);
+            } else {
+              console.error('Failed to fetch CSV:', response.status, response.statusText);
+            }
+          } catch (error) {
+            console.error('Error fetching CSV:', error);
+          }
+        }
 
-    // Include PapaParse library for CSV parsing
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js';
-    script.onload = readCSV;
-    document.head.appendChild(script);
+        // Initial call to load markers
+        updateCSV();
+
+        // Set interval to update markers every 1 second
+        setInterval(updateCSV, 1000);
+
+        // Include PapaParse library for CSV parsing
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js';
+        script.onload = updateCSV; // Call updateCSV when PapaParse is loaded
+        document.head.appendChild(script);
+
 
     map.on('click', function (e) {
     const latlng = e.latlng;

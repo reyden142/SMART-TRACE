@@ -27,6 +27,13 @@ import sklearn.metrics as metrics
 from sklearn.metrics import f1_score, fbeta_score
 from sklearn.metrics import accuracy_score
 
+#Models
+from sklearn.naive_bayes import GaussianNB
+from skmultilearn.problem_transform import BinaryRelevance
+from skmultilearn.problem_transform import ClassifierChain
+from skmultilearn.problem_transform import LabelPowerset
+from skmultilearn.adapt import MLkNN
+
 import os
 import mysql.connector
 from mysql.connector import Error  # Import the Error module
@@ -78,7 +85,85 @@ def main():
     while True:  # Run forever
         # Load the dataset
         file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_processed.csv'
-        ap_data = pd.read_csv(file_path)
+        trainingData = pd.read_csv(file_path)
+
+        def clean_data(df):
+            """
+            Perform feature trimming, and engineering for trainingData
+            Will also be applied to validationData
+
+            INPUT: trainingData DataFrame
+            OUTPUT: Trimmed and cleaned trainingData DataFrame
+            """
+
+            # Reverse the representation for the values. 100=0 and teh values range from 0-105 (weakest to strongest)
+            # "The intensity values are represented as negative integer values ranging -104dBm (extremely poor signal) to 0dbM.
+            # The positive value 100 is used to denote when a WAP was not detected."
+            df.iloc[:, 9:11] = np.where(df.iloc[:, 9:11] <= 0,
+                                        df.iloc[:, 9:11] + 105,
+                                        df.iloc[:, 9:11] - 100)
+
+            # remove selected columns...
+            columns_removed = ['mac_address', 'ssid', 'timestamp']
+            # cap1_channel	cap2_channel	cap3_channel	cap1_signal_strength	cap2_signal_strength	cap3_signal_strength
+
+            for col in columns_removed:
+                df.drop(col, axis=1, inplace=True)
+
+            # Return the cleaned dataframe.
+            return df
+
+        # Apply Cleaning
+
+        trainingData = clean_data(trainingData)
+
+        def preprocess_data(df):
+            """
+            Separates trainingData into Features and Targets
+            Will also be applied to validationData
+
+            INPUT: Cleaned trainingData DataFrame
+            OUTPUT: trainingData as Features and Targets
+            """
+
+            global X
+            global y
+            # split the data set into features and targets(Floor and BuildingID)
+            X = df.drop(['longitude', 'latitude', 'floorid'], axis=1)
+            y = df[['floorid']]
+
+            # create Dummies for the targets to feed into the model
+            y = pd.get_dummies(data=y, columns=['floorid'])
+
+            return X, y
+
+        # Apply preprocessing
+
+        X, y = preprocess_data(trainingData)
+
+        def split_data(preprocess_data):
+            # TO AVOID OVERFITTING: Split the training data into training and testing sets
+            global X_train
+            global X_test
+            global y_train
+            global y_test
+
+            X_train, X_test, y_train, y_test = train_test_split(X,
+                                                                y,
+                                                                test_size=0.2,
+                                                                random_state=42,
+                                                                shuffle=True)
+
+            # Show the results of the split
+            print("Training set has {} samples.".format(X_train.shape[0]))
+            print("Testing set has {} samples.".format(X_test.shape[0]))
+            return X_train, X_test, y_train, y_test
+
+        # Apply split data
+
+        X_train, X_test, y_train, y_test = split_data(preprocess_data)
+
+
 
         # SCANNED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -186,17 +271,35 @@ def main():
                                     'cap1_channel', 'cap2_channel', 'cap3_channel']
                         target = 'floorid'
 
-                        # Select features (X) and target variable (y)
-                        X = ap_data[features]
-                        y = ap_data[target]
+                        # Clean data
+                        validationData = clean_data(ap_data_pivot_2)
+
+                        # preprocess
+                        X_valid, y_valid = preprocess_data(validationData)
+
+                        # scale
+                        X_valid = scaler.transform(X_valid)
+
+                        # pca
+                        X_valid_pca = pca.transform(X_valid)
+
+                        print("Number of PCA Components = {}.".format(pca.n_components_))
+
+                        print("Total Variance Explained by PCA Components = {}.".format(
+                            pca.explained_variance_ratio_.sum()))
+
+                        # Convert to sparse matrix
+                        X_valid_pca = lil_matrix(X_valid_pca).toarray()
+                        y_valid = lil_matrix(y_valid).toarray()
+
+                        # predict mlknn =1
+                        valid_predictions = MLKNN_1_classifier.predict(X_valid_pca)
+
+                        # accuracy
+                        print("Accuracy = ", accuracy_score(y_valid, valid_predictions))
 
                         # Split the data into training and testing sets
-                        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-                        # Train a k-Nearest Neighbors classifier with Euclidean metric
-                        k = 1  # You can adjust the value of k
-                        knn = KNeighborsClassifier(n_neighbors=k, p=2)  # p=2 for Euclidean metric
-                        knn.fit(X_train, y_train)
+                        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
                         # Group by 'ssid' and aggregate values
                         ap_data_pivot_2 = ap_data_pivot_2.groupby('ssid').agg({
@@ -215,22 +318,7 @@ def main():
                         scanned_data_features = ap_data_pivot_2[features]
 
                         # Make predictions on the scanned data
-                        predictions = knn.predict(scanned_data_features)
-
-                        # Add predicted floorid to the scanned data
-                        ap_data_pivot_2['predicted_floorid'] = predictions
-
-                        # Assuming 'knn' is your trained KNN classifier
-                        # Assuming 'X_test' and 'y_test' are your test features and labels
-                        y_pred = knn.predict(X_test)
-
-                        # Calculate accuracy
-                        accuracy = accuracy_score(y_test, y_pred)
-
-                        print(f'Accuracy: {accuracy * 100:.2f}%')
-
-                        # Display the predicted floorid for the scanned data
-                        print(ap_data_pivot_2[['mac_address', 'ssid', 'predicted_floorid']])
+                        #predictions = knn.predict(scanned_data_features)
 
                         # Group by 'ssid' and aggregate values
                         aggregated_data = ap_data_pivot_2.groupby('ssid').agg({
@@ -245,6 +333,57 @@ def main():
                         aggregated_data.to_csv(predicted_values_file, index=False)
                         '''
 
+                        # Apply PCA while keeping 95% of the variation in the data
+                        pca = PCA(.95)
+
+                        # Fit only the training set
+                        pca.fit(X_train)
+
+                        # Apply PCA transform to both the training set and the test set.
+                        X_train_pca = pca.transform(X_train)
+                        X_test_pca = pca.transform(X_test)
+
+                        print("Number of PCA Components = {}.".format(pca.n_components_))
+                        # print(pca.n_components_)
+                        print("Total Variance Explained by PCA Components = {}.".format(
+                            pca.explained_variance_ratio_.sum()))
+                        # print(pca.explained_variance_ratio_.sum())
+
+                        # Create sparse matrices to run the scikit multilearn algorithms
+
+                        X_train_pca = lil_matrix(X_train_pca).toarray()
+                        y_train = lil_matrix(y_train).toarray()
+                        X_test_pca = lil_matrix(X_test_pca).toarray()
+                        y_test = lil_matrix(y_test).toarray()
+
+                        start_time = time.time()
+
+                        MLKNN_1_classifier = MLkNN(k=1)
+
+                        # train
+                        MLKNN_1_classifier.fit(X_train_pca, y_train)
+
+                        # run predictions
+                        # predict mlknn =1
+                        predictions = MLKNN_1_classifier.predict(X_test_pca)
+
+                        # Add predicted floorid to the scanned data
+                        ap_data_pivot_2['predicted_floorid'] = predictions
+
+                        # Convert to sparse matrix
+                        X_valid_pca = lil_matrix(X_valid_pca).toarray()
+                        y_valid = lil_matrix(y_valid).toarray()
+
+                        y_pred = MLKNN_1_classifier.predict(X_valid_pca)
+
+                        # Display the predicted floorid for the scanned data
+                        print(ap_data_pivot_2[['mac_address', 'ssid', 'predicted_floorid']])
+
+                        # accuracy
+                        print("Accuracy = ", accuracy_score(y_test, y_valid))
+
+                        print("--- Run time: %s mins ---" % np.round(((time.time() - start_time) / 60), 2))
+
                         # Query to fetch latitude and longitude from the "markers" table
                         query = "SELECT title, lat, lng FROM markers"
                         # Execute the query and fetch the results
@@ -257,6 +396,8 @@ def main():
 
                         # Convert 'predicted_floorid' to object type in the aggregated_data DataFrame
                         aggregated_data['predicted_floorid'] = aggregated_data['predicted_floorid'].astype(str)
+
+
 
                         # Merge the aggregated_data DataFrame with markers_df based on 'predicted_floorid'
                         result_df = pd.merge(aggregated_data, markers_df, left_on='predicted_floorid', right_on='title',
@@ -283,14 +424,13 @@ def main():
 
                 else:
                     print(f"CSV file '{csv_file}' not found.")
-                    main()
 
-                #Remove all data from the ap_data_position table
-                delete_query = "DELETE FROM `ap_data_position`"
-                with conn.cursor() as cursor:
-                    cursor.execute(delete_query)
-                conn.commit()
-                print("All data removed from 'ap_data_position' table.")
+                # Remove all data from the ap_data_position table
+                # delete_query = "DELETE FROM `ap_data_position`"
+                # with conn.cursor() as cursor:
+                #    cursor.execute(delete_query)
+                # conn.commit()
+                # print("All data removed from 'ap_data_position' table.")
 
             except Exception as e:
                 print(f"Error: {e}")

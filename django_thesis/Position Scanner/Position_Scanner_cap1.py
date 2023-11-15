@@ -21,7 +21,7 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
-                          "F2:1C:E8:EB:2E:E2", #C2
+                          "8E:AB:3C:B5:9E:0E", #C2
                           "56:3A:A2:F8:0C:63", #C3
                           "B6:6A:AD:C1:CF:19", #C4
                           "F6:CE:87:F2:06:21", #C5

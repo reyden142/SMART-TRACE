@@ -21,7 +21,7 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
-                          "F2:1C:E8:EB:2E:E2", #C2
+                          "8E:AB:3C:B5:9E:0E", #C2
                           "56:3A:A2:F8:0C:63", #C3
                           "B6:6A:AD:C1:CF:19", #C4
                           "F6:CE:87:F2:06:21", #C5
@@ -77,7 +77,7 @@ def main():
             ssh.connect(router_ip, username=username, password=password)
 
             # Define the CAP interface names ('cap1' and 'cap2')
-            cap_interfaces = ['cap1']
+            cap_interfaces = ['cap3']
 
             # Create a list to store data from both CAP interfaces
             data = []
@@ -127,7 +127,7 @@ def main():
 
             if "failure: already running" not in output:  # Check the condition here as well
                 # Create and open a CSV file for writing
-                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
+                with open('scanned_aps_cap3.csv', 'w', newline='') as csv_file:
                     fieldnames = ['mac_address', 'ssid', 'channel', 'signal_strength', 'source',
                                   'timestamp']  # mac_address, ssid, signal_strength, channel, source, timestamp
                     csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
