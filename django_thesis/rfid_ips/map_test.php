@@ -101,7 +101,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
     <h1 class="slideInDown animated">Map</h1>
 
         <section id="map" aria-label="Map" role="region" position="absolute" >
-            <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+            <a href="https://www.maptiler.com" style="position:absolute; z-index:500;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
         </section>
     </main>
@@ -125,7 +125,9 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
-        const map = L.map('map').setView([7.06569722, 125.59678861], 14);
+        const map = L.map('map', {
+            preferCanvas: true
+        }).setView([7.06569722, 125.59678861], 14);
 
         // Set the maxZoom and minZoom properties
         map.options.maxZoom = 25; // Adjust this value as needed for your requirements
@@ -345,7 +347,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 
     // Function to delete a marker
     function deleteMarker(marker) {
-        if (marker && marker.options) {
+        if (marker) {
             const title = marker.options.title;
             const lat = marker.getLatLng().lat;
             const lng = marker.getLatLng().lng;
@@ -360,36 +362,6 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
             deleteMarkerInDatabase(title, lat, lng);
         } else {
             console.error('Invalid marker object:', marker);
-        }
-    }
-
-
-    // Button to toggle deleting mode
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Delete Blue Icons';
-    deleteButton.style.position = 'absolute';
-    deleteButton.style.top = '500px';
-    deleteButton.style.right = '200px';
-    deleteButton.addEventListener('click', function () {
-        if (deleteMode) {
-            alert('Click on a marker to delete it.');
-            map.on('click', handleDeleteClick);
-        } else {
-            map.off('click', handleDeleteClick);
-        }
-        deleteMode = !deleteMode;
-        deleteButton.textContent = deleteMode ? 'Stop Deleting' : 'Delete Blue Icons';
-    });
-
-    // Function to handle deleting on map click
-    function handleDeleteClick(e) {
-        if (deleteMode) {
-            var marker = findMarkerByLatLng(e.latlng);
-            if (marker) {
-                deleteMarker(marker);
-            } else {
-                alert('Click on an existing marker to delete it.');
-            }
         }
     }
 
@@ -423,13 +395,11 @@ function resetMarkers() {
 }
 
     const resetButton = document.createElement('button');
-        resetButton.textContent = 'Reset Markers';
-        resetButton.style.position = 'absolute';
-        resetButton.style.top = '400px';
-        resetButton.style.right = '204px';
-        resetButton.addEventListener('click', function () {
-            resetMarkers();
-        });
+    resetButton.textContent = 'Reset Markers';
+    resetButton.classList.add('reset-button'); // Apply the CSS class
+    resetButton.addEventListener('click', function () {
+        resetMarkers();
+    });
 
         function resetMarkers() {
             // Check if markers are saved, and reset markersSaved without prompting if they are
@@ -459,22 +429,25 @@ function resetMarkers() {
 
     // Button to toggle adding markers
     const addButton = document.createElement('button');
-        addButton.textContent = 'Add Blue Icons';
-        addButton.id = 'addButton';
-        addButton.addEventListener('click', function () {
-            isAdding = !isAdding;
-            addButton.textContent = isAdding ? 'Stop Adding' : 'Add Blue Icons';
-        });
-
-    addButton.style.position = 'absolute';
-    addButton.style.top = '300px';
-    addButton.style.right = '200px';
+    addButton.textContent = 'Add Blue Icons';
+    addButton.id = 'addButton';
+    addButton.classList.add('add-button'); // Apply the CSS class
+    addButton.addEventListener('click', function () {
+        isAdding = !isAdding;
+        addButton.textContent = isAdding ? 'Stop Adding' : 'Add Blue Icons';
+    });
 
     // Modify the click event listener to handle renaming
     map.on('click', function (e) {
         if (isAdding) {
             // Prompt the user for the name of the location
             var locationName = prompt('Enter the name for this location:');
+
+            // Check if the user clicked "Cancel" or entered an empty name
+            if (locationName !== null || locationName.trim() !== '') {
+                // Call the addMarker function to add the marker
+                //addMarker(e.latlng.lat, e.latlng.lng, locationName);
+            }
 
             // Create a blue icon marker at the clicked location with the specified name
             var marker = L.marker(e.latlng, {
@@ -559,18 +532,15 @@ function resetMarkers() {
         // Button to save markers
         const saveButton = document.createElement('button');
         saveButton.textContent = 'Save Markers';
-        saveButton.style.position = 'absolute';
-        saveButton.style.top = '350px';
-        saveButton.style.right = '208px';
+        saveButton.classList.add('save-button'); // Apply the CSS class
         saveButton.addEventListener('click', function () {
             updateMarkersInStorage();
-            markersSaved = true; // Set markersSaved to true when markers are saved
-            saveButton.textContent = 'Saved'; // Change the button text to 'Saved'
+            markersSaved = true;
+            saveButton.textContent = 'Saved';
 
-            // Reset the button text after 3 seconds
             setTimeout(function () {
                 saveButton.textContent = 'Save Markers';
-                markersSaved = false; // Reset markersSaved after resetting the button text
+                markersSaved = false;
             }, 3000);
         });
 
@@ -654,18 +624,6 @@ function addMarker(lat, lng, title) {
     updateMarkersInStorage();
 }
 
-// Modify the click event listener to handle adding markers
-map.on('click', function (e) {
-    if (isAdding) {
-        // Prompt the user for the name of the location
-        var locationName = prompt('Enter the name for this location:');
-
-        // Call the addMarker function to add the marker
-        addMarker(e.latlng.lat, e.latlng.lng, locationName);
-    }
-});
-
-
 
 // DATABASE ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -693,7 +651,7 @@ map.on('click', function (e) {
         // AJAX request to delete the marker from the database
         $.ajax({
             type: "POST",
-            url: "delete_marker.php", // Replace with the actual filename or endpoint
+            url: "map_delete_marker.php", // Replace with the actual filename or endpoint
             data: { title: title, lat: lat, lng: lng }, // Match keys with PHP script
             success: function (response) {
                 console.log("Marker deleted from the database:", response);

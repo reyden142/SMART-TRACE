@@ -1,3 +1,35 @@
+.reset-button {
+    position: absolute;
+    top: 71%;
+    right: 8%;
+    z-index: 999;
+}
+
+.add-button {
+    position: absolute;
+    top: 55%;
+    right: 8%;
+    z-index: 999;
+}
+
+.save-button {
+    position: absolute;
+    top: 63%;
+    right: 8%;
+    z-index: 999;
+}
+
+#map {
+  position: absolute;
+  top: 45%;
+  transform: translate(5%, 0%);
+  margin-block: 0%;
+  margin-bottom: 500px;
+  width: 90%;
+  height: 80%;
+}
+
+
 h1{
   font-size: 28px !important;
   color: #111;
@@ -15,17 +47,6 @@ h3{
   font-weight: 600;
   font-family: Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
   text-align: left;
-}
-
-#map {
-  position: absolute;
-  position: absolute;
-  top: 115%;
-  left: 35%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 600px;
-  right: 1350px;
 }
 
 tbody{
@@ -284,11 +305,12 @@ td{
 
   #map {
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
   height: 50%;
+  touch-action: none;
   }
 
   .form-style-5{
@@ -323,7 +345,28 @@ td{
     color: #fff;
     border-bottom: solid 2px rgb(78 21 21 / 10%);
     background: #d91212;
+
   }
+
+
+  .reset-button {
+    position: absolute;
+    top: 450px;
+    right: 10%;
+  }
+
+  .add-button {
+      position: absolute;
+      top: 350px;
+      right: 10%;
+  }
+
+  .save-button {
+      position: absolute;
+      top: 400px;
+      right: 10%;
+  }
+
 }
 
 @media (max-width: 2560px) {

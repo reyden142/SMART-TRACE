@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 MAC,SSID,Signal_Strength,Channel,Source,Timestamp
 FE:47:AD:D7:13:E2,C1,2452/20/gn,-71,cap1,2023-11-13 18:52:06
 8E:B0:7A:54:55:A6,C11,2457/20/gn,-66,cap1,2023-11-13 18:52:06
+=======
+mac_address,ssid,channel,signal_strength,source,timestamp
+FE:47:AD:D7:13:E2,C1,2437,-49,cap1,2023-11-15 10:03:29
+F2:1C:E8:EB:2E:E2,C2,2437,-64,cap1,2023-11-15 10:03:29
+>>>>>>> 41ad0a319d529d47370520dc0ceb137e687a7c70
