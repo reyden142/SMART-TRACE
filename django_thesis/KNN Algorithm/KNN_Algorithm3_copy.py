@@ -131,22 +131,30 @@ def main():
                         ap_data_pivot_2.columns = [f'{col[0]}_{col[1]}' if col[1] else col[0] for col in
                                                    ap_data_pivot_2.columns]
 
-
-
+                        #'''
                         # Rename columns for clarity
                         ap_data_pivot_2.columns = [
                             'mac_address', 'ssid', 'timestamp',
                             'cap1_channel', 'cap2_channel', 'cap3_channel',
                             'cap1_signal_strength', 'cap2_signal_strength', 'cap3_signal_strength'
                         ]
+                        #'''
 
+                        # '''
+                        csv_file = 'ap_data_position_processed_first.csv'
+                        ap_data_pivot_2.to_csv(csv_file, index=False)
+                        print('export ap_data_position_processed_first file successful')
+                        # '''
 
                         # Fill missing columns with NaN
                         ap_data_pivot_2 = ap_data_pivot_2.reindex(columns=[
                             'mac_address', 'ssid', 'timestamp',
                             'cap1_channel', 'cap2_channel', 'cap3_channel',
                             'cap1_signal_strength', 'cap2_signal_strength', 'cap3_signal_strength'
-                        ], fill_value=None)
+                        ], fill_value=0)
+
+                        print("ap_data_pivot_2.columns:")
+                        print(ap_data_pivot_2.columns)
 
                         #'''
                         csv_file = 'ap_data_position_processed_before.csv'
@@ -155,6 +163,29 @@ def main():
                         #'''
 
     # // CODE FOR THE MERGING OF ROWS //////////////////////////////////////////////////////////////////////////////////////////////////
+                        ap_data_pivot_2 = pd.read_csv(csv_file)
+                        # Group by 'ssid', 'mac_address', and 'timestamp', and aggregate the values
+                        # Group by 'timestamp' and 'ssid', and aggregate the values
+                        # Group by 'timestamp' and 'ssid', and aggregate the values
+                        ap_data_pivot_2 = ap_data_pivot_2.groupby(['timestamp']).agg({
+                            'mac_address': 'first',
+                            'ssid': 'first',
+                            'cap1_channel': 'first',
+                            'cap2_channel': 'first',
+                            'cap3_channel': 'first',
+                            'cap1_signal_strength': 'first',
+                            'cap2_signal_strength': 'first',
+                            'cap3_signal_strength': 'first'
+                        }).reset_index()
+
+                        # '''
+                        csv_file = 'ap_data_position_processed_before-aggregate.csv'
+                        ap_data_pivot_2.to_csv(csv_file, index=False)
+                        print('export ap_data_position_processed_before-aggregate file successful')
+                        # '''
+
+                        # Print the resulting DataFrame
+                        print(ap_data_pivot_2)
 
                         # Replace missing signal_strength values with 100
                         ap_data_pivot_2['cap1_signal_strength'].fillna(100, inplace=True)
@@ -166,29 +197,15 @@ def main():
                         ap_data_pivot_2['cap2_channel'].fillna(0, inplace=True)
                         ap_data_pivot_2['cap3_channel'].fillna(0, inplace=True)
 
-                        # Group by 'ssid', 'mac_address', and 'timestamp', and aggregate the values
-                        ap_data_pivot_2 = ap_data_pivot_2.groupby(['timestamp']).agg({
-                            'mac_address': 'first',
-                            'ssid': 'first',
-                            'cap1_channel': 'max',
-                            'cap2_channel': 'max',
-                            'cap3_channel': 'max',
-                            'cap1_signal_strength': 'max',
-                            'cap2_signal_strength': 'max',
-                            'cap3_signal_strength': 'max'
-                        }).reset_index()
-                        # cap1_channel	cap2_channel	cap3_channel	cap1_signal_strength	cap2_signal_strength	cap3_signal_strength
-
-                        # Print the resulting DataFrame
-                        print(ap_data_pivot_2)
 
                         # '''
-                        csv_file = 'ap_data_position_processed_before-aggregate.csv'
+                        csv_file = 'ap_data_position_processed_before-merged.csv'
                         ap_data_pivot_2.to_csv(csv_file, index=False)
-                        print('export ap_data_position_processed_before-aggregate file successful')
+                        print('export ap_data_position_processed_before-merged file successful')
                         # '''
 
-                        print('ap_data_position_processed_before-aggregate', ap_data_pivot_2)
+
+                        print('ap_data_position_processed_before-merged', ap_data_pivot_2)
 
                         # Save the DataFrame to a CSV file
                         '''
@@ -207,11 +224,11 @@ def main():
                         '''
 
                         # Save the DataFrame to a CSV file
-                        #'''
+                        '''
                         csv_file = 'ap_data_position_processed_before.csv'
                         ap_data_pivot_2.to_csv(csv_file, index=False)
                         print('export csv file successful')
-                        #'''
+                        '''
 
                         # '''
                         csv_file = 'ap_data_position_processed.csv'
@@ -248,7 +265,7 @@ def main():
                             knn = KNeighborsClassifier(n_neighbors=k, p=2)  # p=2 for Euclidean metric
                             knn.fit(X_train, y_train)
 
-                            #'''
+                            '''
                             # Group by 'ssid' and aggregate values
                             ap_data_pivot_2 = ap_data_pivot_2.groupby('ssid').agg({
                                 'mac_address': 'first',
@@ -260,15 +277,15 @@ def main():
                                 'cap2_channel': 'first',
                                 'cap3_channel': 'first'
                             }).reset_index()
-                            #'''
+                            '''
 
-                            #'''# Fill missing columns with NaN
+                            '''# Fill missing columns with NaN
                             ap_data_pivot_2 = ap_data_pivot_2.reindex(columns=[
                                 'mac_address', 'ssid', 'timestamp',
                                 'cap1_channel', 'cap2_channel', 'cap3_channel',
                                 'cap1_signal_strength', 'cap2_signal_strength', 'cap3_signal_strength'
                             ], fill_value=None)
-                            #'''
+                            '''
 
                             '''
                             csv_file = 'ap_data_position_processed-scanned.csv'

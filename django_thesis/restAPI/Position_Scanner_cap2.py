@@ -91,7 +91,7 @@ def main():
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
 
-                output = stdout.read(2048).decode()
+                output = stdout.read(1024).decode()
                 lines = output.splitlines()
 
                 # Wait for the scan to complete, adjust the sleep time as needed

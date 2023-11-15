@@ -21,7 +21,8 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
-                          "06:8D:30:36:72:08", #C2
+                          #"1E:03:B6:E0:9E:3C", #C2
+                          "F2:1C:E8:EB:2E:E2", #C2
                           "56:3A:A2:F8:0C:63", #C3
                           #"B6:6A:AD:C1:CF:19", #C4
                           "F6:CE:87:F2:06:21", #C5
@@ -49,7 +50,7 @@ def transfer_to_database(data, connection, floorid):
             cursor = connection.cursor()
             try:
                 # Insert data into the database, including the timestamp
-                insert_query = "INSERT INTO ap_data (mac_address, ssid, signal_strength, channel, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                insert_query = "INSERT INTO ap_data (mac_address, ssid, Channel, signal_strength, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 current_timestamp = datetime.now()  # Capture the current timestamp
                 data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], floorid, current_timestamp) for row in data]
                 cursor.executemany(insert_query, data_with_timestamp)
@@ -68,14 +69,14 @@ def main():
     while True:
         try:
             # Define the floorid here or retrieve it as needed
-            floorid = 116  # You can adjust the floorid as needed
+            floorid = 116 # You can adjust the floorid as needed
 
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(router_ip, username=username, password=password)
 
             # Define the CAP interface names ('cap1' and 'cap2')
-            cap_interfaces = ['cap3']
+            cap_interfaces = ['cap1']
 
             # Create a list to store data from both CAP interfaces
             data = []
@@ -124,20 +125,6 @@ def main():
                     print(f"data {cap_interface}:", current_data)
 
             if "failure: already running" not in output:  # Check the condition here as well
-                # Create and open a CSV file for writing
-                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
-                    fieldnames = ['MAC', 'SSID', 'Signal_Strength', 'Channel', 'Source',
-                                  'Timestamp']  # Add 'Timestamp' to fieldnames
-                    csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                    csv_writer.writeheader()
-
-                    # Write the data to the CSV file
-                    for row in data:
-                        # Convert the timestamp to a string for CSV
-                        timestamp_str = row[5].strftime('%Y-%m-%d %H:%M:%S')
-                        csv_writer.writerow(
-                            {'MAC': row[0], 'SSID': row[1], 'Signal_Strength': row[2], 'Channel': row[3], 'Source': row[4],
-                             'Timestamp': timestamp_str})
 
                 # Connect to the database
                 connection = connect_to_database()
