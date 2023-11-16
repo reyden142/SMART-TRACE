@@ -2,28 +2,7 @@
 // Include the database connection code from 'connectDB.php'
 require 'connectDB.php';
 
-// Check if the macAddress parameter is set in the request
-$Macaddress = isset($_GET['Macaddress']) ? $_GET['Macaddress'] : null;
 
-if ($Macaddress !== null) {
-    // Query the database to retrieve the user's username
-    $query = "SELECT username FROM users WHERE Macaddress = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $Macaddress);
-    $stmt->execute();
-    $stmt->bind_result($username);
-    $stmt->fetch();
-    $stmt->close();
-
-    // Return the username as JSON
-    header('Content-Type: application/json');
-    echo json_encode(['userName' => $username]);
-}
-else {
-    // Handle the case where macAddress is not provided
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'MAC address not provided']);
-}
 
 // Array to store CSV file paths
 $csvFiles = [
@@ -75,44 +54,86 @@ if (!isset($_SESSION['Admin-name'])) {
             <fieldset>
                 <legend><span class="number">1</span> Online User</legend>
                 <?php
+                // Create an associative array to store the merged data
+                $mergedData = [];
+
                 foreach ($csvFiles as $csvFile) {
                     $csvData = readCSV($csvFile);
-                    echo '<h3>Data from ' . basename($csvFile) . '</h3>';
-                    echo '<table class="tbl-content">';
-                    echo '<thead>';
-                    echo '<tr><th>MAC</th><th>SSID</th><th>Signal Strength</th><th>Source</th><th>User Name</th></tr>';
-                    echo '</thead>';
-                    echo '<tbody>'; 
-                    foreach ($csvData as $row) {
-                        echo '<tr>';
-                        foreach ($row as $cell) {
-                            echo '<td>' . htmlspecialchars($cell) . '</td>';
-                        }
 
-                        // Fetch and display user name based on MAC address
+                    foreach ($csvData as $row) {
+                        // Fetch and display user details based on MAC address
                         $Macaddress = $row[0]; // Assuming MAC address is in the first column
 
-                        // Query the database to retrieve the user's username
-                        $query = "SELECT username FROM users WHERE Macaddress = ?";
+                        // Query the database to retrieve the user's details
+                        $query = "SELECT username, serialnumber, sex, Contact, EmergencyContact, MedicalHistory FROM users WHERE Macaddress = ?";
                         $stmt = $conn->prepare($query);
                         $stmt->bind_param("s", $Macaddress);
                         $stmt->execute();
-                        $stmt->bind_result($username);
+                        $stmt->bind_result($username, $serialnumber, $sex, $Contact, $EmergencyContact, $MedicalHistory);
                         $stmt->fetch();
                         $stmt->close();
 
-                        if ($username) {
-                            echo '<td>' . $username . '</td>';
-                        } else {
-                            echo '<td>No User Found</td>';
+                        // Skip rows with empty or 'root' username
+                        if (empty($username) || $username === 'root') {
+                            continue;
                         }
 
-                        echo '</tr>';
+                        // If username already exists in the mergedData array, merge the details
+                        if (isset($mergedData[$username])) {
+                            // Add the details to the array if they are not already present
+                            if (!in_array($serialnumber, $mergedData[$username]['serialnumbers'])) {
+                                $mergedData[$username]['serialnumbers'][] = $serialnumber;
+                            }
+                            // Similar for other details...
+                        } else {
+                            // If username does not exist, create a new entry in the mergedData array
+                            $mergedData[$username] = [
+                                'serialnumbers' => [$serialnumber],
+                                'sex' => $sex,
+                                'Contact' => $Contact,
+                                'EmergencyContact' => $EmergencyContact,
+                                'MedicalHistory' => $MedicalHistory,
+                                'timestamp' => $row[5], // Assuming timestamp is in the 6th column (adjust if needed)
+                                'username' => $username,
+                            ];
+                        }
                     }
-                    echo '</tbody>';
-                    echo '</table>';
                 }
+
+                // Display the merged data in a single table
+                echo '<h3>Merged Data</h3>';
+                echo '<table class="tbl-content">';
+                echo '<thead>';
+                echo '<tr>';
+                echo '<th style="padding: 10px;">Name</th>';
+                echo '<th style="padding: 10px;">ID Number</th>';
+                echo '<th style="padding: 10px;">Sex</th>';
+                echo '<th style="padding: 10px;">Contact</th>';
+                echo '<th style="padding: 10px;">Emergency Contact</th>';
+                echo '<th style="padding: 10px;">Medical History</th>';
+                echo '<th style="padding: 10px;">Timestamp</th>';
+                echo '</tr>';
+                echo '</thead>';
+                echo '<tbody>';
+
+                foreach ($mergedData as $userData) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($userData['username']) . '</td>';
+                    echo '<td>' . implode(', ', $userData['serialnumbers']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['sex']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['Contact']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['EmergencyContact']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['MedicalHistory']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['timestamp']) . '</td>';
+                    echo '</tr>';
+                }
+
+                echo '</tbody>';
+                echo '</table>';
                 ?>
+
+
+
             </fieldset>
         </form>
     </div>
@@ -409,7 +430,7 @@ if (!isset($_SESSION['Admin-name'])) {
         updateCSV();
 
         // Set interval to update markers every 1 second
-        setInterval(updateCSV, 1000);
+        setInterval(updateCSV, 5000);
 
         // Include PapaParse library for CSV parsing
         const script = document.createElement('script');
@@ -417,7 +438,7 @@ if (!isset($_SESSION['Admin-name'])) {
         script.onload = updateCSV; // Call updateCSV when PapaParse is loaded
         document.head.appendChild(script);
 
-
+    /*
     map.on('click', function (e) {
     const latlng = e.latlng;
     const lat = latlng.lat;
@@ -432,6 +453,7 @@ if (!isset($_SESSION['Admin-name'])) {
     // Open the popup on the map
     popup.openOn(map);
     });
+    */
 
     </script>
 </body>

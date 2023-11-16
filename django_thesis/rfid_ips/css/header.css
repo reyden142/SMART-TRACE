@@ -262,8 +262,38 @@ span.psw {
   position: absolute;
 }
 
+@media (max-width: 1024px) {
+  body{
+    background: -webkit-linear-gradient(left, #fae9a5, #f5efcf);
+    background: linear-gradient(to right, #f4eece, #f4eece);
+    <!--<img src="img/RFID_STICKER_LOGO.png" alt"RFID Sticker Logo">-->
+    <div class = "img-RFID_STICKER_LOGO.jpg"> </div>
+
+    font-family: sans-serif;
+    margin: 0;
+    font-size: 15px;
+    color: #4B0606;
+    margin-bottom: 120%;
+  }
+}
+
+@media (max-width: 1024px) {
+  body{
+    background: -webkit-linear-gradient(left, #fae9a5, #f5efcf);
+    background: linear-gradient(to right, #f4eece, #f4eece);
+    <!--<img src="img/RFID_STICKER_LOGO.png" alt"RFID Sticker Logo">-->
+    <div class = "img-RFID_STICKER_LOGO.jpg"> </div>
+
+    font-family: sans-serif;
+    margin: 0;
+    font-size: 15px;
+    color: #4B0606;
+    margin-bottom: 200%;
+  }
+}
+
 /* CSS styles for laptops and desktops */
-@media (max-width: 2024px) {
+@media (min-width: 1024px) {
   body{
     background: -webkit-linear-gradient(left, #fae9a5, #f5efcf);
     background: linear-gradient(to right, #f4eece, #f4eece);
