@@ -22,7 +22,7 @@ db_config = {
 # List of specific MAC addresses to filter
 specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
                           #"1E:03:B6:E0:9E:3C", #C2
-                          "F2:1C:E8:EB:2E:E2", #C2
+                          "6A:D2:19:82:06:D2", #C2
                           "56:3A:A2:F8:0C:63", #C3
                           #"B6:6A:AD:C1:CF:19", #C4
                           "F6:CE:87:F2:06:21", #C5
@@ -31,7 +31,7 @@ specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
                           "7A:6B:C2:5A:7B:88", #C8
                           "56:DE:9D:83:4D:C6", #C9
                           "52:39:94:90:76:D2", #C10
-                          "8E:B0:7A:54:55:A6", #C11
+                          "AA:3A:2F:0C:11:A6", #C11
                           ]
 
 def connect_to_database():
@@ -69,7 +69,7 @@ def main():
     while True:
         try:
             # Define the floorid here or retrieve it as needed
-            floorid = 116 # You can adjust the floorid as needed
+            floorid = 36 # You can adjust the floorid as needed
 
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())

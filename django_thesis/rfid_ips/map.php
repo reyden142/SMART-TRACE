@@ -2,6 +2,29 @@
 // Include the database connection code from 'connectDB.php'
 require 'connectDB.php';
 
+// Check if the macAddress parameter is set in the request
+$Macaddress = isset($_GET['Macaddress']) ? $_GET['Macaddress'] : null;
+
+if ($Macaddress !== null) {
+    // Query the database to retrieve the user's username
+    $query = "SELECT username FROM users WHERE Macaddress = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $Macaddress);
+    $stmt->execute();
+    $stmt->bind_result($username);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Return the username as JSON
+    header('Content-Type: application/json');
+    echo json_encode(['userName' => $username]);
+}
+else {
+    // Handle the case where macAddress is not provided
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'MAC address not provided']);
+}
+
 // Array to store CSV file paths
 $csvFiles = [
     'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap1.csv',
@@ -67,12 +90,12 @@ if (!isset($_SESSION['Admin-name'])) {
                         }
 
                         // Fetch and display user name based on MAC address
-                        $macAddress = $row[0]; // Assuming MAC address is in the first column
+                        $Macaddress = $row[0]; // Assuming MAC address is in the first column
 
                         // Query the database to retrieve the user's username
                         $query = "SELECT username FROM users WHERE Macaddress = ?";
                         $stmt = $conn->prepare($query);
-                        $stmt->bind_param("s", $macAddress);
+                        $stmt->bind_param("s", $Macaddress);
                         $stmt->execute();
                         $stmt->bind_result($username);
                         $stmt->fetch();
@@ -108,13 +131,20 @@ if (!isset($_SESSION['Admin-name'])) {
     <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
 
     <script>
+        // Declare markers as a global variable
+        var markers = [];
+
+        console.log("Markers:", markers);
+
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
-        const map = L.map('map').setView([7.06569722, 125.59678861], 14);
+        const map = L.map('map', {
+            preferCanvas: true
+        }).setView([7.06569722, 125.59678861], 14);
 
         // Set the maxZoom and minZoom properties
         map.options.maxZoom = 25; // Adjust this value as needed for your requirements
-        map.options.minZoom = 15; // Adjust this value as needed
+        map.options.minZoom = 17; // Adjust this value as needed
 
 
         L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aF7HhncV5bhT2pqqWdRV`, {
@@ -311,7 +341,7 @@ if (!isset($_SESSION['Admin-name'])) {
         });
 
         // Function to add markers to the map
-        function addMarkers(data) {
+        async function addMarkers(data) {
           // Clear existing markers
           map.eachLayer(layer => {
             if (layer instanceof L.Marker) {
@@ -319,16 +349,42 @@ if (!isset($_SESSION['Admin-name'])) {
             }
           });
 
-          data.forEach(row => {
+          for (const row of data) {
             const lat = parseFloat(row.lat);
             const lng = parseFloat(row.lng);
 
             if (!isNaN(lat) && !isNaN(lng)) {
+              // Fetch user name based on MAC address from the database
+              const userName = await fetchUserNameFromDatabase(row.mac_address);
+
+              // Create marker with user name in the popup
               L.marker([lat, lng], { icon: customIconStyle }).addTo(map)
-                .bindPopup(`<b>${row.predicted_floorid}</b><br>Latitude: ${lat}<br>Longitude: ${lng}`);
+                .bindPopup(`<b>${userName}</b><br>MAC Address: ${row.mac_address}<br>Latitude: ${lat}<br>Longitude: ${lng}`);
             }
-          });
+          }
         }
+
+        // Function to fetch user name from the database based on MAC address
+        async function fetchUserNameFromDatabase(Macaddress) {
+          try {
+            const response = await fetch(`map_fetchUsername.php?Macaddress=${encodeURIComponent(Macaddress)}`);
+            const data = await response.json();
+
+            if (data.error) {
+              console.error('Error fetching user name:', data.error);
+              return 'Unknown User';
+            }
+
+            // Assume that the response contains the user name
+            return data.userName;
+          } catch (error) {
+            console.error('Error fetching user name:', error);
+            return 'Unknown User';
+          }
+        }
+
+
+
 
         // Function to fetch and update CSV data
         async function updateCSV() {
