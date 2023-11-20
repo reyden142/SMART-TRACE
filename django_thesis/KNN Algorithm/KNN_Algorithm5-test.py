@@ -189,7 +189,7 @@ def main():
         if conn is not None:
             # Extract data to the database
             try:
-
+                '''
                 # Replace 'your_query' with the SQL query to select the data you want
                 your_query = "SELECT * FROM `ap_data_position`"
 
@@ -203,9 +203,9 @@ def main():
                 df.to_csv(ap_data_position, index=False)
                 
                 print(f"Data extracted and saved to {ap_data_position}")
+                '''
 
-
-                #ap_data_position = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_position.csv'
+                ap_data_position = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_position.csv'
                 # Read the CSV file into a new DataFrame
                 ap_data_pivot_2 = pd.read_csv(ap_data_position)
 
@@ -408,6 +408,15 @@ def main():
 
                             print(f'Accuracy: {accuracy * 100:.2f}%')
 
+                            # Add 'C' back to the 'source_without_C' column
+                            ap_data_pivot_2['ssid'] = 'C' + ap_data_pivot_2['ssid'].astype(str)
+
+                            # If you want to replace the existing 'ssid' column with the one containing 'C'
+                            ap_data_pivot_2['ssid'] = ap_data_pivot_2['ssid']
+
+                            # Drop the temporary 'source_with_C' column if you don't need it anymore
+                            #ap_data_pivot_2.drop('ssid', axis=1, inplace=True)
+
                             # Display the predicted floorid for the scanned data
                             print(ap_data_pivot_2[['mac_address', 'ssid', 'predicted_floorid']])
 
@@ -417,6 +426,8 @@ def main():
                                 'timestamp': 'first',
                                 'predicted_floorid': 'first'
                             }).reset_index()
+
+
 
                             #'''
                             # Save the aggregated DataFrame to a new CSV file

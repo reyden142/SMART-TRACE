@@ -3,13 +3,13 @@
 require 'connectDB.php';
 
 // Check if the Macaddress parameter is set in the request
-$Macaddress = isset($_GET['Macaddress']) ? $_GET['Macaddress'] : null;
+$ssid = isset($_GET['ssid']) ? $_GET['ssid'] : null;
 
-if ($Macaddress !== null) {
+if ($ssid !== null) {
     // Query the database to retrieve the user's username
-    $query = "SELECT username FROM users WHERE Macaddress = ?";
+    $query = "SELECT username FROM users WHERE ssid = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $Macaddress);
+    $stmt->bind_param("s", $ssid);
     $stmt->execute();
     $stmt->bind_result($username);
     $stmt->fetch();
@@ -21,6 +21,6 @@ if ($Macaddress !== null) {
 } else {
     // Handle the case where Macaddress is not provided
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'MAC address not provided']);
+    echo json_encode(['error' => 'ssid not provided']);
 }
 ?>
