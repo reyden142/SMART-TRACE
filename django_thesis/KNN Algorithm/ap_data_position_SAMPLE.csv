@@ -1,0 +1,6 @@
+mac_address,ssid,timestamp,cap1_channel,cap2_channel,cap3_channel,cap1_signal_strength,cap2_signal_strength,cap3_signal_strength
+F2:1C:E8:EB:2E:E2,C2,15/11/2023 10:03,2437,0,0,-64,100,100
+F2:1C:E8:EB:2E:E2,C2,15/11/2023 10:03,0,2442,0,100,-65,100
+FE:47:AD:D7:13:E2,C1,15/11/2023 10:03,2437,0,0,-49,100,100
+FE:47:AD:D7:13:E2,C1,15/11/2023 10:03,0,0,2437,100,100,-83
+FE:47:AD:D7:13:E2,C1,15/11/2023 10:03,0,2442,0,100,-70,100

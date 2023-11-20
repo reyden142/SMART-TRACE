@@ -6,9 +6,7 @@ require 'connectDB.php';
 
 // Array to store CSV file paths
 $csvFiles = [
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap1.csv',
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap2.csv',
-    'C:/Users/Thesis2.0/django_thesis/restAPI/scanned_aps_cap3.csv',
+    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated.csv'
 ];
 
 // Function to read CSV file and return data as an array
@@ -62,7 +60,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
                     foreach ($csvData as $row) {
                         // Fetch and display user details based on MAC address
-                        $Macaddress = $row[0]; // Assuming MAC address is in the first column
+                        $Macaddress = $row[1]; // Assuming MAC address is in the first column
 
                         // Query the database to retrieve the user's details
                         $query = "SELECT username, serialnumber, sex, Contact, EmergencyContact, MedicalHistory FROM users WHERE Macaddress = ?";
@@ -93,7 +91,7 @@ if (!isset($_SESSION['Admin-name'])) {
                                 'Contact' => $Contact,
                                 'EmergencyContact' => $EmergencyContact,
                                 'MedicalHistory' => $MedicalHistory,
-                                'timestamp' => $row[5], // Assuming timestamp is in the 6th column (adjust if needed)
+                                'timestamp' => $row[2], // Assuming timestamp is in the 6th column (adjust if needed)
                                 'username' => $username,
                             ];
                         }

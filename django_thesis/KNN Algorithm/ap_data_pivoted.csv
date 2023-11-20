@@ -1,0 +1,4 @@
+mac_address,ssid,timestamp,channel_cap1,channel_cap2,signal_strength_cap1,signal_strength_cap2
+6A:D2:19:82:06:D2,C2,16/11/2023 11:35,2412.0,2412.0,-89.0,-70.0
+AA:3A:2F:0C:11:A6,C11,16/11/2023 11:35,,2462.0,,-74.0
+FE:47:AD:D7:13:E2,C1,16/11/2023 11:35,2442.0,2452.0,-73.0,-74.0
