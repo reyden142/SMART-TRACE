@@ -114,7 +114,7 @@ def main():
                             channel = match.group(3)  # Capture the channel as a string
                             signal_strength = int(match.group(4))  # Capture the signal strength as an integer
 
-                            if mac_address in specific_mac_addresses:
+                            if mac_address in specific_ssid:
                                 current_timestamp = datetime.now()  # Capture the current timestamp
                                 latest_results[ssid] = (
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)

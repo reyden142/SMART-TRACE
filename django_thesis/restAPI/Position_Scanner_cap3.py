@@ -20,18 +20,19 @@ db_config = {
 }
 
 # List of specific MAC addresses to filter
-specific_mac_addresses = ["FE:47:AD:D7:13:E2", #C1
-                          "F2:1C:E8:EB:2E:E2", #C2
-                          "56:3A:A2:F8:0C:63", #C3
-                          "B6:6A:AD:C1:CF:19", #C4
-                          "F6:CE:87:F2:06:21", #C5
-                          "02:9D:2F:8D:49:90", #C6
-                          "A2:89:5E:B6:E7:58", #C7
-                          "7A:6B:C2:5A:7B:88", #C8
-                          "56:DE:9D:83:4D:C6", #C9
-                          "52:39:94:90:76:D2", #C10
-                          "FA:C0:A6:71:FA:ED" #AP4
-                          ]
+specific_ssid = [
+                    "C1",
+                    "C2",
+                    "C2",
+                    "C3",
+                    "C5",
+                    "C6",
+                    "C7",
+                    "C8",
+                    "C9",
+                    "C10",
+                    "C11"
+                ]
 
 def connect_to_database():
     try:
@@ -113,7 +114,7 @@ def main():
                             channel = match.group(3)  # Capture the channel as a string
                             signal_strength = int(match.group(4))  # Capture the signal strength as an integer
 
-                            if mac_address in specific_mac_addresses:
+                            if mac_address in specific_ssid:
                                 current_timestamp = datetime.now()  # Capture the current timestamp
                                 latest_results[ssid] = (
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
@@ -127,7 +128,7 @@ def main():
 
             if "failure: already running" not in output:  # Check the condition here as well
                 # Create and open a CSV file for writing
-                with open('scanned_aps_cap3.csv', 'w', newline='') as csv_file:
+                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
                     fieldnames = ['mac_address', 'ssid', 'channel', 'signal_strength', 'source',
                                   'timestamp']  # mac_address, ssid, signal_strength, channel, source, timestamp
                     csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
