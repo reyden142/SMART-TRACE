@@ -7,7 +7,7 @@
         <th>sex</th>
         <th>ID</th>
         <th>Date</th>
-        <th>Macaddress</th>
+        <th>SSID</th>
         <th>Birthdate</th>
         <th>Contact</th>
         <th>EmergencyContact</th>
@@ -49,7 +49,7 @@
                   <TD><?php echo $row['sex'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['user_date'];?></TD>
-                  <TD><?php echo $row['Macaddress'];?></TD>
+                  <TD><?php echo $row['ssid'];?></TD>
                   <TD><?php echo $row['Birthdate'];?></TD>
                   <TD><?php echo $row['Contact'];?></TD>
                   <TD><?php echo $row['EmergencyContact'];?></TD>

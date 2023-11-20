@@ -34,7 +34,7 @@ $(document).ready(function(){
     var time_sel_end = $('#time_sel_end').val();
     var card_sel = $('#card_sel option:selected').val();
     var dev_uid = $('#dev_sel option:selected').val();
-    var Macaddress = $('#Macaddress').val();
+    var ssid = $('#ssid').val();
     var Birthdate = $('#Birthdate').val();
     var Contact = $('#Contact').val();
     var EmergencyContact = $('#EmergencyContact').val();
@@ -53,9 +53,10 @@ $(document).ready(function(){
         'time_sel_end': time_sel_end,
         'card_sel': card_sel,
         'dev_uid': dev_uid,
-        'Macaddress': Macaddress,
+        'ssid': ssid,
         'Birthdate': Birthdate,
         'Contact': Contact,
+        'EmergencyContact': EmergencyContact,
         'EmergencyContact': EmergencyContact,
         'ValidationPeriod': ValidationPeriod,
         'MedicalHistory': MedicalHistory,
@@ -82,7 +83,7 @@ $(document).ready(function(){
             'time_sel_end': time_sel_end,
             'dev_uid': dev_uid,
             'card_sel': card_sel,
-            'Macaddress': Macaddress,
+            'ssid': ssid,
             'Birthdate': Birthdate,
             'Contact': Contact,
             'EmergencyContact': EmergencyContact,

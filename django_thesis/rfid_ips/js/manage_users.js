@@ -10,7 +10,7 @@ $(document).ready(function(){
     //Additional Info
 
     var dev_uid = $('#dev_uid').val();
-    var Macaddress = $('#Macaddress').val();
+    var ssid = $('#ssid').val();
     var Birthdate = $('#Birthdate').val();
     var Contact = $('#Contact').val();
     var EmergencyContact = $('#EmergencyContact').val();
@@ -29,7 +29,7 @@ $(document).ready(function(){
         'email': email,
         'dev_uid': dev_uid,
         'sex': sex,
-        'Macaddress':Macaddress,
+        'ssid':ssid,
 		'Birthdate': Birthdate,
 	    'Contact': Contact,
 	    'EmergencyContact': EmergencyContact,
@@ -46,7 +46,7 @@ $(document).ready(function(){
           $('#number').val('');
           $('#email').val('');
           $('#dev_sel').val('0');
-          $('#Macaddress').val('');
+          $('#ssid').val('');
 		  $('#Birthdate').val('');
 		  $('#Contact').val('');
 		  $('#EmergencyContact').val('');
@@ -84,7 +84,7 @@ $(document).ready(function(){
     //Additional Info
 
     var dev_uid = $('#dev_uid').val();
-    var Macaddress = $('#Macaddress').val();
+    var ssid = $('#ssid').val();
     var Birthdate = $('#Birthdate').val();
     var Contact = $('#Contact').val();
     var EmergencyContact = $('#EmergencyContact').val();
@@ -103,7 +103,7 @@ $(document).ready(function(){
         'email': email,
         'dev_uid': dev_uid,
         'sex': sex,
-        'Macaddress': Macaddress,
+        'ssid': ssid,
 		'Birthdate': Birthdate,
 		'Contact': Contact,
 		'EmergencyContact': EmergencyContact,
@@ -118,7 +118,7 @@ $(document).ready(function(){
           $('#number').val('');
           $('#email').val('');
           $('#dev_sel').val('0');
-          $('#Macaddress').val('')
+          $('#ssid').val('')
 		  $('#Birthdate').val('');
 		  $('#Contact').val('');
 		  $('#EmergencyContact').val('');
@@ -167,7 +167,7 @@ $(document).ready(function(){
               $('#email').val('');
 
               $('#dev_sel').val('0');
-              $('#Macaddress').val('');
+              $('#ssid').val('');
 			  $('#Birthdate').val('');
 			  $('#Contact').val('');
 			  $('#EmergencyContact').val('');
@@ -243,8 +243,8 @@ $(document).ready(function(){
         var user_sex = {
           User_sex : []
         };
-        var user_Macaddress = {
-          User_Macaddress : []
+        var user_ssid = {
+          User_ssid : []
         };
 
 		var user_Birthdate = {
@@ -273,7 +273,7 @@ $(document).ready(function(){
             user_email.User_email.push(response[i].email);
             user_dev.User_dev.push(response[i].device_uid);
             user_sex.User_sex.push(response[i].sex);
-            user_Macaddress.User_Macaddress.push(response[i].Macaddress);
+            user_ssid.User_ssid.push(response[i].ssid);
 			user_Birthdate.User_Birthdate.push(response[i].Birthdate);
 			user_Contact.User_Contact.push(response[i].Contact);
 			user_EmergencyContact.User_EmergencyContact.push(response[i].EmergencyContact);
@@ -288,7 +288,7 @@ $(document).ready(function(){
         $('#number').val(user_on.User_on);
         $('#email').val(user_email.User_email);
         $('#dev_sel').val(user_dev.User_dev);
-        $('#Macaddress').val(user_Macaddress.User_Macaddress);
+        $('#ssid').val(user_ssid.User_ssid);
 		$('#Birthdate').val(user_Birthdate.User_Birthdate);
 		$('#Contact').val(user_Contact.User_Contact);
 		$('#EmergencyContact').val(user_EmergencyContact.User_EmergencyContact);
@@ -298,11 +298,11 @@ $(document).ready(function(){
 
 
 
-        if (user_sex.User_sex == 'Female'){
-            $('.form-style-5').find(':radio[name=sex][value="Female"]').prop('checked', true);
+        if (user_sex.User_sex == 'F'){
+            $('.form-style-5').find(':radio[name=sex][value="F"]').prop('checked', true);
         }
         else{
-            $('.form-style-5').find(':radio[name=sex][value="Male"]').prop('checked', true);
+            $('.form-style-5').find(':radio[name=sex][value="M"]').prop('checked', true);
         }
 
       },

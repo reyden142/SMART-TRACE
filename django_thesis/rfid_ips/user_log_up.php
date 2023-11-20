@@ -10,7 +10,7 @@ session_start();
         <th>Name</th>
         <th>ID</th>
         <th>UHF RFID</th>
-        <th>Mac Address</th>
+        <th>SSID</th>
         <th>Dep</th>
         <th>Date</th>
         <th>Time In</th>
@@ -123,7 +123,7 @@ session_start();
                   <TD><?php echo $row['username'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['card_uid'];?></TD>
-                  <TD><?php echo $row['Macaddress'];?></TD>
+                  <TD><?php echo $row['SSID'];?></TD>
                   <TD><?php echo $row['device_dep'];?></TD>
                   <TD><?php echo $row['checkindate'];?></TD>
                   <TD><?php echo $row['timein'];?></TD>

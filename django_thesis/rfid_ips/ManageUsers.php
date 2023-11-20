@@ -58,9 +58,9 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="text" name="number" id="number" placeholder="ID Number">
 				<input type="email" name="email" id="email" placeholder="Email">
 			    <label for="sex"><b> Sex:</b></label>
-			    <input type="radio" name="sex" class="sex" value="Female"> Female
+			    <input type="radio" name="sex" class="sex" value="F"> Female
 
-	          	<input type="radio" name="sex" class="sex" value="Male" checked="checked"> Male
+	          	<input type="radio" name="sex" class="sex" value="M" checked="checked"> Male
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
@@ -86,7 +86,7 @@ if (!isset($_SESSION['Admin-name'])) {
                         }
                       ?>
                     </select>
-                    <input type="text" name="Macaddress" id="Macaddress" placeholder="Macaddress">
+                    <input type="text" name="SSID" id="ssid" placeholder="SSID">
                     <input type="text" name="Birthdate" id="Birthdate" placeholder="Birthdate">
                     <input type="text" name="Contact" id="Contact" placeholder="Contact number">
                     <input type="text" name="EmergencyContact" id="EmergencyContact" placeholder="Emergency number">

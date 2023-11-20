@@ -11,7 +11,7 @@ if (isset($_POST['Add'])) {
     $Email = $_POST['email'];
     $dev_uid = $_POST['dev_uid'];	
     $sex = $_POST['sex'];
-    $Macaddress =isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
+    $ssid =isset($_POST['ssid'])? $_POST['ssid'] :" ";
     $Birthdate =isset($_POST['Birthdate'])? $_POST['Birthdate'] :" ";
     $Contact =isset($_POST['Contact'])? $_POST['Contact'] :" ";
     $EmergencyContact = isset($_POST['EmergencyContact'])? $_POST['EmergencyContact'] :" ";
@@ -33,7 +33,7 @@ if (isset($_POST['Add'])) {
 
             if ($row['add_card'] == 0) {
 
-                if (!empty($Uname) && !empty($Number) && !empty($Email) && !empty($Macaddress) && !empty($Birthdate) && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory) ) {
+                if (!empty($Uname) && !empty($Number) && !empty($Email) && !empty($ssid) && !empty($Birthdate) && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory) ) {
                     //check if there any user had already the Serial Number
                     $sql = "SELECT serialnumber FROM users WHERE serialnumber=? AND id NOT like ?";
                     $result = mysqli_stmt_init($conn);
@@ -63,14 +63,14 @@ if (isset($_POST['Add'])) {
                                     $dev_name = "All";
                                 }
                             }
-                            $sql="UPDATE users SET username=?, serialnumber=?, sex=?, email=?, Macaddress=?, Birthdate=?, Contact=?, EmergencyContact=?, ValidationPeriod=?, MedicalHistory=?, user_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
+                            $sql="UPDATE users SET username=?, serialnumber=?, sex=?, email=?, ssid=?, Birthdate=?, Contact=?, EmergencyContact=?, ValidationPeriod=?, MedicalHistory=?, user_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
                             $result = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($result, $sql)) {
                                 echo "SQL_Error_select_Fingerprint";
                                 exit();
                             }
                             else{
-                                mysqli_stmt_bind_param($result,"sdssssssssssi",  $Uname, $Number, $sex, $Email, $Macaddress, $Birthdate, $Contact, $EmergencyContact, $ValidationPeriod, $MedicalHistory, $dev_uid, $dev_name, $user_id );
+                                mysqli_stmt_bind_param($result,"sdssssssssssi",  $Uname, $Number, $sex, $Email, $ssid, $Birthdate, $Contact, $EmergencyContact, $ValidationPeriod, $MedicalHistory, $dev_uid, $dev_name, $user_id );
                                 mysqli_stmt_execute($result);
 
                                 echo 1;
@@ -108,14 +108,14 @@ if (isset($_POST['Update'])) {
     $Email = $_POST['email'];
     $dev_uid = $_POST['dev_uid'];
     $sex = $_POST['sex'];
-    $Macaddress = isset($_POST['Macaddress'])? $_POST['Macaddress'] :" ";
+    $ssid = isset($_POST['ssid'])? $_POST['ssid'] :" ";
 	$Birthdate = isset($_POST['Birthdate'])? $_POST['Birthdate'] :" ";
 	$Contact = isset($_POST['Contact'])? $_POST['Contact'] :" ";
 	$EmergencyContact = isset($_POST['EmergencyContact'])? $_POST['EmergencyContact'] :" ";
     $ValidationPeriod = isset($_POST['ValidationPeriod'])? $_POST['ValidationPeriod'] :" ";
     $MedicalHistory = isset($_POST['MedicalHistory'])? $_POST['MedicalHistory'] :" ";
 
-    if (!empty($Uname) && !empty($Number) && !empty($Email) && !empty($Macaddress) &&  !empty($Birthdate) && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory) ) {
+    if (!empty($Uname) && !empty($Number) && !empty($Email) && !empty($ssid) &&  !empty($Birthdate) && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory) ) {
     // ...
 	}
 
@@ -137,7 +137,7 @@ if (isset($_POST['Update'])) {
                 exit();
             }
             else{
-                if (empty($Uname) && empty($Number) && empty($Email) && empty($Macaddress)  && empty($Birthdate)  && empty($Contact) && empty($EmergencyContact) && empty($ValidationPeriod) && empty($MedicalHistory) ) {
+                if (empty($Uname) && empty($Number) && empty($Email) && empty($ssid)  && empty($Birthdate)  && empty($Contact) && empty($EmergencyContact) && empty($ValidationPeriod) && empty($MedicalHistory) ) {
                     echo "Empty Fields";
                     exit();
                 }
@@ -172,16 +172,16 @@ if (isset($_POST['Update'])) {
                                 }
                             }
 
-                            if (!empty($Uname) && !empty($Email)  && !empty($Macaddress)  &&  !empty($Birthdate)  && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory))  {
+                            if (!empty($Uname) && !empty($Email)  && !empty($ssid)  &&  !empty($Birthdate)  && !empty($Contact) && !empty($EmergencyContact) && !empty($ValidationPeriod) && !empty($MedicalHistory))  {
 
-                                $sql="UPDATE users SET username=?, serialnumber=?, sex=?, Macaddress=?, Birthdate=?, Contact=?, EmergencyContact=?, ValidationPeriod=?, MedicalHistory=?, email=?, device_uid=?, device_dep=? WHERE id=?";
+                                $sql="UPDATE users SET username=?, serialnumber=?, sex=?, ssid=?, Birthdate=?, Contact=?, EmergencyContact=?, ValidationPeriod=?, MedicalHistory=?, email=?, device_uid=?, device_dep=? WHERE id=?";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
                                     echo "SQL_Error_select_Card";
                                     exit();
                                 }
                                 else{
-                                    mysqli_stmt_bind_param($result, "sdssssssssssi", $Uname, $Number, $sex, $Macaddress,  $Birthdate, $Contact, $EmergencyContact, $ValidationPeriod, $MedicalHistory, $Email, $dev_uid, $dev_name, $user_id );
+                                    mysqli_stmt_bind_param($result, "sdssssssssssi", $Uname, $Number, $sex, $ssid,  $Birthdate, $Contact, $EmergencyContact, $ValidationPeriod, $MedicalHistory, $Email, $dev_uid, $dev_name, $user_id );
                                     mysqli_stmt_execute($result);
 
                                     echo 1;
