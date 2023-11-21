@@ -170,6 +170,8 @@ if (!isset($_SESSION['Admin-name'])) {
                 echo '</div>';
 
                 echo '</div>'; // Close the flex container
+
+
                 ?>
 
 
@@ -529,12 +531,14 @@ if (!isset($_SESSION['Admin-name'])) {
     });
     */
 
+
+
     </script>
 
 
 
 <!-- map 2 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-
+<!--
         <section id="map2" aria-label="Map2" role="region" position="absolute" >
             <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
@@ -877,7 +881,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
     </script>
 
-
+-->
 
 
 

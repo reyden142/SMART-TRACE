@@ -295,51 +295,55 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 // CODE FOR THE POPUP LATITUDE, LONGITUDE, AND BLUE ICON NAMES /////////////////////////////////////////////////////
 
     // Function to create a popup with latitude, longitude, and delete option
-    function createPopup(latlng, title) {
-        const lat = latlng.lat;
-        const lng = latlng.lng;
-
-        // Create a popup
-        var popup = L.popup()
-            .setLatLng(latlng);
-
-        // Initialize popupContent
-        let popupContent = "Latitude: " + lat + "<br>Longitude: " + lng + "<br>Name: " + title + "<br><button onclick='deleteMarker(\"" + title + "\", " + latlng.lat + "," + latlng.lng + ")'";
-
-        // Check if title is 'undefined', update popupContent accordingly
-        if (typeof title === 'undefined') {
-            popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
-        }
-
-        // Set the content of the popup
-        popup.setContent(popupContent);
-
-        // Add the marker reference to the popup for access in the delete function
-        popup.marker = title;
-
-        // Open the popup on the map
-        popup.openOn(map);
-
-        // Add the delete button inside the popup
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete Marker';
-        deleteButton.addEventListener('click', function () {
-            const markerToDelete = findMarkerByName(title);
-
-            if (markerToDelete) {
-                deleteMarker(markerToDelete);
-            } else {
-                // Provide a user-friendly message or handle the situation accordingly
-                alert('Marker with name ' + title + ' not found.');
-                console.warn('Marker not found:', title);
-            }
-        });
-
-
-
-        // Append the delete button to the popup
-        popup._contentNode.appendChild(deleteButton);
+function createPopup(latlng, title) {
+    if (!latlng || typeof latlng.lat === 'undefined' || typeof latlng.lng === 'undefined') {
+        console.error('Invalid latlng object:', latlng);
+        return;
     }
+
+    const lat = latlng.lat;
+    const lng = latlng.lng;
+
+    // Create a popup
+    var popup = L.popup()
+        .setLatLng(latlng);
+
+    // Initialize popupContent
+    let popupContent = "Latitude: " + lat + "<br>Longitude: " + lng + "<br>Name: " + title + "<br><button onclick='deleteMarker(\"" + title + "\", " + latlng.lat + "," + latlng.lng + ")'";
+
+    // Check if title is 'undefined', update popupContent accordingly
+    if (typeof title === 'undefined') {
+        popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
+    }
+
+    // Set the content of the popup
+    popup.setContent(popupContent);
+
+    // Add the marker reference to the popup for access in the delete function
+    popup.marker = title;
+
+    // Open the popup on the map
+    popup.openOn(map);
+
+    // Add the delete button inside the popup
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete Marker';
+    deleteButton.addEventListener('click', function () {
+        const markerToDelete = findMarkerByName(title);
+
+        if (markerToDelete) {
+            deleteMarker(markerToDelete);
+        } else {
+            // Provide a user-friendly message or handle the situation accordingly
+            alert('Marker with name ' + title + ' not found.');
+            console.warn('Marker not found:', title);
+        }
+    });
+
+    // Append the delete button to the popup
+    popup._contentNode.appendChild(deleteButton);
+}
+
 
 
 

@@ -11,21 +11,12 @@ router_ip = '192.168.203.2'
 username = 'thesis2.0'
 password = 'admin'
 
-# Database configuration
-db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "rfid_ips"
-}
-
 # List of specific MAC addresses to filter
 specific_ssid = [
                     "C1",
                     "C2",
                     "C2",
                     "C3",
-                    "C4",
                     "C5",
                     "C6",
                     "C7",
@@ -35,44 +26,13 @@ specific_ssid = [
                     "C11"
                 ]
 
-def connect_to_database():
-    try:
-        connection = mysql.connector.connect(**db_config)
-        if connection.is_connected():
-            print("Connected to MySQL database")
-            return connection
-    except Error as e:
-        print(f"Error: {e}")
-    return None
+print(f"specific_ssid: {specific_ssid}")
 
-def transfer_to_database(data, connection):
-    if "already running" not in data:
-        if connection:
-            cursor = connection.cursor()
-            try:
-                # Insert data into the database, including the timestamp
-                insert_query = "INSERT INTO ap_data_position (mac_address, ssid, channel, signal_strength, source, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
-                current_timestamp = datetime.now()  # Capture the current timestamp
-                data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], current_timestamp) for row in data]
-                cursor.executemany(insert_query, data_with_timestamp)
-                connection.commit()
-                print(f"Transferred {len(data)} records to the database with timestamp {current_timestamp}.")
-            except Error as e:
-                connection.rollback()
-                print(f"Error transferring data to the database: {e}")
-            finally:
-                cursor.close()
-
-def extract_numeric_channel(channel):
-    # Use regular expression to extract numeric part from the channel
-    match = re.match(r'(\d+)', str(channel))  # Ensure the result is always a string
-    if match:
-        return match.group(1)
-    else:
-        return None
 def main():
     while True:
         try:
+            # Define the floorid here or retrieve it as needed
+            floorid = 36 # You can adjust the floorid as needed
 
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -88,10 +48,12 @@ def main():
 
             for cap_interface in cap_interfaces:
                 # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=7 {cap_interface}'
+                command = f'd'
 
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
+
+
 
                 output = stdout.read(2048).decode()
                 lines = output.splitlines()
@@ -126,15 +88,6 @@ def main():
                     data.extend(current_data)
 
                     print(f"data {cap_interface}:", current_data)
-
-            if "failure: already running" not in output:  # Check the condition here as well
-
-                # Connect to the database
-                connection = connect_to_database()
-
-                # Transfer data to the database with the floorid and timestamp
-                if connection:
-                    transfer_to_database(data, connection)
 
         except paramiko.AuthenticationException:
             print("Authentication failed. Please check your credentials.")

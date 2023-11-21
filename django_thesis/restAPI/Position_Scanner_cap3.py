@@ -25,6 +25,7 @@ specific_ssid = [
                     "C2",
                     "C2",
                     "C3",
+                    "C4",
                     "C5",
                     "C6",
                     "C7",
@@ -83,11 +84,11 @@ def main():
             # Create a list to store data from both CAP interfaces
             data = []
 
-            pattern = r'(\S+)\s+(\S+)\s+(\d+/\d+/\w+).+?(-\d+)'
+            pattern = r'(\S+)\s+(?:(\S+)\s+)?(\d+/\d+/\w+).+?(-\d+)'
 
             for cap_interface in cap_interfaces:
                 # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=8 {cap_interface}'
+                command = f'/caps-man/interface/scan freeze-frame-interval=7 {cap_interface}'
 
                 # Execute the command
                 stdin, stdout, stderr = ssh.exec_command(command)
@@ -95,10 +96,8 @@ def main():
                 output = stdout.read(2048).decode()
                 lines = output.splitlines()
 
-                # Wait for the scan to complete, adjust the sleep time as needed
-                time.sleep(3)  # You can adjust the sleep duration
-
                 print(f"unprocessed data {cap_interface}:", output)
+                #print(f"lines {cap_interface}:", lines)
 
                 if "failure: already running" not in output:
                     # Data collection and processing for the current CAP interface
@@ -108,17 +107,19 @@ def main():
 
                     for line in lines:
                         match = re.search(pattern, line)
+                        #print(f"line: {line}")
                         if match:
                             mac_address = match.group(1)
                             ssid = match.group(2)
                             channel = match.group(3)  # Capture the channel as a string
                             signal_strength = int(match.group(4))  # Capture the signal strength as an integer
-
-                            if mac_address in specific_ssid:
+                            #print(f"ssid output: {ssid}")
+                            if ssid in specific_ssid:
                                 current_timestamp = datetime.now()  # Capture the current timestamp
                                 latest_results[ssid] = (
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
-
+                    # Wait for the scan to complete, adjust the sleep time as needed
+                    time.sleep(1)  # You can adjust the sleep duration
 
 
                     current_data.extend(latest_results.values())
@@ -127,33 +128,23 @@ def main():
                     print(f"data {cap_interface}:", current_data)
 
             if "failure: already running" not in output:  # Check the condition here as well
-                # Create and open a CSV file for writing
-                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
-                    fieldnames = ['mac_address', 'ssid', 'channel', 'signal_strength', 'source',
-                                  'timestamp']  # mac_address, ssid, signal_strength, channel, source, timestamp
-                    csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                    csv_writer.writeheader()
-
-                    # Write the data to the CSV file
-                    for row in data:
-                        numeric_channel = extract_numeric_channel(row[2])
-                        # Convert the timestamp to a string for CSV
-                        timestamp_str = row[5].strftime('%Y-%m-%d %H:%M:%S')
-                        csv_writer.writerow(
-                            {'mac_address': row[0], 'ssid': row[1], 'channel': numeric_channel, 'signal_strength': row[3],  'source': row[4],
-                             'timestamp': timestamp_str})
 
                 # Connect to the database
                 connection = connect_to_database()
 
-                # Transfer data to the database with timestamp
+                # Transfer data to the database with the floorid and timestamp
                 if connection:
                     transfer_to_database(data, connection)
 
-            ssh.close()
-
+        except paramiko.AuthenticationException:
+            print("Authentication failed. Please check your credentials.")
+        except paramiko.SSHException as e:
+            print(f"SSH connection failed: {str(e)}")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"An unexpected error occurred: {str(e)}")
+        finally:
+            # Close the SSH connection
+            ssh.close()
 
 if __name__ == "__main__":
     main()

@@ -123,7 +123,7 @@ session_start();
                   <TD><?php echo $row['username'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['card_uid'];?></TD>
-                  <TD><?php echo $row['SSID'];?></TD>
+                  <TD><?php echo $row['ssid'];?></TD>
                   <TD><?php echo $row['device_dep'];?></TD>
                   <TD><?php echo $row['checkindate'];?></TD>
                   <TD><?php echo $row['timein'];?></TD>

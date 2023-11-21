@@ -80,6 +80,14 @@ def main():
         file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_processed-2.csv'
         trainingData = pd.read_csv(file_path)
 
+        '''
+        trainingData = trainingData[
+            ~((trainingData['channel_cap1'] == 0) & (trainingData['channel_cap2'] == 0)) &
+            ~((trainingData['channel_cap1'] == 0) & (trainingData['channel_cap3'] == 0)) &
+            ~((trainingData['channel_cap2'] == 0) & (trainingData['channel_cap3'] == 0))
+            ]
+        '''
+
         # Add a new column 'source_without_C' by removing 'C' from 'source'
         trainingData['ssid'] = trainingData['ssid'].str.replace('C', '')
 
@@ -159,24 +167,7 @@ def main():
             print("Testing set has {} samples.".format(X_test.shape[0]))
             return X_train, X_test, y_train, y_test
 
-        # Apply split data
-        X_train, X_test, y_train, y_test = split_data(preprocess_data)
 
-        # Scale Data with Standard Scaler
-
-        scaler = StandardScaler()
-
-        # Fit only the training set
-        # this will help us transform the validation data
-        scaler.fit(X_train)
-
-        # Apply transform to both the training set and the test set.
-        X_train = scaler.transform(X_train)
-        X_test = scaler.transform(X_test)
-
-        k = 1  # You can adjust the value of k
-        knn = KNeighborsClassifier(n_neighbors=k, p=2, metric='euclidean')  # p=2 for Euclidean metric
-        knn.fit(X_train, y_train)
 
         # SCANNED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -198,31 +189,29 @@ def main():
 
                 # Replace 'output_file.csv' with the desired file name
                 ap_data_position = 'ap_data_position.csv'
-                
+
                 # Save the DataFrame to a CSV file
                 df.to_csv(ap_data_position, index=False)
-                
+
                 print(f"Data extracted and saved to {ap_data_position}")
 
-
-                #ap_data_position = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_position.csv'
                 # Read the CSV file into a new DataFrame
                 ap_data_pivot_2 = pd.read_csv(ap_data_position)
 
                 print('ap_data_position', ap_data_pivot_2)
 
-                #print('0WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
+                # print('0WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
 
                 # Check if at least two out of the three sources are available in the 'source' column
-                if len(ap_data_pivot_2['ssid']) > 2:
+                if len(ap_data_pivot_2['ssid']) > 6:
 
-                    #print('1WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
+                    # print('1WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
 
                     # Check if at least two out of the three sources are available in the 'source' column
                     if sum(cap in ap_data_pivot_2['source'].unique() for cap in ['cap1', 'cap2', 'cap3']) > 1:
                         # Assuming 'ap_data_processed' is your training data DataFrame
 
-                        #print('2WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
+                        # print('2WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
 
                         # Select relevant columns
                         selected_columns = ['source', 'channel', 'signal_strength', 'mac_address', 'ssid', 'timestamp']
@@ -249,7 +238,7 @@ def main():
                         print('export ap_data_position_processed_before file successful')
                         '''
 
-    # // CODE FOR THE MERGING OF ROWS //////////////////////////////////////////////////////////////////////////////////////////////////
+                        # // CODE FOR THE MERGING OF ROWS //////////////////////////////////////////////////////////////////////////////////////////////////
 
                         # Define the column names to check
                         columns_to_check_1 = ['signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3']
@@ -260,8 +249,6 @@ def main():
                         # If missing, add the columns with a default value (e.g., 100)
                         for column in missing_columns_1:
                             ap_data_pivot_2[column] = 100
-
-
 
                         print('FIRST IF: ', ap_data_pivot_2)
 
@@ -287,10 +274,11 @@ def main():
                             channel_column = f'channel_cap{cap}'
                             ap_data_pivot_2[channel_column].fillna(0, inplace=True)
 
+                            time.sleep(1)
+
                         csv_file = 'ap_data_position_processed_merged-pivoted.csv'
                         ap_data_pivot_2.to_csv(csv_file, index=False)
                         print('export ap_data_position_processed_merged-pivoted file successful')
-
 
                         # Group by 'ssid', 'mac_address', and 'timestamp', and aggregate the values
                         ap_data_pivot_2 = ap_data_pivot_2.groupby(['ssid']).agg({
@@ -326,9 +314,9 @@ def main():
                         '''
                         # Remove rows if there are two zeroes in a row in the cap_channel
                         ap_data_pivot_2 = ap_data_pivot_2[
-                            ~((ap_data_pivot_2['cap1_channel'] == 0) & (ap_data_pivot_2['cap2_channel'] == 0)) &
-                            ~((ap_data_pivot_2['cap1_channel'] == 0) & (ap_data_pivot_2['cap3_channel'] == 0)) &
-                            ~((ap_data_pivot_2['cap2_channel'] == 0) & (ap_data_pivot_2['cap3_channel'] == 0))
+                            ~((ap_data_pivot_2['channel_cap1'] == 0) & (ap_data_pivot_2['channel_cap2'] == 0)) &
+                            ~((ap_data_pivot_2['channel_cap1'] == 0) & (ap_data_pivot_2['channel_cap3'] == 0)) &
+                            ~((ap_data_pivot_2['channel_cap2'] == 0) & (ap_data_pivot_2['channel_cap3'] == 0))
                             ]
                         '''
 
@@ -346,7 +334,7 @@ def main():
                         # '''
 
                         # If CAP1, CAP2, and CAP3 are available
-                        #csv_file = 'ap_data_position_processed.csv'
+                        # csv_file = 'ap_data_position_processed.csv'
                         # csv_file_2 = 'ap_data_position.csv'
 
                         print('WAAAAAAAAAAAAAAAAAZZUUUUUUUUUUUUUUUUUUUUP')
@@ -356,9 +344,20 @@ def main():
                             # Read the CSV file into a DataFrame
                             ap_data_pivot_2 = pd.read_csv(csv_file)
 
+                            # Replace missing signal_strength values with 100
+                            ap_data_pivot_2['signal_strength_cap1'].fillna(100, inplace=True)
+                            ap_data_pivot_2['signal_strength_cap2'].fillna(100, inplace=True)
+                            ap_data_pivot_2['signal_strength_cap3'].fillna(100, inplace=True)
+
+                            # Replace missing channel values with 0
+                            ap_data_pivot_2['channel_cap1'].fillna(0, inplace=True)
+                            ap_data_pivot_2['channel_cap2'].fillna(0, inplace=True)
+                            ap_data_pivot_2['channel_cap3'].fillna(0, inplace=True)
+
+                            print('ap_data_pivot_2', ap_data_pivot_2)
                             # Replace these column names with the actual column names in your dataset
 
-                            features = ['ssid','signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3',
+                            features = ['ssid', 'signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3',
                                         'channel_cap1', 'channel_cap2', 'channel_cap3']
                             target = 'floorid'
 
@@ -381,15 +380,30 @@ def main():
                             # Split the data into training and testing sets
                             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+                            # Apply split data
+                            X_train, X_test, y_train, y_test = split_data(preprocess_data)
+
+                            # Scale Data with Standard Scaler
+
+                            scaler = StandardScaler()
+
+                            # Fit only the training set
+                            # this will help us transform the validation data
+                            scaler.fit(X_train)
+
+                            # Apply transform to both the training set and the test set.
+                            X_train = scaler.transform(X_train)
+                            X_test = scaler.transform(X_test)
+
                             # Train a k-Nearest Neighbors classifier with Euclidean metric
                             k = 1  # You can adjust the value of k
-                            knn = KNeighborsClassifier(n_neighbors=k, p=2, metric = 'euclidean')  # p=2 for Euclidean metric
+                            knn = KNeighborsClassifier(n_neighbors=k, p=2,
+                                                       metric='euclidean')  # p=2 for Euclidean metric
                             knn.fit(X_train, y_train)
 
                             # Assuming 'combined_scanned_data' is your scanned data DataFrame
                             # Replace these column names with the actual column names in your dataset
                             scanned_data_features = ap_data_pivot_2[features]
-
 
                             # Make predictions on the scanned data
                             predictions = knn.predict(scanned_data_features)
@@ -404,9 +418,18 @@ def main():
                             y_pred = knn.predict(X_test)
 
                             # Calculate accuracy
-                            accuracy = accuracy_score(y_test, y_pred)
+                            #accuracy = accuracy_score(y_test, y_pred)
 
-                            print(f'Accuracy: {accuracy * 100:.2f}%')
+                            #print(f'Accuracy: {accuracy * 100:.2f}%')
+
+                            # Add 'C' back to the 'source_without_C' column
+                            ap_data_pivot_2['ssid'] = 'C' + ap_data_pivot_2['ssid'].astype(str)
+
+                            # If you want to replace the existing 'ssid' column with the one containing 'C'
+                            ap_data_pivot_2['ssid'] = ap_data_pivot_2['ssid']
+
+                            # Drop the temporary 'source_with_C' column if you don't need it anymore
+                            # ap_data_pivot_2.drop('ssid', axis=1, inplace=True)
 
                             # Display the predicted floorid for the scanned data
                             print(ap_data_pivot_2[['mac_address', 'ssid', 'predicted_floorid']])
@@ -418,11 +441,11 @@ def main():
                                 'predicted_floorid': 'first'
                             }).reset_index()
 
-                            #'''
+                            # '''
                             # Save the aggregated DataFrame to a new CSV file
                             predicted_values_file = 'predicted_values_aggregated.csv'
                             aggregated_data.to_csv(predicted_values_file, index=False)
-                            #'''
+                            # '''
 
                             # Query to fetch latitude and longitude from the "markers" table
                             query = "SELECT title, lat, lng FROM markers"
@@ -438,7 +461,8 @@ def main():
                             aggregated_data['predicted_floorid'] = aggregated_data['predicted_floorid'].astype(str)
 
                             # Merge the aggregated_data DataFrame with markers_df based on 'predicted_floorid'
-                            result_df = pd.merge(aggregated_data, markers_df, left_on='predicted_floorid', right_on='title',
+                            result_df = pd.merge(aggregated_data, markers_df, left_on='predicted_floorid',
+                                                 right_on='title',
                                                  how='left')
 
                             # Drop the duplicate 'title' column
@@ -464,14 +488,12 @@ def main():
                         print(f"CSV file '{csv_file}' not found.")
                         main()
 
-                    '''
                     #Remove all data from the ap_data_position table
                     delete_query = "DELETE FROM `ap_data_position`"
                     with conn.cursor() as cursor:
                         cursor.execute(delete_query)
                     conn.commit()
                     print("All data removed from 'ap_data_position' table.")
-                    '''
 
                 else:
                     print("Not enough unique sources in the 'source' column.")
