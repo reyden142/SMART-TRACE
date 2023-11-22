@@ -1,9 +1,10 @@
+
 <div class="table-responsive-sm" style="max-height: 870px;">
   <table class="table">
     <thead class="table-primary">
       <tr>
         <th>UHF RFID</th>
-        <th>Name</th>
+        <th>FullName</th>
         <th>sex</th>
         <th>ID</th>
         <th>Date</th>

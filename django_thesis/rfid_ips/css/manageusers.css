@@ -31,7 +31,7 @@ tbody button:hover {
 }
 
 th{
-  padding: 15px;
+  padding: 35px;
   text-align: center !important;
   font-weight: 500;
   font-size: 17px;
@@ -39,6 +39,7 @@ th{
   text-transform: uppercase;
   border: none !important;
   background-color: #fff !important;
+  white-space :nowrap;
   
 }
 td{
@@ -49,22 +50,22 @@ td{
   color: #fff;
   border-bottom: solid 2px rgb(78 21 21 / 10%);
   background: #d91212;
+  white-space :nowrap;
   
   
 }
 
+
 .section {
   margin: 20px;
-  width: 1500px;
   display: block;
   float: right;
   position: absolute;
-  top: 1400px;
+  top: 300px;
   right: 0;
   background-color: #f1e9c8;
-  
-  
 }
+
 .section span {
   float: left;
   display: block;
@@ -83,7 +84,7 @@ td{
 }
 .form-style-5{
   max-width: 350px;
-  height: 1010px;
+  height: 1090px;
   padding: 30px 20px;
   background: #f4f7f8;
   border-radius: 10px;

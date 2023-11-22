@@ -106,7 +106,7 @@ if (!isset($_SESSION['Admin-name'])) {
 	<!--User table-->
 	<div class="section">
 
-		<div class="slideInRight animated">
+		<div class="table-responsive slideInRight animated" style="max-width: 1250px">
 			<div id="manage_users"></div>
 		</div>
 	</div>
