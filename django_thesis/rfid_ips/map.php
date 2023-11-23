@@ -175,11 +175,13 @@ if (!isset($_SESSION['Admin-name'])) {
                 ?>
 
 
-<!-- map 1 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
             </fieldset>
         </form>
     </div>
+
+<!-- map 1 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
         <section id="map" aria-label="Map" role="region" position="absolute" >
             <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
@@ -538,7 +540,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
 
 <!-- map 2 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-<!--
+
         <section id="map2" aria-label="Map2" role="region" position="absolute" >
             <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
@@ -554,31 +556,27 @@ if (!isset($_SESSION['Admin-name'])) {
     <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
 
     <script>
-        // Declare markers as a global variable
-        var markers = [];
-
-        console.log("Markers:", markers);
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
-        const map = L.map('map', {
+        const map2 = L.map2('map2', {
             preferCanvas: true
         }).setView([7.06569722, 125.59678861], 14);
 
         // Set the maxZoom and minZoom properties
-        map.options.maxZoom = 25; // Adjust this value as needed for your requirements
-        map.options.minZoom = 17; // Adjust this value as needed
+        map2.options.maxZoom = 25; // Adjust this value as needed for your requirements
+        map2.options.minZoom = 17; // Adjust this value as needed
 
 
-        L.tileLayer(`https://api.maptiler.com/data/eecd5f81-4047-4b66-bc5c-7c6d5cfdf196/features.json?key=aF7HhncV5bhT2pqqWdRV`, {
+        L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=aF7HhncV5bhT2pqqWdRV`, {
             tileSize: 512,
             zoomOffset: -1,
             attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
             crossOrigin: true
-        }).addTo(map);
+        }).addTo(map2);
 
-        // GeoJSON data
-        var myGeoJSON2 = {
+        // Add GeoJSON data to the map
+        var myGeoJSON = {
           "type": "FeatureCollection",
           "features": [
             {
@@ -586,12 +584,14 @@ if (!isset($_SESSION['Admin-name'])) {
               "geometry": {
                 "type": "Polygon",
                 "coordinates": [
-                  [125.59657807, 7.06560118],
-                  [125.59664244, 7.06578485],
-                  [125.596739, 7.06582212],
-                  [125.59689055, 7.06576622],
-                  [125.59679533, 7.06551734],
-                  [125.59657807, 7.06560118]
+                  [
+                    [125.59657807, 7.06560118],
+                    [125.59664244, 7.06578485],
+                    [125.596739, 7.06582212],
+                    [125.59689055, 7.06576622],
+                    [125.59679533, 7.06551734],
+                    [125.59657807, 7.06560118]
+                  ]
                 ]
               },
               "id": "73ace24a-738a-49a2-a1a0-9dea8251bb20",
@@ -605,12 +605,14 @@ if (!isset($_SESSION['Admin-name'])) {
               "geometry": {
                 "type": "Polygon",
                 "coordinates": [
-                  [125.59648312, 7.06572744],
-                  [125.59652759, 7.06584043],
-                  [125.5964658, 7.06585894],
-                  [125.59640002, 7.06583076],
-                  [125.59637449, 7.06576338],
-                  [125.59648312, 7.06572744]
+                  [
+                    [125.59648312, 7.06572744],
+                    [125.59652759, 7.06584043],
+                    [125.5964658, 7.06585894],
+                    [125.59640002, 7.06583076],
+                    [125.59637449, 7.06576338],
+                    [125.59648312, 7.06572744]
+                  ]
                 ]
               },
               "id": "ba1cf84b-5911-4090-86dd-3206038d059b",
@@ -623,24 +625,26 @@ if (!isset($_SESSION['Admin-name'])) {
               "geometry": {
                 "type": "Polygon",
                 "coordinates": [
-                  [125.59684311, 7.0652798],
-                  [125.59637025, 7.06544318],
-                  [125.59639652, 7.06550748],
-                  [125.5963755, 7.0655631],
-                  [125.59634398, 7.06557701],
-                  [125.59632471, 7.06562741],
-                  [125.59640002, 7.06583076],
-                  [125.59664346, 7.06593504],
-                  [125.59661544, 7.06600804],
-                  [125.59658216, 7.06602021],
-                  [125.59662419, 7.0661158],
-                  [125.59699373, 7.06598023],
-                  [125.59698322, 7.06594895],
-                  [125.59725818, 7.06585162],
-                  [125.59718112, 7.06565869],
-                  [125.59704627, 7.06570562],
-                  [125.59699373, 7.06568824],
-                  [125.59684311, 7.0652798]
+                  [
+                    [125.59684311, 7.0652798],
+                    [125.59637025, 7.06544318],
+                    [125.59639652, 7.06550748],
+                    [125.5963755, 7.0655631],
+                    [125.59634398, 7.06557701],
+                    [125.59632471, 7.06562741],
+                    [125.59640002, 7.06583076],
+                    [125.59664346, 7.06593504],
+                    [125.59661544, 7.06600804],
+                    [125.59658216, 7.06602021],
+                    [125.59662419, 7.0661158],
+                    [125.59699373, 7.06598023],
+                    [125.59698322, 7.06594895],
+                    [125.59725818, 7.06585162],
+                    [125.59718112, 7.06565869],
+                    [125.59704627, 7.06570562],
+                    [125.59699373, 7.06568824],
+                    [125.59684311, 7.0652798]
+                  ]
                 ]
               },
               "id": "19f98cab-a9e8-440e-8b7a-3aac7f2f6f68",
@@ -655,11 +659,13 @@ if (!isset($_SESSION['Admin-name'])) {
               "geometry": {
                 "type": "Polygon",
                 "coordinates": [
-                  [125.59633693, 7.06566041],
-                  [125.59644047, 7.06562166],
-                  [125.59648312, 7.06572744],
-                  [125.59637449, 7.06576338],
-                  [125.59633693, 7.06566041]
+                  [
+                    [125.59633693, 7.06566041],
+                    [125.59644047, 7.06562166],
+                    [125.59648312, 7.06572744],
+                    [125.59637449, 7.06576338],
+                    [125.59633693, 7.06566041]
+                  ]
                 ]
               },
               "id": "51fe7eb2-7883-4fda-8413-0bc078ce06a2",
@@ -670,9 +676,7 @@ if (!isset($_SESSION['Admin-name'])) {
           ]
         };
 
-
-
-        var geojsonLayer2 = L.geoJSON(myGeoJSON2).addTo(map);
+        var geojsonLayer = L.geoJSON(myGeoJSON).addTo(map2);
 
         // Bind a popup to the GeoJSON layer
        // geojsonLayer.bindPopup("<b>BE Building</b>");
@@ -684,7 +688,7 @@ if (!isset($_SESSION['Admin-name'])) {
             metric: true,
             imperial: false,
             position: 'topright'
-        }).addTo(map);
+        }).addTo(map2);
 
         // The CSS to style the custom marker
     var customMarkerStyle = `
@@ -704,43 +708,6 @@ if (!isset($_SESSION['Admin-name'])) {
       }
     `;
 
-
-        // OLD CODE
-        /*
-        if(!navigator.geolocation) {
-        console.log("Your browser doesn't support geolocation feature!")
-        } else {
-            setInterval(() => {
-                navigator.geolocation.getCurrentPosition(getPosition)
-            }, 5000);
-        }
-
-    var marker, circle;
-
-    function getPosition(position){
-        // console.log(position)
-        var lat = position.coords.latitude
-        var long = position.coords.longitude
-        var accuracy = position.coords.accuracy
-
-        if(marker) {
-            map.removeLayer(marker)
-        }
-
-        if(circle) {
-            map.removeLayer(circle)
-        }
-
-        marker = L.marker([lat, long])
-        circle = L.circle([lat, long], {radius: accuracy})
-
-        var featureGroup = L.featureGroup([marker, circle]).addTo(map)
-
-        //map.fitBounds(featureGroup.getBounds())
-
-        console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
-        }*/
-
         // Load the final_predicted_values_aggregated.csv file with a timestamp to prevent caching
         const csvFilePath = 'css/final_predicted_values_aggregated.csv?' + Date.now();
 
@@ -758,9 +725,9 @@ if (!isset($_SESSION['Admin-name'])) {
 
         async function addMarkers(data) {
           // Clear existing markers
-          map.eachLayer((layer) => {
+          map2.eachLayer((layer) => {
             if (layer instanceof L.Marker) {
-              map.removeLayer(layer);
+              map2.removeLayer(layer);
             }
           });
 
@@ -799,7 +766,7 @@ if (!isset($_SESSION['Admin-name'])) {
             const popupContent = `<b>${userNamesList}</b><br>SSID: ${ssidsList}<br>Latitude: ${markerGroup.marker.getLatLng().lat}<br>Longitude: ${markerGroup.marker.getLatLng().lng}`;
 
             markerGroup.marker.bindPopup(popupContent);
-            map.addLayer(markerGroup.marker);
+            map2.addLayer(markerGroup.marker);
           });
         }
 
@@ -821,9 +788,6 @@ if (!isset($_SESSION['Admin-name'])) {
             return 'Unknown User';
           }
         }
-
-
-
 
         // Function to fetch and update CSV data
         async function updateCSV() {
@@ -859,31 +823,6 @@ if (!isset($_SESSION['Admin-name'])) {
         const markerClusterScript = document.createElement('script');
         markerClusterScript.src = 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js';
         document.head.appendChild(markerClusterScript);
-
-
-
-    /*
-    map.on('click', function (e) {
-    const latlng = e.latlng;
-    const lat = latlng.lat;
-    const lng = latlng.lng;
-
-    // Create a popup and set its content
-    const popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
-    const popup = L.popup()
-        .setLatLng(latlng)
-        .setContent(popupContent);
-
-    // Open the popup on the map
-    popup.openOn(map);
-    });
-    */
-
-    </script>
-
--->
-
-
 
 </body>
 </html>

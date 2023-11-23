@@ -11,8 +11,8 @@ if (!isset($_SESSION['Admin-name'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/RFID_STICKER_LOGO.jpg" href="">
-	
-    
+
+
 
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
@@ -32,7 +32,7 @@ if (!isset($_SESSION['Admin-name'])) {
 <section>
   <h1 class="slideInDown animated">Here are all the Users</h1>
   <!--User table-->
-  <div class="table-responsive slideInRight animated" style="max-height: 400px;"> 
+  <div class="table-responsive slideInRight animated" style="max-height: 400px;">
     <table class="table">
       <thead class="table-primary">
         <tr>
