@@ -46,50 +46,49 @@ def connect_to_database():
     return None
 
 def transfer_to_database(data, connection, floorid):
-    if "already running" not in data:
-        if connection:
-            cursor = connection.cursor()
-            try:
-                # Insert data into the database, including the timestamp
-                insert_query = "INSERT INTO ap_data (mac_address, ssid, Channel, signal_strength, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                current_timestamp = datetime.now()  # Capture the current timestamp
-                data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], floorid, current_timestamp) for row in data]
-                cursor.executemany(insert_query, data_with_timestamp)
-                connection.commit()
-                print(f"Transferred {len(data)} records to the database with floorid {floorid} and timestamp {current_timestamp}.")
-            except Error as e:
-                connection.rollback()
-                print(f"Error transferring data to the database: {e}")
-            finally:
-                cursor.close()
-
-
-
+#    if "already running" not in data:
+    if connection:
+        cursor = connection.cursor()
+        try:
+            # Insert data into the database, including the timestamp
+            insert_query = "INSERT INTO ap_data (mac_address, ssid, Channel, signal_strength, source, floorid, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            current_timestamp = datetime.now()  # Capture the current timestamp
+            data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], floorid, current_timestamp) for row in data]
+            cursor.executemany(insert_query, data_with_timestamp)
+            connection.commit()
+            print(f"Transferred {len(data)} records to the database with floorid {floorid} and timestamp {current_timestamp}.")
+        except Error as e:
+            connection.rollback()
+            print(f"Error transferring data to the database: {e}")
+        finally:
+            cursor.close()
 
 def main():
+    # Define the floorid here or retrieve it as needed
+    floorid = 0  # You can adjust the floorid as needed
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(router_ip, username=username, password=password)
+
+
+    # Create the command
+    command = f'/caps-man/interface/scan cap1'
+
+    # Execute the command
+    stdin, stdout, stderr = ssh.exec_command(command)
+
     while True:
         try:
-            # Define the floorid here or retrieve it as needed
-            floorid = 36 # You can adjust the floorid as needed
-
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(router_ip, username=username, password=password)
-
-            # Define the CAP interface names ('cap1' and 'cap2')
-            cap_interfaces = ['cap1']
 
             # Create a list to store data from both CAP interfaces
             data = []
 
+            cap_interfaces = ['cap1']
+
             pattern = r'(\S+)\s+(?:(\S+)\s+)?(\d+/\d+/\w+).+?(-\d+)'
 
             for cap_interface in cap_interfaces:
-                # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=7 {cap_interface}'
-
-                # Execute the command
-                stdin, stdout, stderr = ssh.exec_command(command)
 
                 output = stdout.read(2048).decode()
                 lines = output.splitlines()
@@ -117,7 +116,7 @@ def main():
                                 latest_results[ssid] = (
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
                     # Wait for the scan to complete, adjust the sleep time as needed
-                    time.sleep(1)  # You can adjust the sleep duration
+                    #time.sleep(1)  # You can adjust the sleep duration
 
 
                     current_data.extend(latest_results.values())
@@ -125,7 +124,7 @@ def main():
 
                     print(f"data {cap_interface}:", current_data)
 
-            if "failure: already running" not in output:  # Check the condition here as well
+            #if "failure: already running" not in output:  # Check the condition here as well
 
                 # Connect to the database
                 connection = connect_to_database()
@@ -140,9 +139,6 @@ def main():
             print(f"SSH connection failed: {str(e)}")
         except Exception as e:
             print(f"An unexpected error occurred: {str(e)}")
-        finally:
-            # Close the SSH connection
-            ssh.close()
 
 if __name__ == "__main__":
     main()
