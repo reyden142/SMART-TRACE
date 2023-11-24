@@ -299,23 +299,23 @@ tbody button:hover {
 
   #map1 {
   position: absolute;
-  top: 115%;
-  left: 35%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
-  right: 1350px;
+  top: 180%;
+  left: 30%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
+
   }
 
   #map2 {
   position: absolute;
   position: absolute;
-  top: 215%;
-  left: 35%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
-  right: 1350px;
+  top: 180%;
+  left: 80%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
+
 }
 
   .form-style-5{
@@ -326,9 +326,9 @@ tbody button:hover {
   border-radius: 30px;
   font-family: Georgia, "Times New Roman", Times, serif;
 
-  top: 80%;
+  top: 30%;
   position: absolute;
-  right: 50px;
+  right: 20%;
   }
 
   th{

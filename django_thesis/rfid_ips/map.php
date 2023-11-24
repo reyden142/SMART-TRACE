@@ -39,6 +39,12 @@ if (!isset($_SESSION['Admin-name'])) {
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.umd.js"></script>
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.css" rel="stylesheet" />
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 </head>
 
 <body>
@@ -203,7 +209,7 @@ if (!isset($_SESSION['Admin-name'])) {
         console.log("Markers:", markers);
 
         // Leaflet map initialization
-        const key = 'aF7HhncV5bhT2pqqWdRV';
+        //const key = 'aF7HhncV5bhT2pqqWdRV';
         const map = L.map('map', {
             preferCanvas: true
         }).setView([7.06569722, 125.59678861], 14);
@@ -354,43 +360,6 @@ if (!isset($_SESSION['Admin-name'])) {
       }
     `;
 
-
-        // OLD CODE
-        /*
-        if(!navigator.geolocation) {
-        console.log("Your browser doesn't support geolocation feature!")
-        } else {
-            setInterval(() => {
-                navigator.geolocation.getCurrentPosition(getPosition)
-            }, 5000);
-        }
-
-    var marker, circle;
-
-    function getPosition(position){
-        // console.log(position)
-        var lat = position.coords.latitude
-        var long = position.coords.longitude
-        var accuracy = position.coords.accuracy
-
-        if(marker) {
-            map.removeLayer(marker)
-        }
-
-        if(circle) {
-            map.removeLayer(circle)
-        }
-
-        marker = L.marker([lat, long])
-        circle = L.circle([lat, long], {radius: accuracy})
-
-        var featureGroup = L.featureGroup([marker, circle]).addTo(map)
-
-        //map.fitBounds(featureGroup.getBounds())
-
-        console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
-        }*/
-
         // Load the final_predicted_values_aggregated.csv file with a timestamp to prevent caching
         const csvFilePath = 'css/final_predicted_values_aggregated.csv?' + Date.now();
 
@@ -453,10 +422,6 @@ if (!isset($_SESSION['Admin-name'])) {
           });
         }
 
-
-
-
-
         // Function to fetch user name from the database based on MAC address
         async function fetchUserNameFromDatabase(ssid) {
           try {
@@ -514,39 +479,16 @@ if (!isset($_SESSION['Admin-name'])) {
         markerClusterScript.src = 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js';
         document.head.appendChild(markerClusterScript);
 
-
-
-    /*
-    map.on('click', function (e) {
-    const latlng = e.latlng;
-    const lat = latlng.lat;
-    const lng = latlng.lng;
-
-    // Create a popup and set its content
-    const popupContent = "Latitude: " + lat + "<br>Longitude: " + lng;
-    const popup = L.popup()
-        .setLatLng(latlng)
-        .setContent(popupContent);
-
-    // Open the popup on the map
-    popup.openOn(map);
-    });
-    */
-
-
-
     </script>
 
 
 
 <!-- map 2 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-
+  </main>
         <section id="map2" aria-label="Map2" role="region" position="absolute" >
             <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
             <p><a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a></p>
         </section>
-    </main>
-
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Vector Tiles in Leaflet JS</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -559,7 +501,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
-        const map2 = L.map2('map2', {
+        const map2 = L.map('map2', {
             preferCanvas: true
         }).setView([7.06569722, 125.59678861], 14);
 
@@ -824,5 +766,6 @@ if (!isset($_SESSION['Admin-name'])) {
         markerClusterScript.src = 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js';
         document.head.appendChild(markerClusterScript);
 
+</script>
 </body>
 </html>
