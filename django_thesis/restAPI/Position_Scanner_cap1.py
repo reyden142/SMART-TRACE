@@ -7,7 +7,7 @@ from mysql.connector import Error
 from datetime import datetime
 
 # Define the MikroTik router's IP address, username, and password
-router_ip = '192.168.203.2'
+router_ip = '192.168.203.17'
 username = 'thesis2.0'
 password = 'admin'
 
