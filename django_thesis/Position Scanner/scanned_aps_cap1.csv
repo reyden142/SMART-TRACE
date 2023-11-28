@@ -1,1 +1,4 @@
 mac_address,ssid,channel,signal_strength,source,timestamp
+80:26:89:AF:C9:F0,CpE_Wifi,2412,-67,cap1,2023-11-28 11:43:08
+FE:47:AD:D7:13:E2,C1,2457,-91,cap1,2023-11-28 11:43:08
+FA:C0:A6:71:FA:ED,AP4,2437,-53,cap1,2023-11-28 11:43:08

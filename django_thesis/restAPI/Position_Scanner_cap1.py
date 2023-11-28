@@ -7,7 +7,7 @@ from mysql.connector import Error
 from datetime import datetime
 
 # Define the MikroTik router's IP address, username, and password
-router_ip = '192.168.203.17'
+router_ip = '192.168.203.2'
 username = 'thesis2.0'
 password = 'admin'
 
@@ -23,16 +23,8 @@ db_config = {
 specific_ssid = [
                     "C1",
                     "C2",
-                    "C2",
-                    "C3",
-                    "C4",
-                    "C5",
-                    "C6",
-                    "C7",
-                    "C8",
-                    "C9",
-                    "C10",
-                    "C11"
+                    "AP4",
+
                 ]
 
 def connect_to_database():
@@ -71,12 +63,19 @@ def extract_numeric_channel(channel):
     else:
         return None
 def main():
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(router_ip, username=username, password=password)
+
+    # Create the command
+    command = f'/caps-man/interface/scan cap1'
+
+    # Execute the command
+    stdin, stdout, stderr = ssh.exec_command(command)
+
     while True:
         try:
-
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(router_ip, username=username, password=password)
 
             # Define the CAP interface names ('cap1' and 'cap2')
             cap_interfaces = ['cap1']
@@ -87,11 +86,6 @@ def main():
             pattern = r'(\S+)\s+(?:(\S+)\s+)?(\d+/\d+/\w+).+?(-\d+)'
 
             for cap_interface in cap_interfaces:
-                # Create the command
-                command = f'/caps-man/interface/scan freeze-frame-interval=7 {cap_interface}'
-
-                # Execute the command
-                stdin, stdout, stderr = ssh.exec_command(command)
 
                 output = stdout.read(2048).decode()
                 lines = output.splitlines()
@@ -119,8 +113,7 @@ def main():
                                 latest_results[ssid] = (
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
                     # Wait for the scan to complete, adjust the sleep time as needed
-                    time.sleep(1)  # You can adjust the sleep duration
-
+                    #time.sleep(1)  # You can adjust the sleep duration
 
                     current_data.extend(latest_results.values())
                     data.extend(current_data)
@@ -142,9 +135,6 @@ def main():
             print(f"SSH connection failed: {str(e)}")
         except Exception as e:
             print(f"An unexpected error occurred: {str(e)}")
-        finally:
-            # Close the SSH connection
-            ssh.close()
 
 if __name__ == "__main__":
     main()
