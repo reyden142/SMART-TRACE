@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import time
 import pprint
+from itertools import product
 
 # Visualizations
 import matplotlib.pyplot as plt
@@ -80,365 +81,274 @@ def save_dataframe_to_csv(df, file_path):
     print(f"Data extracted and saved to {file_path}")
 
 
+def clean_data(df):
+    """
+    Perform feature trimming, and engineering for trainingData
+    Will also be applied to validationData
+
+    INPUT: trainingData DataFrame
+    OUTPUT: Trimmed and cleaned trainingData DataFrame
+    """
+
+    # Reverse the representation for the values. 100=0 and teh values range from 0-105 (weakest to strongest)
+    # "The intensity values are represented as negative integer values ranging -104dBm (extremely poor signal) to 0dbM.
+    # The positive value 100 is used to denote when a WAP was not detected."
+    df.iloc[:, 6:9] = np.where(df.iloc[:, 6:9] <= 0,
+                                df.iloc[:, 6:9] + 105,
+                                df.iloc[:, 6:9] - 100)
+
+    # remove selected columns...
+    columns_removed = ['mac_address', 'timestamp']
+    for col in columns_removed:
+        df.drop(col, axis=1, inplace=True)
+
+    # Return the cleaned dataframe.
+    return df
+
+def preprocess_data(df):
+    """
+    Separates trainingData into Features and Targets
+    Will also be applied to validationData
+
+    INPUT: Cleaned trainingData DataFrame
+    OUTPUT: trainingData as Features and Targets
+    """
+
+    X = df
+
+    # Extract unique channel values
+    unique_channels = sorted(
+        set(df['channel_cap1'].unique()) | set(df['channel_cap2'].unique()) | set(df['channel_cap3'].unique()))
+
+    # Create new one-hot encoded columns
+    for channel in unique_channels:
+        X[f'channel_cap1_{channel}'] = (df['channel_cap1'] == channel).astype(int)
+        X[f'channel_cap2_{channel}'] = (df['channel_cap2'] == channel).astype(int)
+        X[f'channel_cap3_{channel}'] = (df['channel_cap3'] == channel).astype(int)
+
+    # Drop the original 'channel_cap1', 'channel_cap2', and 'channel_cap3' columns
+    X.drop(['channel_cap1', 'channel_cap2', 'channel_cap3'], axis=1, inplace=True)
+
+    # Iterate over signal strength caps and channels to perform multiplication
+    signal_columns = ['signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3']
+
+    for signal_col in signal_columns:
+        for channel in unique_channels:
+            channel_col1 = f'channel_cap1_{channel}'
+            channel_col2 = f'channel_cap2_{channel}'
+            channel_col3 = f'channel_cap3_{channel}'
+
+            if signal_col.endswith('cap1'):
+                X[f'{signal_col}_{channel_col1}'] = df[signal_col] * X[channel_col1]
+            elif signal_col.endswith('cap2'):
+                X[f'{signal_col}_{channel_col2}'] = df[signal_col] * X[channel_col2]
+            elif signal_col.endswith('cap3'):
+                X[f'{signal_col}_{channel_col3}'] = df[signal_col] * X[channel_col3]
+
+    # Drop the original 'signal_strength' columns
+    X.drop(['signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3'], axis=1, inplace=True)
+
+    # Drop unwanted columns
+    unwanted_columns = [f'channel_cap{i}_{cap}' for i in range(1, 4) for cap in unique_channels]
+    X.drop(unwanted_columns, axis=1, inplace=True)
+
+    return X
+
+
 # Main function
 def main():
+
+    # Load the dataset
+    #file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_processed.csv'
+    #trainingData = pd.read_csv(file_path)
+
+
     while True:  # Run forever
-        # Load the dataset
-        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\ap_data_processed.csv'
-        trainingData = pd.read_csv(file_path)
 
-        def clean_data(df):
-            """
-            Perform feature trimming, and engineering for trainingData
-            Will also be applied to validationData
+    # SCANNED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            INPUT: trainingData DataFrame
-            OUTPUT: Trimmed and cleaned trainingData DataFrame
-            """
+        # Load scanned data
+        scanned_data_cap1 = r'C:\Users\Thesis2.0\django_thesis\Position Scanner\scanned_aps_cap1.csv'
+        scanned_data_cap2 = r'C:\Users\Thesis2.0\django_thesis\Position Scanner\scanned_aps_cap2.csv'
+        scanned_data_cap3 = r'C:\Users\Thesis2.0\django_thesis\Position Scanner\scanned_aps_cap3.csv'
 
-            # Reverse the representation for the values. 100=0 and teh values range from 0-105 (weakest to strongest)
-            # "The intensity values are represented as negative integer values ranging -104dBm (extremely poor signal) to 0dbM.
-            # The positive value 100 is used to denote when a WAP was not detected."
-            df.iloc[:, 9:11] = np.where(df.iloc[:, 9:11] <= 0,
-                                        df.iloc[:, 9:11] + 105,
-                                        df.iloc[:, 9:11] - 100)
+        data_cap1 = pd.read_csv(scanned_data_cap1)
+        data_cap2 = pd.read_csv(scanned_data_cap2)
+        data_cap3 = pd.read_csv(scanned_data_cap3)
 
-            # remove selected columns...
-            columns_removed = ['mac_address', 'ssid', 'timestamp']
-            # cap1_channel	cap2_channel	cap3_channel	cap1_signal_strength	cap2_signal_strength	cap3_signal_strength
+        # Combine data from cap1, cap2, and cap3
+        combined_data = pd.concat([data_cap1, data_cap2, data_cap3], ignore_index=True)
+        validationData = pd.concat([data_cap1, data_cap2, data_cap3], ignore_index=True)
 
-            for col in columns_removed:
-                df.drop(col, axis=1, inplace=True)
+        #'''
+        # Add a new column 'source_without_C' by removing 'C' from 'source'
+        combined_data['ssid'] = combined_data['ssid'].str.replace('C', '')
 
-            # Return the cleaned dataframe.
-            return df
+        # Convert the 'source_without_C' column to numeric
+        combined_data['ssid'] = pd.to_numeric(combined_data['ssid'], errors='coerce')
+        #'''
+
+        # Print or use the combined_data DataFrame as needed
+        print(combined_data)
+
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan1_combined_data.csv'
+
+        # Save the DataFrame to a CSV file
+        combined_data.to_csv(output_file, index=False)
+
+    # ARRANGED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        # Assuming 'ap_data' is a DataFrame containing your data
+
+        # Find unique SSIDs in the dataset
+        unique_ssids = combined_data['ssid'].unique()
+
+        print('unique ssids: ', unique_ssids)
+
+        # Initialize an empty list to store dictionaries
+        combinations_list = []
+
+        # Iterate over unique SSIDs and extract unique channels for each 'cap' category
+        for ssid in unique_ssids:
+            # Filter data for the specific SSID
+            specific_ssid_data = combined_data[combined_data['ssid'] == ssid]
+
+            # Filter data for each 'cap' category within the specific SSID
+            cap1_data = specific_ssid_data[specific_ssid_data['source'] == 'cap1']
+            cap2_data = specific_ssid_data[specific_ssid_data['source'] == 'cap2']
+            cap3_data = specific_ssid_data[specific_ssid_data['source'] == 'cap3']
+
+            # Extract unique channels for each 'cap' category within the specific SSID
+            unique_channels_cap1 = cap1_data['channel'].unique()
+            unique_channels_cap2 = cap2_data['channel'].unique()
+            unique_channels_cap3 = cap3_data['channel'].unique()
+
+            # Generate all combinations of unique channels
+            all_combinations = product(unique_channels_cap1, unique_channels_cap2, unique_channels_cap3)
+
+            # Append combinations to the list
+            for combination in all_combinations:
+                combinations_list.append({
+                    'mac_address': specific_ssid_data['mac_address'].iloc[0],
+                    'ssid': ssid,
+                    'timestamp': specific_ssid_data['timestamp'].iloc[0],
+                    'channel_cap1': combination[0],
+                    'channel_cap2': combination[1],
+                    'channel_cap3': combination[2],
+                    'signal_strength_cap1': cap1_data[cap1_data['channel'] == combination[0]]['signal_strength'].iloc[0],
+                    'signal_strength_cap2': cap2_data[cap2_data['channel'] == combination[1]]['signal_strength'].iloc[0],
+                    'signal_strength_cap3': cap3_data[cap3_data['channel'] == combination[2]]['signal_strength'].iloc[0],
+                })
+
+        # Create the DataFrame outside the loop
+        combinations_df = pd.DataFrame(combinations_list, columns=[
+            'mac_address', 'ssid', 'timestamp',
+            'channel_cap1', 'channel_cap2', 'channel_cap3',
+            'signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3'
+        ])
+
+        # Print the resulting DataFrame with all combinations
+        print(combinations_df)
+
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan2_combinations_df.csv'
+
+        # Save the DataFrame to a CSV file
+        combinations_df.to_csv(output_file, index=False)
+
+    # CLEANED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         # Apply Cleaning
 
-        trainingData = clean_data(trainingData)
+        cleaned_data = clean_data(combinations_df)
 
-        def preprocess_data(df):
-            """
-            Separates trainingData into Features and Targets
-            Will also be applied to validationData
+        print(cleaned_data)
+        # trainingData.to_csv('trainingData.csv', index=False)
 
-            INPUT: Cleaned trainingData DataFrame
-            OUTPUT: trainingData as Features and Targets
-            """
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan3_cleaned_data.csv'
 
-            global X
-            global y
-            # split the data set into features and targets(Floor and BuildingID)
-            X = df.drop(['longitude', 'latitude', 'floorid'], axis=1)
-            y = df[['floorid']]
+        # Save the DataFrame to a CSV file
+        cleaned_data.to_csv(output_file, index=False)
 
-            # create Dummies for the targets to feed into the model
-            y = pd.get_dummies(data=y, columns=['floorid'])
+    # TRAINED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            return X, y
+        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\X_values.csv'
+        X_dataset = pd.read_csv(file_path)
+
+        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\y_values.csv'
+        y_dataset = pd.read_csv(file_path)
+
+        X_train, X_test, y_train, y_test = train_test_split(X_dataset,
+                                                            y_dataset,
+                                                            test_size=0.2,
+                                                            random_state=42,
+                                                            shuffle=True)
+
+        # Show the results of the split
+        print("Training set has {} samples.".format(X_train.shape[0]))
+        print("Testing set has {} samples.".format(X_test.shape[0]))
+
+        # Scale Data with Standard Scaler
+
+        scaler = StandardScaler()
+
+        # Fit only the training set
+        # this will help us transform the validation data
+        scaler.fit(X_train)
+
+        # Apply transform to both the training set and the test set.
+        X_train = scaler.transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        k = 1  # You can adjust the value of k
+        knn = KNeighborsClassifier(n_neighbors=k, p=2, metric='euclidean')  # p=2 for Euclidean metric
+        knn.fit(X_train, y_train)
+
+        # Assuming 'knn' is your trained KNN classifier
+        # Assuming 'X_test' and 'y_test' are your test features and labels
+        y_pred = knn.predict(X_test)
+
+        # Calculate accuracy
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f'Accuracy: {accuracy * 100:.2f}%')
+
+    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         # Apply preprocessing
 
-        X, y = preprocess_data(trainingData)
+        X = preprocess_data(cleaned_data)
 
-        def split_data(preprocess_data):
-            # TO AVOID OVERFITTING: Split the training data into training and testing sets
-            global X_train
-            global X_test
-            global y_train
-            global y_test
+        print(X)
 
-            X_train, X_test, y_train, y_test = train_test_split(X,
-                                                                y,
-                                                                test_size=0.2,
-                                                                random_state=42,
-                                                                shuffle=True)
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan4_preprocessed_data.csv'
 
-            # Show the results of the split
-            print("Training set has {} samples.".format(X_train.shape[0]))
-            print("Testing set has {} samples.".format(X_test.shape[0]))
-            return X_train, X_test, y_train, y_test
+        # Save the DataFrame to a CSV file
+        X.to_csv(output_file, index=False)
 
-        # Apply split data
+    # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        X_train, X_test, y_train, y_test = split_data(preprocess_data)
+        # Make predictions on the scanned data
+        predictions = knn.predict(X)
 
+        # Add predicted floorid to the scanned data
+        validationData['predicted_floorid'] = predictions
 
+        # Assuming 'knn' is your trained KNN classifier
+        # Assuming 'X_test' and 'y_test' are your test features and labels
+        y_pred = knn.predict(X)
 
-        # SCANNED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+        # Calculate accuracy
+        accuracy = accuracy_score(y_test, y_pred)
 
-        # Connect to the database
-        conn = connect_to_database()
+        print(f'Accuracy: {accuracy * 100:.2f}%')
 
-        cursor = conn.cursor()
+        # Display the predicted floorid for the scanned data
+        print(validationData[['mac_address', 'ssid', 'predicted_floorid']])
 
-        # Check if the connection is successful
-        if conn is not None:
-            # Extract data to the database
-            try:
-                # Replace 'your_query' with the SQL query to select the data you want
-                your_query = "SELECT * FROM `ap_data_position`"
-
-                # Use pandas to read the query result into a DataFrame
-                df = pd.read_sql_query(your_query, conn)
-
-                # Replace 'output_file.csv' with the desired file name
-                ap_data_position = 'ap_data_position.csv'
-
-                # Save the DataFrame to a CSV file
-                df.to_csv(ap_data_position, index=False)
-
-                print(f"Data extracted and saved to {ap_data_position}")
-
-                # Read the CSV file into a new DataFrame
-                ap_data_pivot_2 = pd.read_csv(ap_data_position)
-
-                print('ap_data_position', ap_data_pivot_2)
-
-                # Check if 'cap1', 'cap2', and 'cap3' are available in the 'source' column
-                if sum(cap in ap_data_pivot_2['source'].unique() for cap in ['cap1', 'cap2', 'cap3']) >= 2:
-                    # Assuming 'ap_data_processed' is your training data DataFrame
-
-                    # Select relevant columns
-                    selected_columns = ['source', 'channel', 'signal_strength', 'mac_address', 'ssid', 'timestamp']
-                    ap_data_selected = ap_data_pivot_2[selected_columns]
-
-                    # Pivot the DataFrame to create separate columns for each 'cap'
-                    ap_data_pivot_2 = ap_data_selected.pivot_table(
-                        index=['mac_address', 'ssid', 'timestamp'],
-                        columns='source',
-                        values=['channel', 'signal_strength'],
-                        aggfunc='first'
-                    ).reset_index()
-
-                    # Flatten the MultiIndex columns
-                    ap_data_pivot_2.columns = [f'{col[0]}_{col[1]}' if col[1] else col[0] for col in
-                                               ap_data_pivot_2.columns]
-
-                    # Rename columns for clarity
-                    ap_data_pivot_2.columns = [
-                        'mac_address', 'ssid', 'timestamp',
-                        'cap1_channel', 'cap2_channel', 'cap3_channel',
-                        'cap1_signal_strength', 'cap2_signal_strength', 'cap3_signal_strength'
-                    ]
-
-                    # Replace missing signal_strength values with 100
-                    ap_data_pivot_2['cap1_signal_strength'].fillna(100, inplace=True)
-                    ap_data_pivot_2['cap2_signal_strength'].fillna(100, inplace=True)
-                    ap_data_pivot_2['cap3_signal_strength'].fillna(100, inplace=True)
-
-                    # Replace missing channel values with 0
-                    ap_data_pivot_2['cap1_channel'].fillna(0, inplace=True)
-                    ap_data_pivot_2['cap2_channel'].fillna(0, inplace=True)
-                    ap_data_pivot_2['cap3_channel'].fillna(0, inplace=True)
-
-                    print('ap_data_pivot_2', ap_data_pivot_2)
-
-                    # Save the DataFrame to a CSV file
-                    '''
-                    csv_file = 'ap_data_position_processed_before.csv'
-                    ap_data_pivot_2.to_csv(csv_file, index=False)
-                    print('export csv file successful')
-                    '''
-
-                    # Remove rows if there are two zeroes in a row in the cap_channel
-                    '''
-                    ap_data_pivot_2 = ap_data_pivot_2[
-                        ~((ap_data_pivot_2['cap1_channel'] == 0) & (ap_data_pivot_2['cap2_channel'] == 0)) &
-                        ~((ap_data_pivot_2['cap1_channel'] == 0) & (ap_data_pivot_2['cap3_channel'] == 0)) &
-                        ~((ap_data_pivot_2['cap2_channel'] == 0) & (ap_data_pivot_2['cap3_channel'] == 0))
-                        ]
-                    '''
-
-                    # Save the DataFrame to a CSV file
-                    ap_data_pivot_2.to_csv('ap_data_position_processed.csv', index=False)
-
-                    # Print the resulting DataFrame
-                    print(ap_data_pivot_2.head())
-
-                    # If CAP1, CAP2, and CAP3 are available
-                    csv_file = 'ap_data_position_processed.csv'
-                    # csv_file_2 = 'ap_data_position.csv'
-
-                    # Check if the CSV file exists
-                    if os.path.exists(csv_file):
-                        # Read the CSV file into a DataFrame
-                        ap_data_pivot_2 = pd.read_csv(csv_file)
-
-                        # Replace these column names with the actual column names in your dataset
-
-                        features = ['cap1_signal_strength', 'cap2_signal_strength', 'cap3_signal_strength',
-                                    'cap1_channel', 'cap2_channel', 'cap3_channel']
-                        target = 'floorid'
-
-                        # Clean data
-                        validationData = clean_data(ap_data_pivot_2)
-
-                        # preprocess
-                        X_valid, y_valid = preprocess_data(validationData)
-
-                        # scale
-                        X_valid = scaler.transform(X_valid)
-
-                        # pca
-                        X_valid_pca = pca.transform(X_valid)
-
-                        print("Number of PCA Components = {}.".format(pca.n_components_))
-
-                        print("Total Variance Explained by PCA Components = {}.".format(
-                            pca.explained_variance_ratio_.sum()))
-
-                        # Convert to sparse matrix
-                        X_valid_pca = lil_matrix(X_valid_pca).toarray()
-                        y_valid = lil_matrix(y_valid).toarray()
-
-                        # predict mlknn =1
-                        valid_predictions = MLKNN_1_classifier.predict(X_valid_pca)
-
-                        # accuracy
-                        print("Accuracy = ", accuracy_score(y_valid, valid_predictions))
-
-                        # Split the data into training and testing sets
-                        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-                        # Group by 'ssid' and aggregate values
-                        ap_data_pivot_2 = ap_data_pivot_2.groupby('ssid').agg({
-                            'mac_address': 'first',
-                            'timestamp': 'first',
-                            'cap1_signal_strength': 'first',
-                            'cap2_signal_strength': 'first',
-                            'cap3_signal_strength': 'first',
-                            'cap1_channel': 'first',
-                            'cap2_channel': 'first',
-                            'cap3_channel': 'first'
-                        }).reset_index()
-
-                        # Assuming 'combined_scanned_data' is your scanned data DataFrame
-                        # Replace these column names with the actual column names in your dataset
-                        scanned_data_features = ap_data_pivot_2[features]
-
-                        # Make predictions on the scanned data
-                        #predictions = knn.predict(scanned_data_features)
-
-                        # Group by 'ssid' and aggregate values
-                        aggregated_data = ap_data_pivot_2.groupby('ssid').agg({
-                            'mac_address': 'first',
-                            'timestamp': 'first',
-                            'predicted_floorid': 'first'
-                        }).reset_index()
-
-                        '''
-                        # Save the aggregated DataFrame to a new CSV file
-                        predicted_values_file = 'predicted_values_aggregated.csv'
-                        aggregated_data.to_csv(predicted_values_file, index=False)
-                        '''
-
-                        # Apply PCA while keeping 95% of the variation in the data
-                        pca = PCA(.95)
-
-                        # Fit only the training set
-                        pca.fit(X_train)
-
-                        # Apply PCA transform to both the training set and the test set.
-                        X_train_pca = pca.transform(X_train)
-                        X_test_pca = pca.transform(X_test)
-
-                        print("Number of PCA Components = {}.".format(pca.n_components_))
-                        # print(pca.n_components_)
-                        print("Total Variance Explained by PCA Components = {}.".format(
-                            pca.explained_variance_ratio_.sum()))
-                        # print(pca.explained_variance_ratio_.sum())
-
-                        # Create sparse matrices to run the scikit multilearn algorithms
-
-                        X_train_pca = lil_matrix(X_train_pca).toarray()
-                        y_train = lil_matrix(y_train).toarray()
-                        X_test_pca = lil_matrix(X_test_pca).toarray()
-                        y_test = lil_matrix(y_test).toarray()
-
-                        start_time = time.time()
-
-                        MLKNN_1_classifier = MLkNN(k=1)
-
-                        # train
-                        MLKNN_1_classifier.fit(X_train_pca, y_train)
-
-                        # run predictions
-                        # predict mlknn =1
-                        predictions = MLKNN_1_classifier.predict(X_test_pca)
-
-                        # Add predicted floorid to the scanned data
-                        ap_data_pivot_2['predicted_floorid'] = predictions
-
-                        # Convert to sparse matrix
-                        X_valid_pca = lil_matrix(X_valid_pca).toarray()
-                        y_valid = lil_matrix(y_valid).toarray()
-
-                        y_pred = MLKNN_1_classifier.predict(X_valid_pca)
-
-                        # Display the predicted floorid for the scanned data
-                        print(ap_data_pivot_2[['mac_address', 'ssid', 'predicted_floorid']])
-
-                        # accuracy
-                        print("Accuracy = ", accuracy_score(y_test, y_valid))
-
-                        print("--- Run time: %s mins ---" % np.round(((time.time() - start_time) / 60), 2))
-
-                        # Query to fetch latitude and longitude from the "markers" table
-                        query = "SELECT title, lat, lng FROM markers"
-                        # Execute the query and fetch the results
-
-                        cursor.execute(query)
-                        markers_data = cursor.fetchall()
-
-                        # Create a DataFrame from the results
-                        markers_df = pd.DataFrame(markers_data, columns=['title', 'lat', 'lng'])
-
-                        # Convert 'predicted_floorid' to object type in the aggregated_data DataFrame
-                        aggregated_data['predicted_floorid'] = aggregated_data['predicted_floorid'].astype(str)
-
-
-
-                        # Merge the aggregated_data DataFrame with markers_df based on 'predicted_floorid'
-                        result_df = pd.merge(aggregated_data, markers_df, left_on='predicted_floorid', right_on='title',
-                                             how='left')
-
-                        # Drop the duplicate 'title' column
-                        result_df = result_df.drop(columns=['title'])
-
-                        # Save the final DataFrame to a new CSV file
-                        # Specify the full path where you want to save the CSV file
-                        csv_file_path = 'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated.csv'
-
-                        # Save the final DataFrame to the specified CSV file
-                        result_df.to_csv(csv_file_path, index=False)
-
-                        print("Latitude and longitude added successfully.")
-
-                        # After processing, delete the CSV file
-                        # os.remove(csv_file)
-                        # print(f"CSV file '{csv_file}' deleted.")
-
-                    else:
-                        print("Missing 'cap1', 'cap2', or 'cap3' in the 'source' column.")
-
-                else:
-                    print(f"CSV file '{csv_file}' not found.")
-
-                # Remove all data from the ap_data_position table
-                # delete_query = "DELETE FROM `ap_data_position`"
-                # with conn.cursor() as cursor:
-                #    cursor.execute(delete_query)
-                # conn.commit()
-                # print("All data removed from 'ap_data_position' table.")
-
-            except Exception as e:
-                print(f"Error: {e}")
-            finally:
-                # Close the database connection
-                conn.close()
-        else:
-            print("Failed to connect to the database")
+        return
 
 # Run the main function
 if __name__ == "__main__":

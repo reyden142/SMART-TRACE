@@ -1,14 +1,18 @@
 import paramiko
 import re
+import pandas as pd
 import csv
+import time
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 
+# Define the MikroTik router's IP address, username, and password
 router_ip = '192.168.203.2'
 username = 'thesis2.0'
 password = 'admin'
 
+# Database configuration
 db_config = {
     "host": "localhost",
     "user": "root",
@@ -16,12 +20,16 @@ db_config = {
     "database": "rfid_ips"
 }
 
+# List of specific MAC addresses to filter
 specific_ssid = [
-    "C1",
-    "C2",
-    "AP4",
-    "CpE_Wifi"
-]
+                    "C1",
+                    "C2",
+                    #"AP4",
+                    #"CpE_Wifi"
+
+                ]
+
+
 
 def connect_to_database():
     try:
@@ -34,125 +42,209 @@ def connect_to_database():
     return None
 
 def transfer_to_database(data, connection):
-    if connection:
-        cursor = connection.cursor()
-        try:
-            insert_query = "INSERT INTO ap_data_position (mac_address, ssid, channel, signal_strength, source, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
-            current_timestamp = datetime.now()
-            data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], current_timestamp) for row in data]
-            cursor.executemany(insert_query, data_with_timestamp)
-            connection.commit()
-            print(f"Transferred {len(data)} records to the database with timestamp {current_timestamp}.")
-        except Error as e:
-            connection.rollback()
-            print(f"Error transferring data to the database: {e}")
-        finally:
-            cursor.close()
+    if "already running" not in data:
+        if connection:
+            cursor = connection.cursor()
+            try:
+                # Insert data into the database, including the timestamp
+                insert_query = "INSERT INTO position_scanner_cap1 (mac_address, ssid, channel, signal_strength, source, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
+                current_timestamp = datetime.now()  # Capture the current timestamp
+                data_with_timestamp = [(row[0], row[1], row[2], row[3], row[4], current_timestamp) for row in data]
+                cursor.executemany(insert_query, data_with_timestamp)
+                connection.commit()
+                print(f"Transferred {len(data)} records to the database with timestamp {current_timestamp}.")
+            except Error as e:
+                connection.rollback()
+                print(f"Error transferring data to the database: {e}")
+            finally:
+                cursor.close()
 
 def extract_numeric_channel(channel):
-    match = re.match(r'(\d+)', str(channel))
+    # Use regular expression to extract numeric part from the channel
+    match = re.match(r'(\d+)', str(channel))  # Ensure the result is always a string
     if match:
         return match.group(1)
     else:
         return None
 
 def main():
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(router_ip, username=username, password=password)
 
-    cap_interfaces = ['cap1']
+    # Create the command
+    command = f'/caps-man/interface/scan cap1'
 
-    all_data = {}  # Dictionary to store data for each SSID
-
-    signal_strength_counter = {}
-
-    # Move the command execution outside the loop
-    command = f'/caps-man/interface/scan {cap_interfaces[0]}'
+    # Execute the command
     stdin, stdout, stderr = ssh.exec_command(command)
 
     while True:
         try:
+
+            # Define the CAP interface names ('cap1' and 'cap2')
+            cap_interfaces = ['cap1']
+
+            # Create a list to store data from both CAP interfaces
             data = []
 
             pattern = r'(\S+)\s+(?:(\S+)\s+)?(\d+/\d+/\w+).+?(-\d+)'
 
-            output = stdout.read(2048).decode()
-            lines = output.splitlines()
+            for cap_interface in cap_interfaces:
 
-            print(f"unprocessed data {cap_interfaces[0]}:", output)
+                output = stdout.read(2048).decode()
+                lines = output.splitlines()
 
-            if "failure: already running" not in output:
-                current_data = []
-                latest_results = {}
+                #print(f"unprocessed data {cap_interface}:", output)
+                #print(f"lines {cap_interface}:", lines)
 
-                for line in lines:
-                    match = re.search(pattern, line)
-                    if match:
-                        mac_address = match.group(1)
-                        ssid = match.group(2)
-                        channel = match.group(3)
-                        signal_strength = int(match.group(4))
+                if "failure: already running" not in output:
+                    # Data collection and processing for the current CAP interface
+                    current_data = []
 
-                        if ssid in specific_ssid:
-                            current_timestamp = datetime.now()
-                            latest_results[ssid] = (
-                                mac_address, ssid, channel, signal_strength, cap_interfaces[0], current_timestamp)
+                    latest_results = {}
 
-                            if ssid not in signal_strength_counter:
-                                signal_strength_counter[ssid] = {signal_strength: 1}
-                            else:
-                                if signal_strength in signal_strength_counter[ssid]:
-                                    signal_strength_counter[ssid][signal_strength] += 1
+                    for line in lines:
+                        match = re.search(pattern, line)
+                        #print(f"line: {line}")
+                        if match:
+                            mac_address = match.group(1)
+                            ssid = match.group(2)
+                            channel = match.group(3)  # Capture the channel as a string
+                            signal_strength = int(match.group(4))  # Capture the signal strength as an integer
+                            #print(f"ssid output: {ssid}")
+                            if ssid in specific_ssid:
+                                current_timestamp = datetime.now()  # Capture the current timestamp
+                                latest_results[ssid] = (
+                                    mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
+                    # Wait for the scan to complete, adjust the sleep time as needed
+                    #time.sleep(1)  # You can adjust the sleep duration
 
-                                    print('SSID: ', ssid)
-                                    print('count: ', signal_strength_counter[ssid][signal_strength])
-                                else:
-                                    signal_strength_counter[ssid][signal_strength] = 1
+                    current_data.extend(latest_results.values())
+                    data.extend(current_data)
 
-                            if signal_strength_counter[ssid].get(signal_strength, 0) == 3:
-                                current_data.extend(latest_results.values())
-                                if ssid not in all_data:
-                                    all_data[ssid] = []
-                                all_data[ssid].extend(current_data)
-                                signal_strength_counter[ssid] = {}
+                    print(f"data {cap_interface}:", current_data)
 
-                print(f"data {cap_interfaces[0]}:", current_data)
 
-            if "failure: already running" not in output:
+
+            if "failure: already running" not in output:  # Check the condition here as well
+
+                # Connect to the database
                 connection = connect_to_database()
 
+                # Transfer data to the database with the floorid and timestamp
                 if connection:
-                    for ssid, ssid_data in all_data.items():
-                        # Write data to CSV file
-                        csv_filename = f'scanned_aps_{cap_interfaces[0]}.csv'
-                        with open(csv_filename, 'w', newline='') as csv_file:
-                            fieldnames = ['mac_address', 'ssid', 'channel', 'signal_strength', 'source',
-                                          'timestamp']
-                            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                            csv_writer.writeheader()  # Write the header in each iteration
-                            for row in ssid_data:
-                                numeric_channel = extract_numeric_channel(row[2])
-                                timestamp_str = row[5].strftime('%Y-%m-%d %H:%M:%S')
-                                csv_writer.writerow(
-                                    {'mac_address': row[0], 'ssid': row[1], 'channel': numeric_channel,
-                                     'signal_strength': row[3], 'source': row[4],
-                                     'timestamp': timestamp_str})
+                    transfer_to_database(data, connection)
 
-                        # Transfer data to the database with timestamp
-                        transfer_to_database(ssid_data, connection)
+                    # Extract data to the database
+                    # Replace 'your_query' with the SQL query to select the data you want
+                    your_query = "SELECT * FROM `position_scanner_cap1`"
 
-                    # Reset the all_data dictionary after transferring data
-                    all_data = {}
+                    # Use pandas to read the query result into a DataFrame
+                    df = pd.read_sql_query(your_query, connection)
+
+                    # Replace 'output_file.csv' with the desired file name
+                    position_scanner_cap1 = 'position_scanner_cap1.csv'
+
+                    # Save the DataFrame to a CSV file
+                    df.to_csv(position_scanner_cap1, index=False)
+
+                    print(f"Data extracted and saved to {position_scanner_cap1}")
+
+                    # Read the CSV file into a new DataFrame
+                    position_scanner_cap1 = pd.read_csv(position_scanner_cap1)
+
+                    print('position_scanner_cap1', position_scanner_cap1)
+
+                    # Check for three similar rows based on specific columns
+                    columns_to_check = ['mac_address', 'ssid', 'channel', 'signal_strength']
+
+                    duplicates = position_scanner_cap1[
+                        position_scanner_cap1.duplicated(subset=columns_to_check, keep=False)]
+
+                    if not duplicates.empty:
+                        # Group by 'ssid', 'channel', and 'signal_strength' columns and count the number of duplicate rows for each group
+                        duplicate_counts = position_scanner_cap1[
+                            position_scanner_cap1.duplicated(subset=columns_to_check, keep=False)].groupby(
+                            ['ssid', 'channel', 'signal_strength']).size()
+
+                        # Print the results and transfer data for groups with duplicate_count >= 4
+                        for (ssid, channel, signal_strength), count in duplicate_counts.items():
+
+                            # Print the total count for each SSID before processing the data
+                            total_count = position_scanner_cap1[position_scanner_cap1['ssid'] == ssid].shape[0]
+                            print(f"SSID: {ssid}, Total Count: {total_count}, Number of Duplicate Rows: {count}")
+
+                            print(
+                                f"SSID: {ssid}, Channel: {channel}, Signal Strength: {signal_strength}, Number of Duplicate Rows: {count}")
+
+                            # Check if duplicate_count is 4 or more
+                            if count >= 4:
+                                # Extract the data for the current group
+                                group_data = position_scanner_cap1[
+                                    (position_scanner_cap1['ssid'] == ssid) &
+                                    (position_scanner_cap1['channel'] == channel) &
+                                    (position_scanner_cap1['signal_strength'] == signal_strength)
+                                    ]
+
+                                # Select the row with the maximum signal strength
+                                #representative_row = group_data.loc[group_data['signal_strength'].idxmax()]
+
+                                # Save the representative row to "scanned_aps_cap1.csv"
+                                #representative_row.to_csv("scanned_aps_cap1.csv", index=False, mode='a', header=False)
+
+                                # Create and open a CSV file for writing
+                                with open('scanned_aps_cap1.csv', 'w', newline='') as csv_file:
+                                    fieldnames = ['mac_address', 'ssid', 'channel', 'signal_strength', 'source',
+                                                  'timestamp']  # mac_address, ssid, signal_strength, channel, source, timestamp
+                                    csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                                    csv_writer.writeheader()
+
+                                    # Write the data to the CSV file
+                                    for row in data:
+                                        numeric_channel = extract_numeric_channel(row[2])
+                                        # Convert the timestamp to a string for CSV
+                                        timestamp_str = row[5].strftime('%Y-%m-%d %H:%M:%S')
+                                        csv_writer.writerow(
+                                            {'mac_address': row[0], 'ssid': row[1], 'channel': numeric_channel,
+                                             'signal_strength': row[3], 'source': row[4],
+                                             'timestamp': timestamp_str})
+
+                                print(
+                                    f"Data transferred to scanned_aps_cap1.csv for SSID: {ssid}, Channel: {channel}, Signal Strength: {signal_strength}")
+
+                                # Connect to the database
+                                with connect_to_database() as connection:
+                                    delete_data_from_database(ssid, connection)
+
+                            if total_count >= 20:
+                                print(f"Total count for SSID {ssid} is 20 or more. Performing actions...")
+
+                                # Connect to the database
+                                with connect_to_database() as connection:
+                                    delete_data_from_database(ssid, connection)
+
+                    else:
+                        print("No rows with similar values found.")
 
         except paramiko.AuthenticationException:
             print("Authentication failed. Please check your credentials.")
-
         except paramiko.SSHException as e:
             print(f"SSH connection failed: {str(e)}")
-
         except Exception as e:
             print(f"An unexpected error occurred: {str(e)}")
+
+def delete_data_from_database(ssid, connection):
+    if connection:
+        try:
+            with connection.cursor() as cursor:
+                delete_query = "DELETE FROM position_scanner_cap1 WHERE ssid = %s"
+                cursor.execute(delete_query, (ssid,))
+            connection.commit()
+            print(f"All data with SSID {ssid} deleted from the database.")
+        except Error as e:
+            connection.rollback()
+            print(f"Error deleting data from the database: {e}")
 
 if __name__ == "__main__":
     main()

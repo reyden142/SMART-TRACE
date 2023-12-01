@@ -1,4 +1,0 @@
-ssid,mac_address,channel_cap1,channel_cap2,channel_cap3,signal_strength_cap1,signal_strength_cap2,signal_strength_cap3
-C1,FE:47:AD:D7:13:E2,2442.0,2452.0,0,-73.0,-74.0,100
-C11,AA:3A:2F:0C:11:A6,0.0,2462.0,0,100.0,-74.0,100
-C2,6A:D2:19:82:06:D2,2412.0,2412.0,0,-89.0,-70.0,100
