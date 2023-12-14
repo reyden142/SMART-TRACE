@@ -58,7 +58,6 @@ def connect_to_database():
         print(f"Error: {e}")
     return None
 
-
 # Function to connect to the MySQL database
 def connect_to_database():
     try:
@@ -93,14 +92,55 @@ def clean_data(df):
     # Reverse the representation for the values. 100=0 and teh values range from 0-105 (weakest to strongest)
     # "The intensity values are represented as negative integer values ranging -104dBm (extremely poor signal) to 0dbM.
     # The positive value 100 is used to denote when a WAP was not detected."
+    '''
     df.iloc[:, 6:9] = np.where(df.iloc[:, 6:9] <= 0,
                                 df.iloc[:, 6:9] + 105,
                                 df.iloc[:, 6:9] - 100)
+    '''
 
     # remove selected columns...
     columns_removed = ['mac_address', 'timestamp']
     for col in columns_removed:
         df.drop(col, axis=1, inplace=True)
+
+    # Return the cleaned dataframe.
+    return df
+
+def clean_data_dataset(df):
+    """
+    Perform feature trimming, and engineering for trainingData
+    Will also be applied to validationData
+
+    INPUT: trainingData DataFrame
+    OUTPUT: Trimmed and cleaned trainingData DataFrame
+    """
+
+    # Reverse the representation for the values. 100=0 and teh values range from 0-105 (weakest to strongest)
+    # "The intensity values are represented as negative integer values ranging -104dBm (extremely poor signal) to 0dbM.
+    # The positive value 100 is used to denote when a WAP was not detected."
+    df.iloc[:, 5:8] = np.where(df.iloc[:, 5:8] <= 0,
+                               df.iloc[:, 5:8] + 105,
+                               df.iloc[:, 5:8] - 100)
+
+    '''
+    df.iloc[:, 6:9] = np.where(df.iloc[:, 6:9] > 2000, 
+                df.iloc[:, 6:9] - 2300, 
+                df.iloc[:, 6:9] - 0)
+    '''
+
+    # Remove rows if there are two zeroes in a row in the cap_channel
+    df = df[
+        ~((df['channel_cap1'] == 0) & (df['channel_cap2'] == 0)) &
+        ~((df['channel_cap1'] == 0) & (df['channel_cap3'] == 0)) &
+        ~((df['channel_cap2'] == 0) & (df['channel_cap3'] == 0))
+        ]
+
+    # Remove rows if there are one zeroes in a row in the cap_channel
+    df = df[
+        ~((df['channel_cap1'] == 0)) &
+        ~((df['channel_cap2'] == 0)) &
+        ~((df['channel_cap3'] == 0))
+        ]
 
     # Return the cleaned dataframe.
     return df
@@ -154,7 +194,130 @@ def preprocess_data(df):
 
     return X
 
+def preprocess_data_dataset(df):
+    """
+    Separates trainingData into Features and Targets
+    Will also be applied to validationData
 
+    INPUT: Cleaned trainingData DataFrame
+    OUTPUT: trainingData as Features and Targets
+    """
+    # split the data set into features and targets(Floor and BuildingID)
+    X = df.drop(['floorid'], axis=1)
+    y = df[['floorid']]
+
+    # Extract unique channel values
+    unique_channels = sorted(
+        set(df['channel_cap1'].unique()) | set(df['channel_cap2'].unique()) | set(df['channel_cap3'].unique()))
+
+    # Create new one-hot encoded columns
+    for channel in unique_channels:
+        X[f'channel_cap1_{channel}'] = (df['channel_cap1'] == channel).astype(int)
+        X[f'channel_cap2_{channel}'] = (df['channel_cap2'] == channel).astype(int)
+        X[f'channel_cap3_{channel}'] = (df['channel_cap3'] == channel).astype(int)
+
+    # Drop the original 'channel_cap1', 'channel_cap2', and 'channel_cap3' columns
+    X.drop(['channel_cap1', 'channel_cap2', 'channel_cap3'], axis=1, inplace=True)
+
+    # Iterate over signal strength caps and channels to perform multiplication
+    signal_columns = ['signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3']
+
+    for signal_col in signal_columns:
+        for channel in unique_channels:
+            channel_col1 = f'channel_cap1_{channel}'
+            channel_col2 = f'channel_cap2_{channel}'
+            channel_col3 = f'channel_cap3_{channel}'
+
+            if signal_col.endswith('cap1'):
+                X[f'{signal_col}_{channel_col1}'] = df[signal_col] * X[channel_col1]
+            elif signal_col.endswith('cap2'):
+                X[f'{signal_col}_{channel_col2}'] = df[signal_col] * X[channel_col2]
+            elif signal_col.endswith('cap3'):
+                X[f'{signal_col}_{channel_col3}'] = df[signal_col] * X[channel_col3]
+
+    # Drop the original 'signal_strength' columns
+    X.drop(['signal_strength_cap1', 'signal_strength_cap2', 'signal_strength_cap3'], axis=1, inplace=True)
+
+    # Drop unwanted columns
+    unwanted_columns = [f'channel_cap{i}_{cap}' for i in range(1, 4) for cap in unique_channels]
+    X.drop(unwanted_columns, axis=1, inplace=True)
+
+    # create Dummies for the targets to feed into the model
+    y = pd.get_dummies(data=y, columns=['floorid'])
+
+    return X, y
+
+def add_unique_channels(df):
+
+    X_processed = df
+
+    # Assuming X_processed is your existing DataFrame and X_train_cols is the list of columns in X_train
+    X_train_cols = [
+        "ssid",
+        "signal_strength_cap1_channel_cap1_2412",
+        "signal_strength_cap1_channel_cap1_2417",
+        "signal_strength_cap1_channel_cap1_2422",
+        "signal_strength_cap1_channel_cap1_2427",
+        "signal_strength_cap1_channel_cap1_2432",
+        "signal_strength_cap1_channel_cap1_2437",
+        "signal_strength_cap1_channel_cap1_2442",
+        "signal_strength_cap1_channel_cap1_2447",
+        "signal_strength_cap1_channel_cap1_2452",
+        "signal_strength_cap1_channel_cap1_2457",
+        "signal_strength_cap1_channel_cap1_2462",
+        "signal_strength_cap2_channel_cap2_2412",
+        "signal_strength_cap2_channel_cap2_2417",
+        "signal_strength_cap2_channel_cap2_2422",
+        "signal_strength_cap2_channel_cap2_2427",
+        "signal_strength_cap2_channel_cap2_2432",
+        "signal_strength_cap2_channel_cap2_2437",
+        "signal_strength_cap2_channel_cap2_2442",
+        "signal_strength_cap2_channel_cap2_2447",
+        "signal_strength_cap2_channel_cap2_2452",
+        "signal_strength_cap2_channel_cap2_2457",
+        "signal_strength_cap2_channel_cap2_2462",
+        "signal_strength_cap3_channel_cap3_2412",
+        "signal_strength_cap3_channel_cap3_2417",
+        "signal_strength_cap3_channel_cap3_2422",
+        "signal_strength_cap3_channel_cap3_2427",
+        "signal_strength_cap3_channel_cap3_2432",
+        "signal_strength_cap3_channel_cap3_2437",
+        "signal_strength_cap3_channel_cap3_2442",
+        "signal_strength_cap3_channel_cap3_2447",
+        "signal_strength_cap3_channel_cap3_2452",
+        "signal_strength_cap3_channel_cap3_2457",
+        "signal_strength_cap3_channel_cap3_2462"
+    ]
+
+    # Iterate through each column in X_train_cols
+    for col in X_train_cols:
+        # Check if the column already exists in X_processed
+        if col not in X_processed.columns:
+            # If not, add the column and fill with 0
+            X_processed[col] = 0
+
+    # Rearrange the columns of X_train to match the order in X_train_cols
+    X_processed = X_processed[X_train_cols]
+
+    return X_processed
+
+def split_data_dataset(preprocess_data_dataset):
+    # TO AVOID OVERFITTING: Split the training data into training and testing sets
+    global X_train
+    global X_test
+    global y_train
+    global y_test
+
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        y,
+                                                        test_size=0.20,
+                                                        random_state=42,
+                                                        shuffle=True)
+
+    # Show the results of the split
+    print("Training set has {} samples.".format(X_train.shape[0]))
+    print("Testing set has {} samples.".format(X_test.shape[0]))
+    return X_train, X_test, y_train, y_test
 # Main function
 def main():
 
@@ -272,25 +435,51 @@ def main():
         # Save the DataFrame to a CSV file
         cleaned_data.to_csv(output_file, index=False)
 
-    # TRAINED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\X_values.csv'
-        X_dataset = pd.read_csv(file_path)
+        # Apply preprocessing
 
-        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\y_values.csv'
-        y_dataset = pd.read_csv(file_path)
+        X_processed = preprocess_data(cleaned_data)
 
-        X_train, X_test, y_train, y_test = train_test_split(X_dataset,
-                                                            y_dataset,
-                                                            test_size=0.2,
-                                                            random_state=42,
-                                                            shuffle=True)
+        print(X_processed)
 
-        # Show the results of the split
-        print("Training set has {} samples.".format(X_train.shape[0]))
-        print("Testing set has {} samples.".format(X_test.shape[0]))
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan4_preprocessed_data.csv'
 
-        # Scale Data with Standard Scaler
+        # Save the DataFrame to a CSV file
+        X_processed.to_csv(output_file, index=False)
+
+    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        # Apply preprocessing
+        X_test = add_unique_channels(X_processed)
+        print(X_test)
+
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan5_add_unique_channels_data.csv'
+
+        # Save the DataFrame to a CSV file
+        X_test.to_csv(output_file, index=False)
+
+    # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        # Load the dataset
+        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\combined_rssi_final.csv'
+        trainingData = pd.read_csv(file_path)
+
+        # Apply Cleaning
+        trainingData = clean_data_dataset(trainingData)
+
+        # Apply preprocessing
+        X, y = preprocess_data_dataset(trainingData)
+
+        print(X)
+        print(y)
+
+        # Apply split data
+        X_train, X_test, y_train, y_test = split_data_dataset(preprocess_data_dataset)
+
+    # Scale Data with Standard Scaler
 
         scaler = StandardScaler()
 
@@ -314,41 +503,54 @@ def main():
         accuracy = accuracy_score(y_test, y_pred)
         print(f'Accuracy: {accuracy * 100:.2f}%')
 
-    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+    # See the predictions and translate them
 
-        # Apply preprocessing
+        scanned_file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\scan5_add_unique_channels_data.csv'
+        scanned_data = pd.read_csv(scanned_file_path)
 
-        X = preprocess_data(cleaned_data)
+        features = ['ssid'] + [
+            f'signal_strength_{cap}_channel_{cap}_{channel}'
+            for cap in ['cap1', 'cap2', 'cap3']
+            for channel in ['2412', '2417', '2422', '2427', '2432', '2437', '2442', '2447', '2452', '2457', '2462']
+        ]
 
-        print(X)
+        # Replace these column names with the actual column names in your dataset
+        scanned_data_features = scanned_data[features]
 
-        # Replace 'output_file.csv' with the desired file name
-        output_file = 'scan4_preprocessed_data.csv'
+        scanned_predictions = knn.predict(scanned_data_features)
 
-        # Save the DataFrame to a CSV file
-        X.to_csv(output_file, index=False)
+        print(scanned_predictions)
 
-    # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+        # Find the indices where the predicted values are 1
+        indices_with_1 = np.where(scanned_predictions == 1)
 
-        # Make predictions on the scanned data
-        predictions = knn.predict(X)
+        # Extract the corresponding values from the y_train column
+        corresponding_values = y_train.iloc[indices_with_1]
 
-        # Add predicted floorid to the scanned data
-        validationData['predicted_floorid'] = predictions
+        # Print the corresponding values
+        print(corresponding_values)
 
-        # Assuming 'knn' is your trained KNN classifier
-        # Assuming 'X_test' and 'y_test' are your test features and labels
-        y_pred = knn.predict(X)
+        # Assuming scanned_data has 'ssid' and other relevant columns
+        columns_of_interest = ['ssid']  # Include other relevant columns as needed
+        scanned_data_subset = scanned_data[columns_of_interest].copy()  # Use .copy() to create a copy of the DataFrame
 
-        # Calculate accuracy
-        accuracy = accuracy_score(y_test, y_pred)
+        # Create a new column 'timestamp' with dummy values
+        scanned_data_subset['timestamp'] = pd.Timestamp.now()  # You can replace this with your desired timestamp
 
-        print(f'Accuracy: {accuracy * 100:.2f}%')
+        # Find the indices where the predicted values are 1
+        indices_with_1 = np.where(scanned_predictions == 1)[0]  # Use [0] to get the array from the tuple
 
-        # Display the predicted floorid for the scanned data
-        print(validationData[['mac_address', 'ssid', 'predicted_floorid']])
+        # Add the predicted 'floorid' to the scanned_data_subset
+        scanned_data_subset['floorid'] = corresponding_values.idxmax(axis=1).apply(lambda x: int(x.split('_')[1]))
+
+        # Print the final table
+        print(scanned_data_subset)
 
         return
+
+
+
+
 
 # Run the main function
 if __name__ == "__main__":
