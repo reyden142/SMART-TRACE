@@ -57,7 +57,7 @@ def transfer_to_database(data, connection, floorid):
 
 def main():
     # Define the floorid here or retrieve it as needed
-    floorid = 179  # You can adjust the floorid as needed
+    floorid = 376  # You can adjust the floorid as needed
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
