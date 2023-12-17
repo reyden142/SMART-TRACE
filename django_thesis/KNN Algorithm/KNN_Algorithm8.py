@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import time
+from datetime import datetime
 import pprint
 from itertools import product
 
@@ -426,7 +427,7 @@ def main():
 
         # Apply preprocessing
         X_test = add_unique_channels(X_processed)
-        print(X_test)
+        print('X_test', X_test)
 
         # Replace 'output_file.csv' with the desired file name
         output_file = 'scan5_add_unique_channels_data.csv'
@@ -476,17 +477,42 @@ def main():
 
         print(y_test)
 
-        # Find the indices where the value is True
-        true_indices = np.where(y_test[0])[0]
-        print(np.where(y_test[0])[0])
-
         # Assuming 'y_train' is your true labels array
         column_names = y_train.columns
 
-        # Print the column names where the value is True
-        true_column_names = [column_names[index] for index in true_indices]
-        print("Column names with 'True' predictions:", true_column_names)
+        for i, y_pred in enumerate(y_test):
+            print(f"\nPrediction {i + 1}:")
+            print(f"Column names with 'True' predictions:")
 
+            # Find the indices where the value is True for the current prediction
+            true_indices = np.where(y_pred)[0]
+
+            # Remove the 'floorid_' prefix when printing the column names
+            true_column_names = [column.replace('floorid_', '') for column in column_names[true_indices]]
+            print("Column names with 'True' predictions:", true_column_names)
+
+            # Add predicted floorid to the scanned data
+            cleaned_data.loc[cleaned_data.index[i], 'predicted_floorid'] = true_column_names[0]
+
+            current_timestamp = datetime.now()  # Capture the current timestamp
+
+
+
+        print(cleaned_data[['ssid', 'predicted_floorid']])
+
+        ''''
+        # Group by 'ssid' and aggregate values
+        aggregated_data = cleaned_data.groupby('ssid').agg({
+            'timestamp': 'first',
+            'predicted_floorid': 'first'
+        }).reset_index()
+
+        print('aggregated_data: ', aggregated_data)
+        '''
+
+
+
+        return
 
 # Run the main function
 if __name__ == "__main__":

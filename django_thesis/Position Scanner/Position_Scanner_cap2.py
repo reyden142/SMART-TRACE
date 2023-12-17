@@ -92,7 +92,7 @@ def main():
 
             for cap_interface in cap_interfaces:
 
-                output = stdout.read(2048).decode()
+                output = stdout.read(3000).decode()
                 lines = output.splitlines()
 
                 #print(f"unprocessed data {cap_interface}:", output)
@@ -179,7 +179,7 @@ def main():
                                 f"SSID: {ssid}, Channel: {channel}, Signal Strength: {signal_strength}, Number of Duplicate Rows: {count}")
 
                             # Check if duplicate_count is 4 or more
-                            if count >= 6:
+                            if count >= 4:
                                 # Extract the data for the current group
                                 group_data = position_scanner_cap2[
                                     (position_scanner_cap2['ssid'] == ssid) &

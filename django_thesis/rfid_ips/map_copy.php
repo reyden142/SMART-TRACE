@@ -6,7 +6,8 @@ require 'connectDB.php';
 
 // Array to store CSV file paths
 $csvFiles = [
-    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated.csv'
+    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map1.csv',
+    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map2.csv'
 ];
 
 // Function to read CSV file and return data as an array
@@ -378,7 +379,7 @@ if (!isset($_SESSION['Admin-name'])) {
     `;
 
         // Load the final_predicted_values_aggregated.csv file with a timestamp to prevent caching
-        const csvFilePath = 'css/final_predicted_values_aggregated.csv?' + Date.now();
+        const csvFilePath = 'css/final_predicted_values_aggregated_map1.csv?' + Date.now();
 
         // Inject the custom marker CSS into the document
         const style = document.createElement('style');
@@ -442,7 +443,7 @@ if (!isset($_SESSION['Admin-name'])) {
         // Function to fetch user name from the database based on MAC address
         async function fetchUserNameFromDatabase(ssid) {
           try {
-            const response = await fetch(`map_fetchUsername.php?ssid=${encodeURIComponent(ssid)}`);
+            const response = await fetch(`map1_fetchUsername.php?ssid=${encodeURIComponent(ssid)}`);
             const data = await response.json();
 
             if (data.error) {
@@ -719,7 +720,7 @@ if (!isset($_SESSION['Admin-name'])) {
         }).addTo(map2);
 
         // The CSS to style the custom marker
-    var customMarkerStyle = `
+    var customMarkerStyle2 = `
       .custom-icon {
         width: 32px;
         height: 32px;
@@ -736,6 +737,123 @@ if (!isset($_SESSION['Admin-name'])) {
       }
     `;
 
+
+        // Load the final_predicted_values_aggregated.csv file with a timestamp to prevent caching
+        const csvFilePath2 = 'css/final_predicted_values_aggregated_map2.csv?' + Date.now();
+
+        // Inject the custom marker CSS into the document
+        const style2 = document.createElement('style');
+        style2.innerHTML = customMarkerStyle2;
+        document.head.appendChild(style2);
+
+        // Create a custom CSS style for the marker
+        const customIconStyle2 = L.divIcon({
+          className: 'custom-icon',
+          html: '<div class="marker-icon" style="background-color: blue;"></div>',
+          draggable: true // Enable dragging
+        });
+
+        async function addMarkers2(data) {
+          // Clear existing markers
+          map2.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+              map2.removeLayer(layer);
+            }
+          });
+
+          const markerGroups2 = {};
+
+          for (const row of data) {
+            const lat = parseFloat(row.lat);
+            const lng = parseFloat(row.lng);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+              // Fetch user name based on MAC address from the database
+              const userName = await fetchUserNameFromDatabase2(row.ssid);
+
+              const key = `${lat}_${lng}`;
+
+              if (!markerGroups2[key]) {
+                // Create a new marker group for this location
+                markerGroups2[key] = {
+                  marker: L.marker([lat, lng], { icon: customIconStyle }),
+                  userNames: [userName],
+                  ssids: [row.ssid],
+                };
+              } else {
+                // Add user name and SSID to existing marker group
+                markerGroups2[key].userNames.push(userName);
+                markerGroups2[key].ssids.push(row.ssid);
+              }
+            }
+          }
+
+          // Add all marker groups to the map
+          Object.values(markerGroups2).forEach((markerGroup) => {
+            const userNamesList = markerGroup.userNames.join(', ');
+            const ssidsList = markerGroup.ssids.join(', ');
+
+            const popupContent = `<b>${userNamesList}</b><br>SSID: ${ssidsList}<br>Latitude: ${markerGroup.marker.getLatLng().lat}<br>Longitude: ${markerGroup.marker.getLatLng().lng}`;
+
+            markerGroup.marker.bindPopup(popupContent);
+            //map1.addLayer(markerGroup.marker);
+            map2.addLayer(markerGroup.marker);
+          })
+        }
+
+        // Function to fetch user name from the database based on MAC address
+        async function fetchUserNameFromDatabase2(ssid) {
+          try {
+            const response = await fetch(`map2_fetchUsername.php?ssid=${encodeURIComponent(ssid)}`);
+            const data = await response.json();
+
+            if (data.error) {
+              console.error('Error fetching user name:', data.error);
+              return 'Unknown User';
+            }
+
+            // Assume that the response contains the user name
+            return data.userName;
+          } catch (error) {
+            console.error('Error fetching user name:', error);
+            return 'Unknown User';
+          }
+        }
+
+        // Function to fetch and update CSV data
+        async function updateCSV2() {
+          console.log('Updating MAP2 CSV...');
+          try {
+            const response = await fetch(csvFilePath2);
+            if (response.ok) {
+              const data = await response.text();
+
+              // Parse CSV data and add markers
+              const csvData = Papa.parse(data, { header: true });
+              addMarkers2(csvData.data);
+            } else {
+              console.error('Failed to fetch CSV:', response.status, response.statusText);
+            }
+          } catch (error) {
+            console.error('Error fetching CSV:', error);
+          }
+        }
+
+        // Initial call to load markers
+        updateCSV2();
+
+        // Set interval to update markers every 1 second
+        setInterval(updateCSV2, 5000);
+
+        // Include PapaParse library for CSV parsing
+        const script2 = document.createElement('script');
+        script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js';
+        script2.onload = updateCSV; // Call updateCSV when PapaParse is loaded
+        document.head.appendChild(script2);
+
+        const markerClusterScript2 = document.createElement('script');
+        markerClusterScript2.src = 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js';
+        document.head.appendChild(markerClusterScript2);
 
 
     </script>
