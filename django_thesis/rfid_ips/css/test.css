@@ -1,0 +1,77 @@
+html, body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+	background:#002134;
+}
+
+.charts_orb {
+	display:flex;
+	align-items:flex-start;
+	justify-content:center;
+	flex-wrap:wrap;
+	font-family:arial;
+	color:white;
+
+	.orb {
+		padding:20px;
+
+		.orb_graphic {
+			position:relative;
+
+			.orb_value {
+				position:absolute;
+				top:0;
+				left:0;
+				width:100%;
+				height:100%;
+				display:flex;
+				align-items:center;
+				justify-content:center;
+				font-size:2.5em;
+				font-weight:bold;
+			}
+		}//.orb_graphic
+
+		.orb_label {
+			text-transform:uppercase;
+			text-align:center;
+			margin-top:1em;
+		}//.orb_label
+	}//.orb
+
+	svg {
+		width:110px;
+		height:110px;
+
+		circle {
+			transform: rotate(-90deg);
+			transform-origin: 50% 50%;
+			stroke-dasharray: 314.16, 314.16;
+			stroke-width: 2;
+			fill: transparent;
+			r: 50;
+			cx: 55;
+			cy: 55;
+
+			&.fill {
+				stroke: #D3D3D3;
+			}
+
+			&.progress {
+				stroke: #FF6B00;
+				transition: stroke-dashoffset 0.35s;
+				stroke-dashoffset: 214.16;
+				-webkit-animation: NAME-YOUR-ANIMATION 1.5s forwards;
+				-webkit-animation-timing-function: linear;
+
+				@-webkit-keyframes NAME-YOUR-ANIMATION {
+					0% { stroke-dashoffset: 314.16; }
+					100%   { stroke-dashoffset: 0; }
+				}
+			}
+		}
+	}
+}

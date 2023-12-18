@@ -6,7 +6,8 @@ require 'connectDB.php';
 
 // Array to store CSV file paths
 $csvFiles = [
-    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated.csv'
+    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map1.csv',
+    'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map2.csv'
 ];
 
 // Function to read CSV file and return data as an array

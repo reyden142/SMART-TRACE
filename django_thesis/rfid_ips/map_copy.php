@@ -105,23 +105,11 @@ if (!isset($_SESSION['Admin-name'])) {
                                 'Contact' => $Contact,
                                 'EmergencyContact' => $EmergencyContact,
                                 'MedicalHistory' => $MedicalHistory,
-                                'timestamp' => $row[2], // Assuming timestamp is in the 6th column (adjust if needed)
+                                #'timestamp' => $row[2], // Assuming timestamp is in the 6th column (adjust if needed)
                                 'username' => $username,
+                                'room' => $row[2],
                             ];
                         }
-
-                        // Determine the room based on the 'predicted_floorid'
-                        $predictedFloorId = (int)$row[3]; // Assuming predicted_floorid is in the 4th column (adjust if needed)
-                        if ($predictedFloorId >= 101 && $predictedFloorId <= 189) {
-                            $room = 'BE213';
-                        } elseif ($predictedFloorId >= 1 && $predictedFloorId <= 80) {
-                            $room = 'BE214';
-                        } else {
-                            $room = 'Unknown Room';
-                        }
-
-                        // Store room information
-                        $roomData[$username] = $room;
                     }
                 }
 
@@ -142,7 +130,7 @@ if (!isset($_SESSION['Admin-name'])) {
                 echo '<th style="padding: 10px;">Contact</th>';
                 echo '<th style="padding: 10px;">Emergency Contact</th>';
                 echo '<th style="padding: 10px;">Medical History</th>';
-                echo '<th style="padding: 10px;">Timestamp</th>';
+                #echo '<th style="padding: 10px;">Timestamp</th>';
                 echo '<th style="padding: 10px;">Room</th>';
                 echo '</tr>';
                 echo '</thead>';
@@ -157,8 +145,8 @@ if (!isset($_SESSION['Admin-name'])) {
                     echo '<td>' . htmlspecialchars($userData['Contact']) . '</td>';
                     echo '<td>' . htmlspecialchars($userData['EmergencyContact']) . '</td>';
                     echo '<td>' . htmlspecialchars($userData['MedicalHistory']) . '</td>';
-                    echo '<td>' . htmlspecialchars($userData['timestamp']) . '</td>';
-                     echo '<td>' . htmlspecialchars($room) . '</td>';
+                    #echo '<td>' . htmlspecialchars($userData['timestamp']) . '</td>';
+                    echo '<td>' . htmlspecialchars($userData['room']) . '</td>';
                     echo '</tr>';
                 }
 

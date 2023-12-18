@@ -48,17 +48,6 @@ db_config = {
     "database": "rfid_ips"
 }
 
-
-def connect_to_database():
-    try:
-        connection = mysql.connector.connect(**db_config)
-        if connection.is_connected():
-            print("Connected to MySQL database")
-            return connection
-    except Error as e:
-        print(f"Error: {e}")
-    return None
-
 # Function to connect to the MySQL database
 def connect_to_database():
     try:
@@ -209,8 +198,8 @@ def preprocess_data_dataset(df):
     OUTPUT: trainingData as Features and Targets
     """
     # split the data set into features and targets(Floor and BuildingID)
-    X = df.drop(['floorid'], axis=1)
-    y = df[['floorid']]
+    X = df.drop(['floorid', 'roomid'], axis=1)
+    y = df[['floorid', 'roomid']]
 
     # Extract unique channel values
     unique_channels = sorted(
@@ -249,36 +238,16 @@ def preprocess_data_dataset(df):
     X.drop(unwanted_columns, axis=1, inplace=True)
 
     # create Dummies for the targets to feed into the model
-    y = pd.get_dummies(data=y, columns=['floorid'])
+    y = pd.get_dummies(data=y, columns=['floorid', 'roomid'])
 
     return X, y
 
-def add_unique_channels(df):
+def add_unique_channels(df, X_train):
 
     X_processed = df
 
     # Assuming X_processed is your existing DataFrame and X_train_cols is the list of columns in X_train
-    X_train_cols = [
-        'ssid',
-        'signal_strength_cap1_channel_cap1_0', 'signal_strength_cap1_channel_cap1_2412',
-        'signal_strength_cap1_channel_cap1_2417', 'signal_strength_cap1_channel_cap1_2422',
-        'signal_strength_cap1_channel_cap1_2427', 'signal_strength_cap1_channel_cap1_2432',
-        'signal_strength_cap1_channel_cap1_2437', 'signal_strength_cap1_channel_cap1_2442',
-        'signal_strength_cap1_channel_cap1_2447', 'signal_strength_cap1_channel_cap1_2452',
-        'signal_strength_cap1_channel_cap1_2457', 'signal_strength_cap1_channel_cap1_2462',
-        'signal_strength_cap2_channel_cap2_0', 'signal_strength_cap2_channel_cap2_2412',
-        'signal_strength_cap2_channel_cap2_2417', 'signal_strength_cap2_channel_cap2_2422',
-        'signal_strength_cap2_channel_cap2_2427', 'signal_strength_cap2_channel_cap2_2432',
-        'signal_strength_cap2_channel_cap2_2437', 'signal_strength_cap2_channel_cap2_2442',
-        'signal_strength_cap2_channel_cap2_2447', 'signal_strength_cap2_channel_cap2_2452',
-        'signal_strength_cap2_channel_cap2_2457', 'signal_strength_cap2_channel_cap2_2462',
-        'signal_strength_cap3_channel_cap3_0', 'signal_strength_cap3_channel_cap3_2412',
-        'signal_strength_cap3_channel_cap3_2417', 'signal_strength_cap3_channel_cap3_2422',
-        'signal_strength_cap3_channel_cap3_2427', 'signal_strength_cap3_channel_cap3_2432',
-        'signal_strength_cap3_channel_cap3_2437', 'signal_strength_cap3_channel_cap3_2442',
-        'signal_strength_cap3_channel_cap3_2447', 'signal_strength_cap3_channel_cap3_2452',
-        'signal_strength_cap3_channel_cap3_2457', 'signal_strength_cap3_channel_cap3_2462'
-    ]
+    X_train_cols = X_train.columns  # Get the columns of X_train
 
     # Iterate through each column in X_train_cols
     for col in X_train_cols:
@@ -423,19 +392,7 @@ def main():
         # Save the DataFrame to a CSV file
         X_processed.to_csv(output_file, index=False)
 
-    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        # Apply preprocessing
-        X_test = add_unique_channels(X_processed)
-        print('X_test', X_test)
-
-        # Replace 'output_file.csv' with the desired file name
-        output_file = 'scan5_add_unique_channels_data.csv'
-
-        # Save the DataFrame to a CSV file
-        X_test.to_csv(output_file, index=False)
-
-    # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+    # TRAINED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         # Load the dataset
         file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\combined_rssi_final.csv'
@@ -453,8 +410,22 @@ def main():
         X_train.to_csv('X_train.csv', index=False)
         y_train.to_csv('y_train.csv', index=False)
 
-    # Scale Data with Standard Scaler
 
+    # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        # Apply preprocessing
+        X_test = add_unique_channels(X_processed, X_train)
+        print('X_test', X_test)
+
+        # Replace 'output_file.csv' with the desired file name
+        output_file = 'scan5_add_unique_channels_data.csv'
+
+        # Save the DataFrame to a CSV file
+        X_test.to_csv(output_file, index=False)
+
+    # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        # Scale Data with Standard Scaler
         scaler = StandardScaler()
 
         # Fit only the training set
@@ -488,19 +459,24 @@ def main():
             true_indices = np.where(y_pred)[0]
 
             # Remove the 'floorid_' prefix when printing the column names
-            true_column_names = [column.replace('floorid_', '') for column in column_names[true_indices]]
+            true_column_names = [column.replace('floorid_', '').replace('roomid_', '') for column in column_names[true_indices]]
             print("Column names with 'True' predictions:", true_column_names)
 
             # Add predicted floorid to the scanned data
             cleaned_data.loc[cleaned_data.index[i], 'predicted_floorid'] = true_column_names[0]
-
+            cleaned_data.loc[cleaned_data.index[i], 'predicted_roomid'] = true_column_names[1]
             current_timestamp = datetime.now()  # Capture the current timestamp
 
+        # Extract columns [ssid, predicted_floorid, predicted_roomid]
+        selected_columns = cleaned_data[['ssid', 'predicted_floorid', 'predicted_roomid']]
 
+        # Create a new DataFrame named 'final_predictions'
+        final_predictions = pd.DataFrame(selected_columns)
 
-        print(cleaned_data[['ssid', 'predicted_floorid']])
+        print('Final Predictions: ')
+        print(final_predictions)
 
-        ''''
+        '''
         # Group by 'ssid' and aggregate values
         aggregated_data = cleaned_data.groupby('ssid').agg({
             'timestamp': 'first',
@@ -510,9 +486,56 @@ def main():
         print('aggregated_data: ', aggregated_data)
         '''
 
+        connection = connect_to_database()
 
+        cursor = connection.cursor()
 
-        return
+        # Query to fetch latitude and longitude from the "markers" table
+        query = "SELECT title, lat, lng FROM markers_combined"
+        # Execute the query and fetch the results
+
+        cursor.execute(query)
+        markers_data = cursor.fetchall()
+
+        # Create a DataFrame from the results
+        markers_df = pd.DataFrame(markers_data, columns=['title', 'lat', 'lng'])
+
+        # Convert 'predicted_floorid' to object type in the aggregated_data DataFrame
+        final_predictions['predicted_floorid'] = final_predictions['predicted_floorid'].astype(str)
+
+        # Merge the aggregated_data DataFrame with markers_df based on 'predicted_floorid'
+        result_df = pd.merge(final_predictions, markers_df, left_on='predicted_floorid', right_on='title',
+                             how='left')
+
+        # Drop the duplicate 'title' column
+        result_df = result_df.drop(columns=['title'])
+
+        # Create empty DataFrames to accumulate rows based on the condition
+        df_map1 = pd.DataFrame()
+        df_map2 = pd.DataFrame()
+
+        for i, row in result_df.iterrows():
+            # Convert 'predicted_roomid' column to integers
+            row['predicted_roomid'] = int(row['predicted_roomid'])
+
+            # Check if the value in the 'predicted_roomid' column is equal to 111
+            if row['predicted_roomid'] == 111:
+                # Append the current row to df_map2
+                df_map2 = pd.concat([df_map2, row.to_frame().T], ignore_index=True)
+            else:
+                # Append the current row to df_map1
+                df_map1 = pd.concat([df_map1, row.to_frame().T], ignore_index=True)
+
+        # Specify the full paths for the CSV files
+        csv_file_path_map1 = 'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map1.csv'
+        csv_file_path_map2 = 'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/final_predicted_values_aggregated_map2.csv'
+
+        # Save the accumulated DataFrames to the specified CSV files
+        df_map1.to_csv(csv_file_path_map1, index=False)
+        df_map2.to_csv(csv_file_path_map2, index=False)
+
+        print("Latitude and longitude added successfully.")
+
 
 # Run the main function
 if __name__ == "__main__":
