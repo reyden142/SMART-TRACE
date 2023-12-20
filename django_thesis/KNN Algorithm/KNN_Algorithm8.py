@@ -476,6 +476,29 @@ def main():
         print('Final Predictions: ')
         print(final_predictions)
 
+        # Count occurrences of each room ID
+        roomid_counts = final_predictions['predicted_roomid'].value_counts()
+
+        # Count occurrences of specific rooms and floors
+        be111_count = roomid_counts.get('111', 0)
+        be213_count = roomid_counts.get('213', 0)
+        be214_count = roomid_counts.get('214', 0)
+        first_floor_count = be111_count
+        second_floor_count = be213_count + be214_count
+        total_persons = roomid_counts.sum()
+
+        # Create a DataFrame for the counts
+        counts_df = pd.DataFrame({
+            'RoomID': ['BE111', 'BE213', 'BE214', 'First Floor', 'Second Floor', 'Total'],
+            'Count': [be111_count, be213_count, be214_count, first_floor_count, second_floor_count, total_persons]
+        })
+
+        # Save the DataFrame to a CSV file
+        csv_file_path = 'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/room_counts.csv'
+        counts_df.to_csv(csv_file_path, index=False)
+
+        print(f'Room Count CSV file saved at: {csv_file_path}')
+
         '''
         # Group by 'ssid' and aggregate values
         aggregated_data = cleaned_data.groupby('ssid').agg({
@@ -485,6 +508,7 @@ def main():
 
         print('aggregated_data: ', aggregated_data)
         '''
+    # CSV FILE /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         connection = connect_to_database()
 
@@ -535,6 +559,8 @@ def main():
         df_map2.to_csv(csv_file_path_map2, index=False)
 
         print("Latitude and longitude added successfully.")
+
+        return
 
 
 # Run the main function
