@@ -171,26 +171,7 @@ if (!isset($_SESSION['Admin-name'])) {
         </form>
     </div>
 
-        <!-- Display tables side by side -->
-        <div style="display: flex; justify-content: space-around;">
 
-            <!-- Table 1: Display merged data -->
-            <div>
-                <h3>Table 1</h3>
-                <table class="tbl-content">
-                    <!-- ... (Your existing table 1 code) ... -->
-                </table>
-            </div>
-
-            <!-- Table 2: Display room data -->
-            <div>
-                <h3>Table 2</h3>
-                <table class="tbl-content">
-                    <!-- ... (Your existing table 2 code) ... -->
-                </table>
-            </div>
-
-        </div>
 
       <!-- Map 1 -->
     <div style="width: 50%; float: left;">
