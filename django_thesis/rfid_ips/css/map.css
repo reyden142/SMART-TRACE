@@ -17,17 +17,6 @@ h3{
   text-align: left;
 }
 
-#map {
-  position: absolute;
-  position: absolute;
-  top: 115%;
-  left: 35%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
-  right: 1350px;
-}
-
 tbody{
   border: 1px solid rgb(255 255 255 / 30%) !important;
 
@@ -50,26 +39,77 @@ tbody button:hover {
 
 }
 
- th{
-  padding: 0px;
-  text-align: center !important;
-  font-weight: 500;
-  font-size: 100%;
-  color: #f4f7f8;
-  text-transform: uppercase;
-  border: none !important;
-  background-color: #880b0b !important;
-  }
-
-  td{
-    padding: 0px;
-    text-align: center;
-    font-weight: 300;
-    font-size: 85%;
-    color: #333;
-    border-bottom: solid 2px rgb(78 21 21 / 10%);
-    background: #f4f7f8;
-  }
+count {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70%;
+      position: absolute;
+      background: #002134;
+    }
+    .charts_orb {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-family: arial;
+      color: white;
+    }
+    .charts_orb .orb {
+      padding: 20px;
+    }
+    .charts_orb .orb .orb_graphic {
+      position: relative;
+    }
+    .charts_orb .orb .orb_graphic .orb_value {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+    .charts_orb .orb .orb_label {
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: 1em;
+    }
+    .charts_orb svg {
+      width: 110px;
+      height: 110px;
+    }
+    .charts_orb svg circle {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 314.16, 314.16;
+      stroke-width: 2;
+      fill: transparent;
+      r: 50;
+      cx: 55;
+      cy: 55;
+    }
+    .charts_orb svg circle.fill {
+      stroke: #D3D3D3;
+    }
+    .charts_orb svg circle.progress {
+      stroke: #FF6B00;
+      transition: stroke-dashoffset 0.35s;
+      stroke-dashoffset: 214.16;
+      -webkit-animation: NAME-YOUR-ANIMATION 1.5s forwards;
+      -webkit-animation-timing-function: linear;
+    }
+    @-webkit-keyframes NAME-YOUR-ANIMATION {
+      0% {
+        stroke-dashoffset: 314.16;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
 
 .section {
   margin: 20px;
@@ -271,7 +311,7 @@ tbody button:hover {
 }
 @keyframes slideInDown {
   from {
-    transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 60%, 0);
     visibility: visible;
   }
 
@@ -289,6 +329,25 @@ tbody button:hover {
   transform: translate(-50%, -50%);
   width: 90%;
   height: 50%;
+  }
+
+  #map1 {
+  position: absolute;
+  top: 200%;
+  left: 30%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
+
+  }
+
+  #map2 {
+  position: absolute;
+  top: 200%;
+  left: 80%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
   }
 
   .form-style-5{
@@ -324,30 +383,35 @@ tbody button:hover {
     border-bottom: solid 2px rgb(78 21 21 / 10%);
     background: #f4f7f8;
   }
+
+  .count_rectangle {
+    background-color: #880b0b;
+    margin-top: 30%;
+  }
+
 }
 
 /* CSS styles for laptops and desktops */
 @media (min-width: 1024px) {
 
-  #map {
+  #map1 {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  height: 50%;
+  top: 200%;
+  left: 30%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
+
   }
 
   #map2 {
   position: absolute;
-
-  top: 215%;
-  left: 35%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
-  right: 1350px;
-}
+  top: 200%;
+  left: 80%;
+  transform: translate(-60%, -50%);
+  width: 650px;
+  height: 650px;
+  }
 
   .form-style-5{
   max-width: 100%;
@@ -357,9 +421,9 @@ tbody button:hover {
   border-radius: 30px;
   font-family: Georgia, "Times New Roman", Times, serif;
 
-  top: 80%;
+  top: 30%;
   position: absolute;
-  right: 50px;
+  right: 20%;
   }
 
   th{
@@ -382,4 +446,11 @@ tbody button:hover {
     border-bottom: solid 2px rgb(78 21 21 / 10%);
     background: #f4f7f8;
   }
+
+  .count_rectangle {
+    background-color: #880b0b;
+    margin-top: 30%;
+  }
+
+
 }

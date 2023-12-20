@@ -17,6 +17,17 @@ h3{
   text-align: left;
 }
 
+#map {
+  position: absolute;
+  position: absolute;
+  top: 115%;
+  left: 35%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
+  right: 1350px;
+}
+
 tbody{
   border: 1px solid rgb(255 255 255 / 30%) !important;
 
@@ -38,6 +49,27 @@ tbody button:hover {
   color: black;
 
 }
+
+ th{
+  padding: 0px;
+  text-align: center !important;
+  font-weight: 500;
+  font-size: 100%;
+  color: #f4f7f8;
+  text-transform: uppercase;
+  border: none !important;
+  background-color: #880b0b !important;
+  }
+
+  td{
+    padding: 0px;
+    text-align: center;
+    font-weight: 300;
+    font-size: 85%;
+    color: #333;
+    border-bottom: solid 2px rgb(78 21 21 / 10%);
+    background: #f4f7f8;
+  }
 
 .section {
   margin: 20px;
@@ -297,25 +329,24 @@ tbody button:hover {
 /* CSS styles for laptops and desktops */
 @media (min-width: 1024px) {
 
-  #map1 {
+  #map {
   position: absolute;
-  top: 180%;
-  left: 30%;
-  transform: translate(-60%, -50%);
-  width: 650px;
-  height: 650px;
-
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 50%;
   }
 
   #map2 {
   position: absolute;
-  position: absolute;
-  top: 180%;
-  left: 80%;
-  transform: translate(-60%, -50%);
-  width: 650px;
-  height: 650px;
 
+  top: 215%;
+  left: 35%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
+  right: 1350px;
 }
 
   .form-style-5{
@@ -326,9 +357,9 @@ tbody button:hover {
   border-radius: 30px;
   font-family: Georgia, "Times New Roman", Times, serif;
 
-  top: 30%;
+  top: 80%;
   position: absolute;
-  right: 20%;
+  right: 50px;
   }
 
   th{
