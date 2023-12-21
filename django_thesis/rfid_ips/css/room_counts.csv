@@ -1,7 +1,7 @@
 RoomID,Count
-BE111,1
-BE213,2
-BE214,0
-First Floor,1
+BE111,0
+BE213,0
+BE214,2
+First Floor,0
 Second Floor,2
-Total,3
+Total,2

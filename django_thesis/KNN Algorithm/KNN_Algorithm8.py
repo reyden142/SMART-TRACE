@@ -560,7 +560,7 @@ def main():
 
         print("Latitude and longitude added successfully.")
 
-        return
+        time.sleep(1)
 
 
 # Run the main function
