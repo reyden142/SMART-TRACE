@@ -334,20 +334,20 @@ count {
   #map1 {
   position: absolute;
   top: 200%;
-  left: 30%;
-  transform: translate(-60%, -50%);
-  width: 650px;
-  height: 650px;
+  left: 25%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 50%;
 
   }
 
   #map2 {
   position: absolute;
-  top: 200%;
-  left: 80%;
-  transform: translate(-60%, -50%);
-  width: 650px;
-  height: 650px;
+  top: 250%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 50%;
   }
 
   .form-style-5{
@@ -386,7 +386,7 @@ count {
 
   .count_rectangle {
     background-color: #880b0b;
-    margin-top: 30%;
+    margin-top: 10%;
   }
 
 }

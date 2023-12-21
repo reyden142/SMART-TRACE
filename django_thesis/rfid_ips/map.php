@@ -219,7 +219,7 @@ if (!isset($_SESSION['Admin-name'])) {
     $secondFloorCount = $csvAssociative[4]['Count'];
     $be111Count = $csvAssociative[0]['Count'];
     $be213Count = $csvAssociative[1]['Count'];
-    $be214Count = $csvAssociative[2]['Count'];
+    $be216Count = $csvAssociative[2]['Count'];
     $totalPersons = $csvAssociative[5]['Count'];
     ?>
 
@@ -245,7 +245,7 @@ if (!isset($_SESSION['Admin-name'])) {
                     array('label' => '2nd Floor', 'count' => $secondFloorCount),
                     array('label' => 'BE 111', 'count' => $be111Count),
                     array('label' => 'BE 213', 'count' => $be213Count),
-                    array('label' => 'BE 214', 'count' => $be214Count),
+                    array('label' => 'BE 216', 'count' => $be216Count),
                 );
 
                 foreach ($floorCounts as $floor) {
