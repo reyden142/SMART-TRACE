@@ -401,14 +401,22 @@ def main():
         # Apply Cleaning
         trainingData = clean_data_dataset(trainingData)
 
+        print('cleaned_data', trainingData)
+        trainingData.to_csv('cleaned_data.csv', index=False)
+
         # Apply preprocessing
         X_train, y_train = preprocess_data_dataset(trainingData)
 
         print(X_train)
-        print(y_train)
+        print('y_train', y_train)
+
+        #y_train = y_train.sample(frac=1).reset_index(drop=True)
 
         X_train.to_csv('X_train.csv', index=False)
         y_train.to_csv('y_train.csv', index=False)
+
+        # Assuming y_train is your DataFrame
+        # Shuffle the rows
 
 
     # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -437,7 +445,7 @@ def main():
         X_test = scaler.transform(X_test)
 
         k = 1  # You can adjust the value of k
-        knn = KNeighborsClassifier(n_neighbors=k, p=2, metric='euclidean')  # p=2 for Euclidean metric
+        knn = KNeighborsClassifier(n_neighbors=k, p=2)  # p=2 for Euclidean metric
         knn.fit(X_train, y_train)
 
         # Assuming 'knn' is your trained KNN classifier
@@ -473,6 +481,7 @@ def main():
         # Create a new DataFrame named 'final_predictions'
         final_predictions = pd.DataFrame(selected_columns)
 
+
         print('Final Predictions: ')
         print(final_predictions)
 
@@ -482,15 +491,15 @@ def main():
         # Count occurrences of specific rooms and floors
         be111_count = roomid_counts.get('111', 0)
         be213_count = roomid_counts.get('213', 0)
-        be214_count = roomid_counts.get('214', 0)
+        be216_count = roomid_counts.get('216', 0)
         first_floor_count = be111_count
-        second_floor_count = be213_count + be214_count
+        second_floor_count = be213_count + be216_count
         total_persons = roomid_counts.sum()
 
         # Create a DataFrame for the counts
         counts_df = pd.DataFrame({
-            'RoomID': ['BE111', 'BE213', 'BE214', 'First Floor', 'Second Floor', 'Total'],
-            'Count': [be111_count, be213_count, be214_count, first_floor_count, second_floor_count, total_persons]
+            'RoomID': ['BE111', 'BE213', 'BE216', 'First Floor', 'Second Floor', 'Total'],
+            'Count': [be111_count, be213_count, be216_count , first_floor_count, second_floor_count, total_persons]
         })
 
         # Save the DataFrame to a CSV file

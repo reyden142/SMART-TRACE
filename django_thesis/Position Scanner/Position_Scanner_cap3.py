@@ -120,6 +120,12 @@ def main():
                     # Wait for the scan to complete, adjust the sleep time as needed
                     #time.sleep(1)  # You can adjust the sleep duration
 
+                    # If specific_ssid is not in the data, add a default entry
+                    for ssid in specific_ssid:
+                        if ssid not in latest_results:
+                            default_entry = ('0', ssid, '0', 100, cap_interface, datetime.now())
+                            latest_results[ssid] = default_entry
+
                     current_data.extend(latest_results.values())
                     data.extend(current_data)
 
@@ -179,7 +185,7 @@ def main():
                                 f"SSID: {ssid}, Channel: {channel}, Signal Strength: {signal_strength}, Number of Duplicate Rows: {count}")
 
                             # Check if duplicate_count is 4 or more
-                            if count >= 5:
+                            if count >= 3:
                                 # Extract the data for the current group
                                 group_data = position_scanner_cap3[
                                     (position_scanner_cap3['ssid'] == ssid) &
@@ -217,7 +223,7 @@ def main():
                                 with connect_to_database() as connection:
                                     delete_data_from_database(ssid, connection)
 
-                            if total_count >= 20:
+                            if total_count >= 10:
                                 print(f"Total count for SSID {ssid} is 20 or more. Performing actions...")
 
                                 # Connect to the database
