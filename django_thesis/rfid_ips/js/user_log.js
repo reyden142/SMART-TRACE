@@ -31,6 +31,7 @@ $(document).ready(function(){
     var date_sel_end = $('#date_sel_end').val();
     var time_sel = $(".time_sel:checked").val();
     var time_sel_start = $('#time_sel_start').val();
+    var time_with_milliseconds = $('#time_with_milliseconds').val();
     var time_sel_end = $('#time_sel_end').val();
     var card_sel = $('#card_sel option:selected').val();
     var dev_uid = $('#dev_sel option:selected').val();
@@ -50,6 +51,7 @@ $(document).ready(function(){
         'date_sel_end': date_sel_end,
         'time_sel': time_sel,
         'time_sel_start': time_sel_start,
+       'time_with_milliseconds':time_with_milliseconds,
         'time_sel_end': time_sel_end,
         'card_sel': card_sel,
         'dev_uid': dev_uid,
@@ -80,6 +82,7 @@ $(document).ready(function(){
             'date_sel_end': date_sel_end,
             'time_sel': time_sel,
             'time_sel_start': time_sel_start,
+            'time_with_milliseconds':time_with_milliseconds,
             'time_sel_end': time_sel_end,
             'dev_uid': dev_uid,
             'card_sel': card_sel,

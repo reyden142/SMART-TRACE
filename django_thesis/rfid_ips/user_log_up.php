@@ -30,7 +30,8 @@ $End_time = "";
 $Card_sel = "";
 
 // Retrieve the time with milliseconds from the GET request
-$time_with_milliseconds = $_GET['time_with_milliseconds'];
+$time_with_milliseconds = isset($_GET['time_with_milliseconds']) ? $_GET['time_with_milliseconds'] : null;
+
 
 if (isset($_POST['log_date'])) {
     // Start date filter
@@ -81,7 +82,7 @@ $time_seconds = round($time_with_milliseconds / 1000); // Assuming milliseconds 
 // Convert time to MySQL format (YYYY-MM-DD HH:MM:SS)
 $time_mysql = date('Y-m-d H:i:s', $time_seconds);
 
-$sql = "SELECT * FROM users_logs WHERE ".$_SESSION['searchQuery']." AND timein = '".$time_mysql."' GROUP BY username ORDER BY id DESC";
+$sql = "SELECT * FROM users_logs WHERE ".$_SESSION['searchQuery']." ORDER BY id DESC";
 $result = mysqli_stmt_init($conn);
 if (!mysqli_stmt_prepare($result, $sql)) {
     echo '<p class="error">SQL Error</p>';
