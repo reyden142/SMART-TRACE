@@ -8,7 +8,7 @@ from mysql.connector import Error
 from datetime import datetime
 
 # Define the MikroTik router's IP address, username, and password
-router_ip = '192.168.203.2'
+router_ip = '[fe80::6e3b:6bff:fe5a:e788%5]'
 username = 'thesis2.0'
 password = 'admin'
 
@@ -82,7 +82,7 @@ def main():
     while True:
         try:
 
-            # Define the CAP interface names ('cap1' and 'cap2')
+            # Define the CAP interface names ('cap1' and 'cap1')
             cap_interfaces = ['cap1']
 
             # Create a list to store data from both CAP interfaces
@@ -95,7 +95,7 @@ def main():
                 output = stdout.read(3000).decode()
                 lines = output.splitlines()
 
-                print(f"unprocessed data {cap_interface}:", output)
+                #print(f"unprocessed data {cap_interface}:", output)
                 #print(f"lines {cap_interface}:", lines)
 
                 if "failure: already running" not in output:
@@ -119,6 +119,12 @@ def main():
                                     mac_address, ssid, channel, signal_strength, cap_interface, current_timestamp)
                     # Wait for the scan to complete, adjust the sleep time as needed
                     #time.sleep(1)  # You can adjust the sleep duration
+
+                    # If specific_ssid is not in the data, add a default entry
+                    for ssid in specific_ssid:
+                        if ssid not in latest_results:
+                            default_entry = ('0', ssid, '0', 100, cap_interface, datetime.now())
+                            latest_results[ssid] = default_entry
 
                     current_data.extend(latest_results.values())
                     data.extend(current_data)
@@ -179,7 +185,7 @@ def main():
                                 f"SSID: {ssid}, Channel: {channel}, Signal Strength: {signal_strength}, Number of Duplicate Rows: {count}")
 
                             # Check if duplicate_count is 4 or more
-                            if count >= 4:
+                            if count >= 5:
                                 # Extract the data for the current group
                                 group_data = position_scanner_cap1[
                                     (position_scanner_cap1['ssid'] == ssid) &
@@ -217,7 +223,7 @@ def main():
                                 with connect_to_database() as connection:
                                     delete_data_from_database(ssid, connection)
 
-                            if total_count >= 20:
+                            if total_count >= 10:
                                 print(f"Total count for SSID {ssid} is 20 or more. Performing actions...")
 
                                 # Connect to the database

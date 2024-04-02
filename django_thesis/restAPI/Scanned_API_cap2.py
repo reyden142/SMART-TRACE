@@ -57,7 +57,7 @@ def transfer_to_database(data, connection, floorid):
 
 def main():
     # Define the floorid here or retrieve it as needed
-    floorid = 376 # You can adjust the floorid as needed
+    floorid = 189 # You can adjust the floorid as needed
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -82,7 +82,7 @@ def main():
 
             for cap_interface in cap_interfaces:
 
-                output = stdout.read(2048).decode()
+                output = stdout.read(3000).decode()
                 lines = output.splitlines()
 
                 print(f"unprocessed data {cap_interface}:", output)

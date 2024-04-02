@@ -1,7 +1,16 @@
 RoomID,Count
+<<<<<<< HEAD
 BE111,2
 BE213,1
 BE214,0
 First Floor,2
 Second Floor,1
 Total,3
+=======
+BE111,0
+BE213,2
+BE216,0
+First Floor,0
+Second Floor,2
+Total,2
+>>>>>>> 5da3193271b38a644fc89f2636231d5e5d727163
