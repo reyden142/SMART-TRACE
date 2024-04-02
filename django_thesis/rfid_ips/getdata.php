@@ -18,7 +18,7 @@ if (!is_null($time_with_milliseconds)) {
     $milliseconds = isset($parts[1]) ? $parts[1] : ''; // Milliseconds
 
     // Convert time to 24-hour format
-    $t = date("H:i:s", strtotime($t));
+    $t = date("H:i:s", strtotime(str_replace('pm.', '', $t))); // Remove 'pm.' from the time
 
     // Append milliseconds if available
     if (!empty($milliseconds)) {
@@ -99,6 +99,7 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
                                             mysqli_stmt_execute($result);
 
                                             echo "login".$Uname;
+                                            echo "time: ".$t;
                                             exit();
                                         }
                                     }
