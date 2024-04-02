@@ -26,7 +26,7 @@ session_start();
         $searchQuery = "";
         $Start_date = "";
         $End_date = "";
-        $Start_time = "";
+        $time_with_milliseconds = $_GET['time_with_milliseconds'];
         $End_time = "";
         $Card_sel = "";
 

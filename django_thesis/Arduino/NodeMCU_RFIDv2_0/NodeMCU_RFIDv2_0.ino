@@ -186,9 +186,14 @@ void SendCardID(String Card_uid){
   if(WiFi.isConnected())
   {
     HTTPClient http;    //Declare object of class HTTPClient
-    //GET Data          
-      getData = "?card_uid=" + String(Card_uid) + "&device_token=" + String(device_token); // Add the Card ID to the GET array in order to send it
-      Serial.println(getData);
+
+    // Get current time with milliseconds
+    unsigned long currentMillis = millis();
+    String time_with_milliseconds = String(currentMillis);
+
+    // GET Data          
+    getData = "?card_uid=" + String(Card_uid) + "&time_with_milliseconds=" + time_with_milliseconds + "&device_token=" + String(device_token); // Add the Card ID and time to the GET array
+    Serial.println(getData);
       //GET methode
       Link = URL + getData;
       http.begin(client,Link); //initiate HTTP request   //Specify content-type header
