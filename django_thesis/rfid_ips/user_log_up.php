@@ -13,7 +13,6 @@ session_start();
         <th>Dep</th>
         <th>Date</th>
         <th>Time In</th>
-        <th>Time Out</th>
       </tr>
     </thead>
     <tbody class="table-secondary">
@@ -74,7 +73,7 @@ session_start();
             $_SESSION['searchQuery'] = "checkindate='".$Start_date."'";
         }
 
-        $sql = "SELECT * FROM users_logs WHERE ".$_SESSION['searchQuery']." ORDER BY id DESC";
+        $sql = "SELECT * FROM users_logs WHERE ".$_SESSION['searchQuery']." GROUP BY username ORDER BY id DESC";
         $result = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($result, $sql)) {
             echo '<p class="error">SQL Error</p>';
@@ -83,11 +82,7 @@ session_start();
             $resultl = mysqli_stmt_get_result($result);
             if (mysqli_num_rows($resultl) > 0){
                 while ($row = mysqli_fetch_assoc($resultl)){
-                    // Check if time-in has already been recorded for this RFID ID
-                    if ($row['timein_recorded'] == 1) {
-                        continue; // Skip this row if time-in has already been recorded
-                    }
-      ?>
+                    ?>
                   <TR>
                   <TD><?php echo $row['id'];?></TD>
                   <TD><?php echo $row['username'];?></TD>
@@ -99,11 +94,6 @@ session_start();
                   <TD><?php echo $row['timein'];?></TD>
                   </TR>
       <?php
-                    // Update time-in recorded status for this RFID ID
-                    $updateQuery = "UPDATE users_logs SET timein_recorded = 1 WHERE id = ?";
-                    $updateStmt = mysqli_prepare($conn, $updateQuery);
-                    mysqli_stmt_bind_param($updateStmt, "i", $row['id']);
-                    mysqli_stmt_execute($updateStmt);
                 }
             }
         }
