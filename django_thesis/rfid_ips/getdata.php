@@ -5,6 +5,15 @@ date_default_timezone_set('Asia/Manila');
 $d = date("Y-m-d");
 $t = date("H:i:sa");
 
+// Retrieve milliseconds from GET request
+$time_with_milliseconds = isset($_GET['time_with_milliseconds']) ? $_GET['time_with_milliseconds'] : null;
+
+// Concatenate milliseconds to the time
+if (!is_null($time_with_milliseconds)) {
+    // Convert milliseconds to seconds and append to the time
+    $milliseconds_seconds = $time_with_milliseconds / 1000;
+    $t .= '.' . sprintf('%03d', $milliseconds_seconds); // Append milliseconds
+}
 
 if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
     
