@@ -3,31 +3,10 @@
 require 'connectDB.php';
 date_default_timezone_set('Asia/Manila');
 $d = date("Y-m-d");
-$t = date("H:i:sa");
 
-// Retrieve the time with milliseconds from the GET request
-$time_with_milliseconds = isset($_GET['time_with_milliseconds']) ? $_GET['time_with_milliseconds'] : null;
+list($microseconds, $seconds) = explode(' ', microtime());
+$t = date("H:i:s", $seconds) . substr($microseconds, 1, 4) . ' '.date("a"); // Get the first 4 digits of microseconds
 
-// Extract time and milliseconds from the Arduino output
-if (!is_null($time_with_milliseconds)) {
-    // Split the time and milliseconds
-    $parts = explode('.', $time_with_milliseconds);
-
-    // Extract time and milliseconds
-    $t = $parts[0]; // Time
-    $milliseconds = isset($parts[1]) ? $parts[1] : ''; // Milliseconds
-
-    // Convert time to 24-hour format
-    $t = date("H:i:s", strtotime(str_replace('pm.', '', $t))); // Remove 'pm.' from the time
-
-    // Append milliseconds if available
-    if (!empty($milliseconds)) {
-        $t .= '.' . $milliseconds;
-    }
-} else {
-    // If time with milliseconds is not provided, use current time
-    $t = date("H:i:s");
-}
 
 if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
     
@@ -117,6 +96,7 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
                                             mysqli_stmt_execute($result);
 	
                                             echo "logout".$Uname;
+                                            echo "Time".$t;
                                             exit();
                                         }
                                     }

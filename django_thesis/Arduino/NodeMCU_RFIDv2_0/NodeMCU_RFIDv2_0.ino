@@ -29,7 +29,7 @@ const char* device_token  = "e33ecebe831f152a";
 
 //************************************************************************
 
-String URL = "http://192.168.137.115/rfid_ips/getdata.php"; //computer IP or the server domain
+String URL = "http://192.168.201.248/rfid_ips/getdata.php"; //computer IP or the server domain
 String getData, Link;
 String OldCardID = "";
 unsigned long previousMillis = 0;
