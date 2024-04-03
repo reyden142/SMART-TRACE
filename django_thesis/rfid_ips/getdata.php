@@ -66,16 +66,19 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
                                     //Login
                                     if (!$row = mysqli_fetch_assoc($resultl)){
 
-                                        $sql = "INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout, ssid) VALUES (?,? ,?, ?, ?, ?, ?, ?, ?)";
-                                        $result = mysqli_stmt_init($conn);
-                                        if (!mysqli_stmt_prepare($result, $sql)) {
-                                            echo "SQL_Error_Select_login1";
-                                            exit();
-                                        }
-                                        else{
-                                            $timeout = "00:00:00";
-                                            mysqli_stmt_bind_param($result, "sdsssssss", $Uname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout, $ssid);
-                                            mysqli_stmt_execute($result);
+                                        // Check if the username already exists in the users_logs table
+                                        $sql_check_username = "SELECT id FROM users_logs WHERE username = ?";
+                                        $stmt_check_username = mysqli_prepare($conn, $sql_check_username);
+                                        mysqli_stmt_bind_param($stmt_check_username, "s", $Uname);
+                                        mysqli_stmt_execute($stmt_check_username);
+                                        mysqli_stmt_store_result($stmt_check_username);
+
+                                        if (mysqli_stmt_num_rows($stmt_check_username) == 0) {
+                                            // Username doesn't exist in the users_logs table, insert a new record
+                                            $sql_insert = "INSERT INTO users_logs (username, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout, ssid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                            $stmt_insert = mysqli_prepare($conn, $sql_insert);
+                                            mysqli_stmt_bind_param($stmt_insert, "sssssssss", $Uname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, '00:00:00', $ssid);
+                                            mysqli_stmt_execute($stmt_insert);
 
                                             echo "login".$Uname;
                                             echo "time: ".$t;
