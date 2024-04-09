@@ -15,22 +15,16 @@ if (isset($_POST['title']) && isset($_POST['lat']) && isset($_POST['lng'])) {
     $lat = $_POST['lat'];
     $lng = $_POST['lng'];
 
-    // Prepare the SQL statement
-    $query = "DELETE FROM markers WHERE title = ? AND `lat` = ? AND `lng` = ?";
-    $stmt = mysqli_prepare($conn, $query);
+    // Perform the database deletion
+    // Assuming your table is named 'markers' and has columns 'latitude' and 'longitude'
+    $query = "DELETE FROM markers WHERE title = '$title' AND `lat` = $lat AND `lng` = $lng";
 
-    // Bind parameters to the prepared statement
-    mysqli_stmt_bind_param($stmt, 'sdd', $title, $lat, $lng);
-
-    // Execute the prepared statement
-    if (mysqli_stmt_execute($stmt)) {
+    // Execute the query using the database connection
+    if (mysqli_query($conn, $query)) {
         echo "Marker deleted successfully";
     } else {
         echo "Error deleting marker from the database: " . mysqli_error($conn);
     }
-
-    // Close the prepared statement
-    mysqli_stmt_close($stmt);
 } else {
     echo "Invalid request. Required data not provided.";
 }
