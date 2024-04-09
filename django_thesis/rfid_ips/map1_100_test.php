@@ -8,9 +8,9 @@ if (!isset($_SESSION['Admin-name'])) {
     header("location: login.php");
 }
 
-if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
-    // Save markers to the database
-    $markers = json_decode($_POST['markers'], true);
+if (isset($_POST['saveButton']) && isset($_POST['markers1_100'])) {
+    // Save markers1_100 to the database
+    $markers = json_decode($_POST['markers1_100'], true);
 
     foreach ($markers as $marker) {
         $lat = $marker['lat'];
@@ -18,7 +18,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         $title = $marker['title']; // Assuming 'name' is a unique identifier
 
         // Check if the marker already exists in the database
-        $query = "SELECT * FROM markers WHERE title = ?";
+        $query = "SELECT * FROM markers1_100 WHERE title = ?";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, 's', $title);
         mysqli_stmt_execute($stmt);
@@ -30,7 +30,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 
         // If the marker exists, update its position
         if (mysqli_num_rows($result) > 0) {
-            $updateQuery = "UPDATE markers SET lat = ?, lng = ? WHERE title = ?";
+            $updateQuery = "UPDATE markers1_100 SET lat = ?, lng = ? WHERE title = ?";
             $updateStmt = mysqli_prepare($conn, $updateQuery);
             mysqli_stmt_bind_param($updateStmt, 'dds', $lat, $lng, $title);
             mysqli_stmt_execute($updateStmt);
@@ -40,7 +40,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
             }
         } else {
             // If the marker doesn't exist, insert a new record
-            $insertQuery = "INSERT INTO markers (title, lat, lng) VALUES (?, ?, ?)";
+            $insertQuery = "INSERT INTO markers1_100 (title, lat, lng) VALUES (?, ?, ?)";
             $insertStmt = mysqli_prepare($conn, $insertQuery);
             mysqli_stmt_bind_param($insertStmt, 'sdd', $title, $lat, $lng);
             mysqli_stmt_execute($insertStmt);
@@ -51,12 +51,12 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         }
     }
 
-    echo "Markers saved successfully!";
+    echo "markers1_100 saved successfully!";
 } elseif (isset($_POST['loadButton'])) {
-    // Load markers from the database
+    // Load markers1_100 from the database
     $markers = array();
 
-    $query = "SELECT * FROM markers";
+    $query = "SELECT * FROM markers1_100";
     $result = mysqli_query($conn, $query);
 
     if ($result) {
@@ -118,10 +118,10 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         // Declare isAdding outside the script block
         var isAdding = false;
 
-        // Declare markers as a global variable
-        var markers = [];
+        // Declare markers1_100 as a global variable
+        var markers1_100 = [];
 
-        console.log("Markers:", markers);
+        console.log("markers1_100:", markers1_100);
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
@@ -142,108 +142,170 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         }).addTo(map);
 
         // Add GeoJSON data to the map
-        var myGeoJSON = {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [125.59657807, 7.06560118],
-                    [125.59664244, 7.06578485],
-                    [125.596739, 7.06582212],
-                    [125.59689055, 7.06576622],
-                    [125.59679533, 7.06551734],
-                    [125.59657807, 7.06560118]
+       var myGeoJSON =
+                {
+                  "type": "FeatureCollection",
+                  "features": [
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                          [
+                            [125.59637449, 7.06576338],
+                            [125.59648312, 7.06572744],
+                            [125.59650144, 7.06576752],
+                            [125.5965249, 7.06577757],
+                            [125.5964806, 7.06586484],
+                            [125.59640102, 7.0658299],
+                            [125.59637449, 7.06576338]
+                          ]
+                        ]
+                      },
+                      "id": "3ea697ba-4906-4119-bac3-28185d4370af",
+                      "properties": {
+                        "name": "BE111"
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                          [125.59650144, 7.06576752],
+                          [125.5965249, 7.06577757],
+                          [125.5964806, 7.06586484]
+                        ]
+                      },
+                      "id": "8d8997bd-e916-476c-b6cf-2348356abf2c",
+                      "properties": {
+                        "name": ""
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                          [125.59648312, 7.06572744],
+                          [125.59647392, 7.06570462],
+                          [125.59636602, 7.06574016]
+                        ]
+                      },
+                      "id": "92d9bef7-74fc-4953-bc47-406bb50bee02",
+                      "properties": {
+                        "name": ""
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                          [125.59637449, 7.06576338],
+                          [125.59640102, 7.0658299],
+                          [125.59664152, 7.06593549]
+                        ]
+                      },
+                      "id": "290edff5-3525-4f0b-81a5-f017953195d5",
+                      "properties": {
+                        "name": ""
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                          [
+                            [125.59657807, 7.06560118],
+                            [125.59664244, 7.06578485],
+                            [125.596739, 7.06582212],
+                            [125.59689055, 7.06576622],
+                            [125.59679533, 7.06551734],
+                            [125.59657807, 7.06560118]
+                          ]
+                        ]
+                      },
+                      "id": "73ace24a-738a-49a2-a1a0-9dea8251bb20",
+                      "properties": {
+                        "name": "",
+                        "Open space": ""
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                          [
+                            [125.59633693, 7.06566041],
+                            [125.59644047, 7.06562166],
+                            [125.59648312, 7.06572744],
+                            [125.59637449, 7.06576338],
+                            [125.59633693, 7.06566041]
+                          ]
+                        ]
+                      },
+                      "id": "51fe7eb2-7883-4fda-8413-0bc078ce06a2",
+                      "properties": {
+                        "name": "BE 216"
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                          [
+                            [125.59640102, 7.0658299],
+                            [125.59633693, 7.06566041],
+                            [125.59632563, 7.06563214],
+                            [125.59634798, 7.06556914],
+                            [125.59638016, 7.06556116],
+                            [125.59639536, 7.06551502],
+                            [125.59637748, 7.0654467],
+                            [125.59684508, 7.06527812],
+                            [125.5969926, 7.06567917],
+                            [125.59700333, 7.06568627],
+                            [125.59703909, 7.06570756],
+                            [125.59717946, 7.06565432],
+                            [125.59725188, 7.06584864],
+                            [125.59698277, 7.0659489],
+                            [125.5969935, 7.06597818],
+                            [125.59662156, 7.0661166],
+                            [125.59658401, 7.066019],
+                            [125.59661799, 7.06600391],
+                            [125.59664928, 7.06593737],
+                            [125.59640102, 7.0658299]
+                          ]
+                        ]
+                      },
+                      "id": "24b16770-840f-443d-809b-d176e0706d12",
+                      "properties": {
+                        "name": ""
+                      }
+                    },
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                          [125.59648312, 7.06572744],
+                          [125.59650144, 7.06576752],
+                          [125.5965249, 7.06577757],
+                          [125.59648093, 7.06586499]
+                        ]
+                      },
+                      "id": "45ba25f5-671c-4ffc-99ac-f7404d45d3e0",
+                      "properties": {
+                        "name": ""
+                      }
+                    }
                   ]
-                ]
-              },
-              "id": "73ace24a-738a-49a2-a1a0-9dea8251bb20",
-              "properties": {
-                "name": "",
-                "Open space": ""
-              }
-            },
-            {
-              "type": "Feature",
-              "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [125.59648312, 7.06572744],
-                    [125.59652759, 7.06584043],
-                    [125.5964658, 7.06585894],
-                    [125.59640002, 7.06583076],
-                    [125.59637449, 7.06576338],
-                    [125.59648312, 7.06572744]
-                  ]
-                ]
-              },
-              "id": "ba1cf84b-5911-4090-86dd-3206038d059b",
-              "properties": {
-                "name": "BE 213"
-              }
-            },
-            {
-              "type": "Feature",
-              "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [125.59684311, 7.0652798],
-                    [125.59637025, 7.06544318],
-                    [125.59639652, 7.06550748],
-                    [125.5963755, 7.0655631],
-                    [125.59634398, 7.06557701],
-                    [125.59632471, 7.06562741],
-                    [125.59640002, 7.06583076],
-                    [125.59664346, 7.06593504],
-                    [125.59661544, 7.06600804],
-                    [125.59658216, 7.06602021],
-                    [125.59662419, 7.0661158],
-                    [125.59699373, 7.06598023],
-                    [125.59698322, 7.06594895],
-                    [125.59725818, 7.06585162],
-                    [125.59718112, 7.06565869],
-                    [125.59704627, 7.06570562],
-                    [125.59699373, 7.06568824],
-                    [125.59684311, 7.0652798]
-                  ]
-                ]
-              },
-              "id": "19f98cab-a9e8-440e-8b7a-3aac7f2f6f68",
-              "properties": {
-                "name": "BE building",
-                "BE 216": "",
-                "BE Building": ""
-              }
-            },
-            {
-              "type": "Feature",
-              "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [125.59633693, 7.06566041],
-                    [125.59644047, 7.06562166],
-                    [125.59648312, 7.06572744],
-                    [125.59637449, 7.06576338],
-                    [125.59633693, 7.06566041]
-                  ]
-                ]
-              },
-              "id": "51fe7eb2-7883-4fda-8413-0bc078ce06a2",
-              "properties": {
-                "name": "BE 216"
-              }
-            }
-          ]
-        };
+                };
 
-
-        var geojsonLayer = L.geoJSON(myGeoJSON).addTo(map);
+                var geojsonLayer = L.geoJSON(myGeoJSON).addTo(map);
 
         // Bind a popup to the GeoJSON layer
        // geojsonLayer.bindPopup("<b>BE Building</b>");
@@ -251,7 +313,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 
         var bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
-    // Create a layer group to store the markers
+    // Create a layer group to store the markers1_100
     var markerLayer = L.layerGroup().addTo(map);
 
     // The CSS to style the custom marker
@@ -377,17 +439,17 @@ function resetMarkers() {
     var confirmReset = confirm('Are you sure you want to reset the blue icons? This action cannot be undone.');
 
     if (confirmReset) {
-        // Remove all markers from the marker layer
+        // Remove all markers1_100 from the marker layer
         markerLayer.clearLayers();
 
-        // Clear markers from local storage
-        localStorage.removeItem('markers');
+        // Clear markers1_100 from local storage
+        localStorage.removeItem('markers1_100');
 
-        // Reset markersSaved when markers are reset
+        // Reset markersSaved when markers1_100 are reset
         markersSaved = false;
 
         // Reset the button text
-        saveButton.textContent = 'Save Markers';
+        saveButton.textContent = 'Save markers1_100';
 
         // Reset the delete mode
         deleteMode = false;
@@ -399,30 +461,30 @@ function resetMarkers() {
 }
 
     const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Markers';
+    resetButton.textContent = 'Reset markers1_100';
     resetButton.classList.add('reset-button'); // Apply the CSS class
     resetButton.addEventListener('click', function () {
         resetMarkers();
     });
 
         function resetMarkers() {
-            // Check if markers are saved, and reset markersSaved without prompting if they are
+            // Check if markers1_100 are saved, and reset markersSaved without prompting if they are
             if (markersSaved) {
-                markersSaved = false; // Reset markersSaved when markers are reset
-                saveButton.textContent = 'Save Markers'; // Reset the button text
+                markersSaved = false; // Reset markersSaved when markers1_100 are reset
+                saveButton.textContent = 'Save markers1_100'; // Reset the button text
             } else {
-                var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
+                var confirmReset = confirm('Are you sure you want to reset the markers1_100? This action cannot be undone.');
 
                 if (!confirmReset) {
                     return;
                 }
             }
 
-            // Remove all markers from the marker layer
+            // Remove all markers1_100 from the marker layer
             markerLayer.clearLayers();
 
-            // Clear markers from local storage
-            localStorage.removeItem('markers');
+            // Clear markers1_100 from local storage
+            localStorage.removeItem('markers1_100');
         }
 
     resetButton.addEventListener('click', function () {
@@ -431,7 +493,7 @@ function resetMarkers() {
 
 // ADD BLUE ICONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Button to toggle adding markers
+    // Button to toggle adding markers1_100
     const addButton = document.createElement('button');
     addButton.textContent = 'Add Blue Icons';
     addButton.id = 'addButton';
@@ -502,15 +564,15 @@ function resetMarkers() {
     markerLayer.eachLayer(function (marker) {
     var latlng = marker.getLatLng();
     var title = marker.options.title; // Assuming you set the title as the name
-    markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+    markers1_100.push({ title: title, lat: latlng.lat, lng: latlng.lng });
     });
 
     // Helper function to find a marker by its coordinates
     function findMarkerByLatLng(latlng) {
-        var markers = markerLayer.getLayers();
-        for (var i = 0; i < markers.length; i++) {
-            if (markers[i].getLatLng().equals(latlng)) {
-                return markers[i];
+        var markers1_100 = markerLayer.getLayers();
+        for (var i = 0; i < markers1_100.length; i++) {
+            if (markers1_100[i].getLatLng().equals(latlng)) {
+                return markers1_100[i];
             }
         }
         return null;
@@ -518,11 +580,11 @@ function resetMarkers() {
 
     // Function to find a marker by its title
     function findMarkerByName(title) {
-        var markers = markerLayer.getLayers();
-        for (var i = 0; i < markers.length; i++) {
-            if (markers[i].options.title === title) {
-                console.log("markers:", markers[i]);
-                return markers[i];
+        var markers1_100 = markerLayer.getLayers();
+        for (var i = 0; i < markers1_100.length; i++) {
+            if (markers1_100[i].options.title === title) {
+                console.log("markers1_100:", markers1_100[i]);
+                return markers1_100[i];
             }
         }
         return null;
@@ -530,12 +592,12 @@ function resetMarkers() {
 
 // SAVED BUTTON //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   // Updated variable to track whether markers are saved
+   // Updated variable to track whether markers1_100 are saved
         var markersSaved = false;
 
-        // Button to save markers
+        // Button to save markers1_100
         const saveButton = document.createElement('button');
-        saveButton.textContent = 'Save Markers';
+        saveButton.textContent = 'Save markers1_100';
         saveButton.classList.add('save-button'); // Apply the CSS class
         saveButton.addEventListener('click', function () {
             updateMarkersInStorage();
@@ -543,7 +605,7 @@ function resetMarkers() {
             saveButton.textContent = 'Saved';
 
             setTimeout(function () {
-                saveButton.textContent = 'Save Markers';
+                saveButton.textContent = 'Save markers1_100';
                 markersSaved = false;
             }, 3000);
         });
@@ -555,32 +617,32 @@ function resetMarkers() {
             markersSaved = true;
             saveButton.textContent = 'Saved';
             setTimeout(function () {
-                saveButton.textContent = 'Save Markers';
+                saveButton.textContent = 'Save markers1_100';
                 markersSaved = false;
             }, 3000);
    });
 
-   // Function to save markers
+   // Function to save markers1_100
    function saveMarkers() {
-        var markers = [];
+        var markers1_100 = [];
         markerLayer.eachLayer(function (marker) {
             var latlng = marker.getLatLng();
             var title = marker.options.title; // Assuming you set the title as the name
-            markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+            markers1_100.push({ title: title, lat: latlng.lat, lng: latlng.lng });
         });
 
-        console.log("AJAX URL:", "map1_test.php");
-        // AJAX request to save markers to the database
+        console.log("AJAX URL:", "map1_100_test.php");
+        // AJAX request to save markers1_100 to the database
         $.ajax({
             type: "POST",
-            url: "map1_test.php", // Replace with the actual filename
-            data: { saveButton: true, markers: JSON.stringify(markers) },
+            url: "map1_100_test.php", // Replace with the actual filen ame
+            data: { saveButton: true, markers1_100: JSON.stringify(markers1_100) },
             success: function (response) {
                 alert(response); // Display the server response
                 // Optionally, update the button text or perform other actions
             },
             error: function (xhr, status, error) {
-                console.error("Error saving markers:", error);
+                console.error("Error saving markers1_100:", error);
                 console.log(xhr.responseText); // Log the full response for debugging
             }
         });
@@ -638,7 +700,7 @@ function addMarker(lat, lng, title) {
         // AJAX request to update the marker in the database
         $.ajax({
             type: "POST",
-            url: "map1_update_marker.php", // Replace with the actual filename or endpoint
+            url: "map1_100_update_marker.php", // Replace with the actual filename or endpoint
             data: { title: title, lat: lat, lng: lng },
             success: function (response) {
                 console.log("Marker updated in the database:", response);
@@ -655,7 +717,7 @@ function addMarker(lat, lng, title) {
         // AJAX request to delete the marker from the database
         $.ajax({
             type: "POST",
-            url: "map1_delete_marker.php", // Replace with the actual filename or endpoint
+            url: "map1_100_delete_marker.php", // Replace with the actual filename or endpoint
             data: { title: title, lat: lat, lng: lng }, // Match keys with PHP script
             success: function (response) {
                 console.log("Marker deleted from the database:", response);
@@ -668,10 +730,10 @@ function addMarker(lat, lng, title) {
     }
 
 
-   // Load markers from local storage if available, only if markers are not saved
-   var storedMarkers = localStorage.getItem('markers');
+   // Load markers1_100 from local storage if available, only if markers1_100 are not saved
+   var storedMarkers = localStorage.getItem('markers1_100');
    if (storedMarkers && !markersSaved) {
-        var confirmReload = confirm('Do you want to load the saved markers?');
+        var confirmReload = confirm('Do you want to load the saved markers1_100?');
         if (confirmReload) {
             var parsedMarkers = JSON.parse(storedMarkers);
             parsedMarkers.forEach(function (markerData) {
@@ -691,33 +753,33 @@ function addMarker(lat, lng, title) {
             });
             updateMarkersInStorage();
         } else {
-            localStorage.removeItem('markers');
+            localStorage.removeItem('markers1_100');
         }
    }
 
    function updateMarkersInStorage() {
 
-        var markers = markerLayer.getLayers().map(function (marker) {
+        var markers1_100 = markerLayer.getLayers().map(function (marker) {
                 return {
                     lat: marker.getLatLng().lat,
                     lng: marker.getLatLng().lng
                 };
             });
-            localStorage.setItem('markers', JSON.stringify(markers));
+            localStorage.setItem('markers1_100', JSON.stringify(markers1_100));
         }
 
         window.onbeforeunload = function (event) {
             if (markerLayer.getLayers().length > 0) {
-                return 'You have unsaved markers. Do you really want to leave?';
+                return 'You have unsaved markers1_100. Do you really want to leave?';
             }
    };
 
-   // Load markers from the database
+   // Load markers1_100 from the database
     function loadMarkersFromDatabase() {
-        // AJAX request to load markers from the database
+        // AJAX request to load markers1_100 from the database
         $.ajax({
             type: "POST",
-            url: "map1_load_marker.php",
+            url: "map1_100_load_marker.php",
             data: { loadButton: true },
             success: function (response) {
                 console.log("Response from the server:", response);
@@ -730,10 +792,10 @@ function addMarker(lat, lng, title) {
                     if (databaseMarkers.length > 0) {
                         console.log("First marker's data:", databaseMarkers[0]);
                     } else {
-                        console.log("No markers returned from the database.");
+                        console.log("No markers1_100 returned from the database.");
                     }
 
-                    // Add markers to the map
+                    // Add markers1_100 to the map
                     databaseMarkers.forEach(function (markerData) {
                         addMarker(markerData.lat, markerData.lng, markerData.title);
                     });
@@ -743,7 +805,7 @@ function addMarker(lat, lng, title) {
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Error loading markers from the database:", error);
+                console.error("Error loading markers1_100 from the database:", error);
                 console.log(xhr.responseText); // Log the full response for debugging
             }
         });
@@ -751,7 +813,7 @@ function addMarker(lat, lng, title) {
 
 
 
-// Call the function to load markers from the database
+// Call the function to load markers1_100 from the database
 loadMarkersFromDatabase();
 
 // BUTTONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -769,3 +831,6 @@ console.log("markersSaved:", markersSaved);
 
 </body>
 </html>
+
+
+

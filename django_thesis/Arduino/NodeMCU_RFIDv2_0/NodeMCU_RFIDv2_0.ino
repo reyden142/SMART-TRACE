@@ -29,7 +29,7 @@ const char* device_token  = "e33ecebe831f152a";
 
 //************************************************************************
 
-String URL = "http://192.168.201.248/rfid_ips/getdata.php"; //computer IP or the server domain
+String URL = "http://192.168.137.115/rfid_ips/getdata.php"; //computer IP or the server domain
 String getData, Link;
 String OldCardID = "";
 unsigned long previousMillis = 0;
@@ -139,9 +139,9 @@ void loop() {
         break;
       }
 
-      RFIDcode[n] = code;
+      RFIDcode[1] = code;
       code = "";
-
+      /*
       if(n == 2)
         {
         if(RFIDcode[1] == RFIDcode[2]) //look for new card
@@ -172,9 +172,11 @@ void loop() {
         //delay(2000);
         n++;
       }
-  
+  */SendCardID(RFIDcode[1]);
     }
-  }
+    
+  } 
+  
   code = ""; 
 
 }

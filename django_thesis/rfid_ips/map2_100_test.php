@@ -8,9 +8,9 @@ if (!isset($_SESSION['Admin-name'])) {
     header("location: login.php");
 }
 
-if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
-    // Save markers to the database
-    $markers = json_decode($_POST['markers'], true);
+if (isset($_POST['saveButton']) && isset($_POST['markers2_100'])) {
+    // Save markers2_100 to the database
+    $markers = json_decode($_POST['markers2_100'], true);
 
     foreach ($markers as $marker) {
         $lat = $marker['lat'];
@@ -18,7 +18,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         $title = $marker['title']; // Assuming 'name' is a unique identifier
 
         // Check if the marker already exists in the database
-        $query = "SELECT * FROM markers WHERE title = ?";
+        $query = "SELECT * FROM markers2_100 WHERE title = ?";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, 's', $title);
         mysqli_stmt_execute($stmt);
@@ -30,7 +30,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 
         // If the marker exists, update its position
         if (mysqli_num_rows($result) > 0) {
-            $updateQuery = "UPDATE markers SET lat = ?, lng = ? WHERE title = ?";
+            $updateQuery = "UPDATE markers2_100 SET lat = ?, lng = ? WHERE title = ?";
             $updateStmt = mysqli_prepare($conn, $updateQuery);
             mysqli_stmt_bind_param($updateStmt, 'dds', $lat, $lng, $title);
             mysqli_stmt_execute($updateStmt);
@@ -40,7 +40,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
             }
         } else {
             // If the marker doesn't exist, insert a new record
-            $insertQuery = "INSERT INTO markers (title, lat, lng) VALUES (?, ?, ?)";
+            $insertQuery = "INSERT INTO markers2_100 (title, lat, lng) VALUES (?, ?, ?)";
             $insertStmt = mysqli_prepare($conn, $insertQuery);
             mysqli_stmt_bind_param($insertStmt, 'sdd', $title, $lat, $lng);
             mysqli_stmt_execute($insertStmt);
@@ -51,12 +51,12 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         }
     }
 
-    echo "Markers saved successfully!";
+    echo "markers2_100 saved successfully!";
 } elseif (isset($_POST['loadButton'])) {
-    // Load markers from the database
+    // Load markers2_100 from the database
     $markers = array();
 
-    $query = "SELECT * FROM markers";
+    $query = "SELECT * FROM markers2_100";
     $result = mysqli_query($conn, $query);
 
     if ($result) {
@@ -69,7 +69,7 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         }
 
         // Return the data as JSON
-        echo json_encode($markers);
+        echo json_encode($markers2_100);
     } else {
         echo "Error retrieving data from the database";
     }
@@ -78,8 +78,6 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
 }
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html>
@@ -118,10 +116,10 @@ if (isset($_POST['saveButton']) && isset($_POST['markers'])) {
         // Declare isAdding outside the script block
         var isAdding = false;
 
-        // Declare markers as a global variable
-        var markers = [];
+        // Declare markers2_100 as a global variable
+        var markers2_100 = [];
 
-        console.log("Markers:", markers);
+        console.log("markers2_100:", markers2_100);
 
         // Leaflet map initialization
         const key = 'aF7HhncV5bhT2pqqWdRV';
@@ -377,17 +375,17 @@ function resetMarkers() {
     var confirmReset = confirm('Are you sure you want to reset the blue icons? This action cannot be undone.');
 
     if (confirmReset) {
-        // Remove all markers from the marker layer
+        // Remove all markers2_100 from the marker layer
         markerLayer.clearLayers();
 
-        // Clear markers from local storage
-        localStorage.removeItem('markers');
+        // Clear markers2_100 from local storage
+        localStorage.removeItem('markers2_100');
 
-        // Reset markersSaved when markers are reset
+        // Reset markers2_100Saved when markers2_100 are reset
         markersSaved = false;
 
         // Reset the button text
-        saveButton.textContent = 'Save Markers';
+        saveButton.textContent = 'Save markers2_100';
 
         // Reset the delete mode
         deleteMode = false;
@@ -399,30 +397,30 @@ function resetMarkers() {
 }
 
     const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Markers';
+    resetButton.textContent = 'Reset markers2_100';
     resetButton.classList.add('reset-button'); // Apply the CSS class
     resetButton.addEventListener('click', function () {
         resetMarkers();
     });
 
         function resetMarkers() {
-            // Check if markers are saved, and reset markersSaved without prompting if they are
+            // Check if markers2_100 are saved, and reset markers2_100Saved without prompting if they are
             if (markersSaved) {
-                markersSaved = false; // Reset markersSaved when markers are reset
-                saveButton.textContent = 'Save Markers'; // Reset the button text
+                markersSaved = false; // Reset markers2_100Saved when markers2_100 are reset
+                saveButton.textContent = 'Save markers2_100'; // Reset the button text
             } else {
-                var confirmReset = confirm('Are you sure you want to reset the markers? This action cannot be undone.');
+                var confirmReset = confirm('Are you sure you want to reset the markers2_100? This action cannot be undone.');
 
                 if (!confirmReset) {
                     return;
                 }
             }
 
-            // Remove all markers from the marker layer
+            // Remove all markers2_100 from the marker layer
             markerLayer.clearLayers();
 
-            // Clear markers from local storage
-            localStorage.removeItem('markers');
+            // Clear markers2_100 from local storage
+            localStorage.removeItem('markers2_100');
         }
 
     resetButton.addEventListener('click', function () {
@@ -502,15 +500,15 @@ function resetMarkers() {
     markerLayer.eachLayer(function (marker) {
     var latlng = marker.getLatLng();
     var title = marker.options.title; // Assuming you set the title as the name
-    markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+    markers2_100.push({ title: title, lat: latlng.lat, lng: latlng.lng });
     });
 
     // Helper function to find a marker by its coordinates
     function findMarkerByLatLng(latlng) {
-        var markers = markerLayer.getLayers();
-        for (var i = 0; i < markers.length; i++) {
-            if (markers[i].getLatLng().equals(latlng)) {
-                return markers[i];
+        var markers2_100 = markerLayer.getLayers();
+        for (var i = 0; i < markers2_100.length; i++) {
+            if (markers2_100[i].getLatLng().equals(latlng)) {
+                return markers2_100[i];
             }
         }
         return null;
@@ -518,11 +516,11 @@ function resetMarkers() {
 
     // Function to find a marker by its title
     function findMarkerByName(title) {
-        var markers = markerLayer.getLayers();
-        for (var i = 0; i < markers.length; i++) {
-            if (markers[i].options.title === title) {
-                console.log("markers:", markers[i]);
-                return markers[i];
+        var markers2_100 = markerLayer.getLayers();
+        for (var i = 0; i < markers2_100.length; i++) {
+            if (markers2_100[i].options.title === title) {
+                console.log("markers2_100:", markers2_100[i]);
+                return markers2_100[i];
             }
         }
         return null;
@@ -530,12 +528,12 @@ function resetMarkers() {
 
 // SAVED BUTTON //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   // Updated variable to track whether markers are saved
+   // Updated variable to track whether markers2_100 are saved
         var markersSaved = false;
 
-        // Button to save markers
+        // Button to save markers2_100
         const saveButton = document.createElement('button');
-        saveButton.textContent = 'Save Markers';
+        saveButton.textContent = 'Save markers2_100';
         saveButton.classList.add('save-button'); // Apply the CSS class
         saveButton.addEventListener('click', function () {
             updateMarkersInStorage();
@@ -560,21 +558,21 @@ function resetMarkers() {
             }, 3000);
    });
 
-   // Function to save markers
+   // Function to save markers2_100
    function saveMarkers() {
-        var markers = [];
+        var markers2_100 = [];
         markerLayer.eachLayer(function (marker) {
             var latlng = marker.getLatLng();
             var title = marker.options.title; // Assuming you set the title as the name
-            markers.push({ title: title, lat: latlng.lat, lng: latlng.lng });
+            markers2_100.push({ title: title, lat: latlng.lat, lng: latlng.lng });
         });
 
-        console.log("AJAX URL:", "map1_test.php");
+        console.log("AJAX URL:", "map2_100_test.php");
         // AJAX request to save markers to the database
         $.ajax({
             type: "POST",
-            url: "map1_test.php", // Replace with the actual filename
-            data: { saveButton: true, markers: JSON.stringify(markers) },
+            url: "map2_100_test.php", // Replace with the actual filename
+            data: { saveButton: true, markers2_100: JSON.stringify(markers2_100) },
             success: function (response) {
                 alert(response); // Display the server response
                 // Optionally, update the button text or perform other actions
@@ -638,7 +636,7 @@ function addMarker(lat, lng, title) {
         // AJAX request to update the marker in the database
         $.ajax({
             type: "POST",
-            url: "map1_update_marker.php", // Replace with the actual filename or endpoint
+            url: "map2_100_update_marker.php", // Replace with the actual filename or endpoint
             data: { title: title, lat: lat, lng: lng },
             success: function (response) {
                 console.log("Marker updated in the database:", response);
@@ -655,7 +653,7 @@ function addMarker(lat, lng, title) {
         // AJAX request to delete the marker from the database
         $.ajax({
             type: "POST",
-            url: "map1_delete_marker.php", // Replace with the actual filename or endpoint
+            url: "map2_100_delete_marker.php", // Replace with the actual filename or endpoint
             data: { title: title, lat: lat, lng: lng }, // Match keys with PHP script
             success: function (response) {
                 console.log("Marker deleted from the database:", response);
@@ -668,8 +666,8 @@ function addMarker(lat, lng, title) {
     }
 
 
-   // Load markers from local storage if available, only if markers are not saved
-   var storedMarkers = localStorage.getItem('markers');
+   // Load markers2_100 from local storage if available, only if markers2_100 are not saved
+   var storedMarkers = localStorage.getItem('markers2_100');
    if (storedMarkers && !markersSaved) {
         var confirmReload = confirm('Do you want to load the saved markers?');
         if (confirmReload) {
@@ -691,19 +689,19 @@ function addMarker(lat, lng, title) {
             });
             updateMarkersInStorage();
         } else {
-            localStorage.removeItem('markers');
+            localStorage.removeItem('markers2_100');
         }
    }
 
    function updateMarkersInStorage() {
 
-        var markers = markerLayer.getLayers().map(function (marker) {
+        var markers2_100 = markerLayer.getLayers().map(function (marker) {
                 return {
                     lat: marker.getLatLng().lat,
                     lng: marker.getLatLng().lng
                 };
             });
-            localStorage.setItem('markers', JSON.stringify(markers));
+            localStorage.setItem('markers2_100', JSON.stringify(markers2_100));
         }
 
         window.onbeforeunload = function (event) {
@@ -712,12 +710,12 @@ function addMarker(lat, lng, title) {
             }
    };
 
-   // Load markers from the database
+   // Load markers2_100 from the database
     function loadMarkersFromDatabase() {
         // AJAX request to load markers from the database
         $.ajax({
             type: "POST",
-            url: "map1_load_marker.php",
+            url: "map2_100_load_marker.php",
             data: { loadButton: true },
             success: function (response) {
                 console.log("Response from the server:", response);
@@ -769,3 +767,6 @@ console.log("markersSaved:", markersSaved);
 
 </body>
 </html>
+
+
+
