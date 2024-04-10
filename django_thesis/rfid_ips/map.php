@@ -207,12 +207,19 @@ if (!isset($_SESSION['Admin-name'])) {
     $csvFilePath = 'C:/Users/Thesis2.0/django_thesis/rfid_ips/css/room_counts.csv';
 
     // Read the CSV file into an associative array
-    $csvData = array_map('str_getcsv', file($csvFilePath));
-    $header = array_shift($csvData);
-    $csvAssociative = array();
-    foreach ($csvData as $row) {
+$csvData = array_map('str_getcsv', file($csvFilePath));
+$header = array_shift($csvData);
+$csvAssociative = array();
+foreach ($csvData as $row) {
+    // Check if the row has the same number of elements as the header
+    if (count($row) === count($header)) {
         $csvAssociative[] = array_combine($header, $row);
+    } else {
+        // Handle the error or log it
+
     }
+}
+
 
     // Extract counts for each room
     $firstFloorCount = $csvAssociative[3]['Count'];
