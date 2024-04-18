@@ -7,7 +7,7 @@ from mysql.connector import Error
 from datetime import datetime
 
 # Define the MikroTik router's IP address, username, and password
-router_ip = '[fe80::6e3b:6bff:fe5a:e788%5]'
+router_ip = '[fe80::6e3b:6bff:fe5a:e788%6]'
 username = 'thesis2.0'
 password = 'admin'
 
@@ -21,8 +21,13 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_ssid = [
-                            "Vivo_Y21T",
-                            "Xiaomipoco_X3"
+                                    "Vivo_Y21T",
+                                     "Xiaomipoco_X3",
+                                    "Realme_6Pro",
+                                    "RedmiNote_11",
+                                    "TechnoCamon_20",
+                                    "Xiaomi_10T"
+
                 ]
 
 print(f"specific_ssid: {specific_ssid}")
@@ -56,7 +61,7 @@ def transfer_to_database(data, connection, floorid):
 
 def main():
     # Define the floorid here or retrieve it as needed
-    floorid = 137   # You can adjust the floorid as needed
+    floorid = 170   # You can adjust the floorid as needed
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
