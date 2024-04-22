@@ -243,22 +243,16 @@ def preprocess_data_dataset(df):
     return X, y
 
 
+def add_unique_channels(X_processed, X_train):
+    # Get the columns of X_train
+    X_train_cols = X_train.columns
 
-def add_unique_channels(df, X_train):
-
-    X_processed = df
-
-    # Assuming X_processed is your existing DataFrame and X_train_cols is the list of columns in X_train
-    X_train_cols = X_train.columns  # Get the columns of X_train
-
-    # Iterate through each column in X_train_cols
+    # Add missing columns from X_train to X_processed with a default value
     for col in X_train_cols:
-        # Check if the column already exists in X_processed
         if col not in X_processed.columns:
-            # If not, add the column and fill with 0
-            X_processed[col] = 0
+            X_processed[col] = 0  # Fill missing columns with default value
 
-    # Rearrange the columns of X_train to match the order in X_train_cols
+    # Rearrange columns to match X_train
     X_processed = X_processed[X_train_cols]
 
     return X_processed
@@ -539,26 +533,35 @@ def main():
 
     # TRAINED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        # Load the dataset
-        file_path = r'C:\Users\Thesis2.0\django_thesis\KNN Algorithm\combined_rssi_final.csv'
-        trainingData = pd.read_csv(file_path)
+        # Load datasets for each device
+        datasets = {}
+        for ssid in range(1, 7):
+            file_path = f'C:/Users/Thesis2.0/django_thesis/KNN Algorithm/trainingdataset/device{ssid}_trainingdataset_300.csv'
+            training_data = pd.read_csv(file_path)
+            cleaned_data = clean_data_dataset(training_data)  # Apply your data cleaning function
+            datasets[f'device{ssid}'] = cleaned_data
 
-        # Apply Cleaning
-        trainingData = clean_data_dataset(trainingData)
+        # Identify unique SSIDs from 'X_processed'
+        relevant_ssids = X_processed['ssid'].unique()  # Identify relevant SSIDs for training
 
-        print('cleaned_data', trainingData)
-        trainingData.to_csv('cleaned_data.csv', index=False)
+        # Filter the datasets based on relevant SSIDs
+        filtered_datasets = {f'device{ssid}': datasets[f'device{ssid}'] for ssid in relevant_ssids}
 
-        # Apply preprocessing
-        X_train, y_train = preprocess_data_dataset(trainingData)
+        # Apply preprocessing to the filtered datasets and create training data
+        X_train_sets = {}
+        y_train_sets = {}
 
-        print(X_train)
-        print('y_train', y_train)
+        for device, data in filtered_datasets.items():
+            X_train, y_train = preprocess_data_dataset(data)  # Apply your preprocessing function
+            X_train_sets[device] = X_train
+            y_train_sets[device] = y_train
+
+        print("X_train_sets: ", X_train_sets)  # To check the structure of X_train_sets
+        print("y_train_sets: ", y_train_sets)  # To check the structure of y_train_sets
+
+        print("Successfully trained the data")
 
         #y_train = y_train.sample(frac=1).reset_index(drop=True)
-
-        X_train.to_csv('X_train.csv', index=False)
-        y_train.to_csv('y_train.csv', index=False)
 
         # Assuming y_train is your DataFrame
         # Shuffle the rows
@@ -566,62 +569,131 @@ def main():
 
     # PREPROCESSED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        # Apply preprocessing
-        X_test = add_unique_channels(X_processed, X_train)
-        print('X_test', X_test)
+        # Create X_test_sets for each relevant SSID
+        X_test_sets = {}
 
+        # Extract the relevant data from 'X_processed' based on unique SSIDs
+        for ssid in relevant_ssids:
+            # Filter X_processed to include only the rows with the current SSID
+            X_test_subset = X_processed[X_processed['ssid'] == ssid]
+
+            # Add unique channels to align with the corresponding training set
+            # You need to determine which X_train set to use for adding unique channels
+            corresponding_device = f'device{ssid}'
+            if corresponding_device in X_train_sets:
+                X_train = X_train_sets[corresponding_device]
+                # Add unique channels to X_test_subset using X_train's columns
+                X_test = add_unique_channels(X_test_subset, X_train)  # This function should align channels
+
+                # Store the resulting X_test in the dictionary
+                X_test_sets[corresponding_device] = X_test
+            else:
+                print(f"Warning: No X_train found for device {ssid}")
+
+        print("X_test_sets:", X_test_sets)  # To check the structure and content of X_test_sets
         # Replace 'output_file.csv' with the desired file name
-        output_file = 'scan5_add_unique_channels_data.csv'
+        #output_file = 'scan5_add_unique_channels_data.csv'
 
         # Save the DataFrame to a CSV file
-        X_test.to_csv(output_file, index=False)
+        #X_test_sets.to_csv(output_file, index=False)
 
     # PREDICTED DATA /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        # Scale Data with Standard Scaler
-        scaler = StandardScaler()
+        # Dictionary to store KNN classifiers for each relevant SSID
+        knn_classifiers = {}
 
-        # Fit only the training set
-        # this will help us transform the validation data
-        scaler.fit(X_train)
+        # Dictionary to store predictions for each relevant SSID
+        predictions = {}
 
-        # Apply transform to both the training set and the test set.
-        X_train = scaler.transform(X_train)
-        X_test = scaler.transform(X_test)
+        # Define the value of k for KNN
+        k = 1  # Adjustable
 
-        k = 1  # You can adjust the value of k
-        knn = KNeighborsClassifier(n_neighbors=k, p=2)  # p=2 for Euclidean metric
-        knn.fit(X_train, y_train)
+        # Iterate over relevant SSIDs and get corresponding X_train, y_train, and X_test
+        for ssid in relevant_ssids:
+            # Ensure we're dealing with the right SSID key
+            ssid_key = f'device{ssid}'
 
-        # Assuming 'knn' is your trained KNN classifier
-        # Assuming 'X_test' and 'y_test' are your test features and labels
-        y_test = knn.predict(X_test)
+            # Get the training data and labels for the current SSID
+            X_train = X_train_sets.get(ssid_key, pd.DataFrame())  # Default to empty DataFrame if not found
+            y_train = y_train_sets.get(ssid_key, pd.DataFrame())
+
+            # Get the test data for the current SSID
+            X_test = X_test_sets.get(ssid_key, pd.DataFrame())
+
+            # Check for empty datasets
+            if X_train.empty or X_test.empty:
+                print(f"Warning: No data for SSID {ssid}. Skipping...")
+                continue  # Skip if there's no data
+
+            # Scale the data
+            scaler = StandardScaler()
+            scaler.fit(X_train)  # Fit only on the training data
+            X_train_scaled = scaler.transform(X_train)  # Transform the training set
+            X_test_scaled = scaler.transform(X_test)  # Transform the test set
+
+            # Train the KNN classifier
+            knn = KNeighborsClassifier(n_neighbors=k, p=2)  # Euclidean metric (p=2)
+            knn.fit(X_train_scaled, y_train)  # Fit the classifier
+
+            # Store the trained KNN classifier in the dictionary
+            knn_classifiers[ssid_key] = knn
+
+            # Make predictions on the test data
+            y_test_predictions = knn.predict(X_test_scaled)
+
+            # Store the predictions in the dictionary
+            predictions[ssid_key] = y_test_predictions
+
+            print(f'prediction for SSID{ssid}: ', predictions[ssid_key])
+
 
     # See the predictions and translate them
 
-        print(y_test)
+        # Print the predictions
+        # Print the predictions and translate them
+        print("Predictions:")
 
-        # Assuming 'y_train' is your true labels array
-        column_names = y_train.columns
+        # Create a new DataFrame to store SSID, predicted floor ID, and predicted room ID
+        predictions_summary = pd.DataFrame(columns=['ssid', 'predicted_floorid', 'predicted_roomid'])
 
-        for i, y_pred in enumerate(y_test):
-            print(f"\nPrediction {i + 1}:")
-            print(f"Column names with 'True' predictions:")
+        # Loop through each SSID and its corresponding predictions
+        for ssid_key, y_test in predictions.items():
+            print(f"\nSSID {ssid_key} Predictions:")
 
-            # Find the indices where the value is True for the current prediction
-            true_indices = np.where(y_pred)[0]
+            # Get column names from 'y_train' to map the predictions
+            column_names = y_train.columns  # Adjust if needed
 
-            # Remove the 'floorid_' prefix when printing the column names
-            true_column_names = [column.replace('floorid_', '').replace('roomid_', '') for column in column_names[true_indices]]
-            print("Column names with 'True' predictions:", true_column_names)
+            # Ensure the SSID is stored in the new DataFrame
+            for i, y_pred in enumerate(y_test):
+                print(f"\nPrediction {i + 1}:")
 
-            # Add predicted floorid to the scanned data
-            cleaned_data.loc[cleaned_data.index[i], 'predicted_floorid'] = true_column_names[0]
-            cleaned_data.loc[cleaned_data.index[i], 'predicted_roomid'] = true_column_names[1]
-            current_timestamp = datetime.now()  # Capture the current timestamp
+                # Find indices where the prediction is True
+                true_indices = np.where(y_pred == 1)[0]
 
-        # Extract columns [ssid, predicted_floorid, predicted_roomid]
-        selected_columns = cleaned_data[['ssid', 'predicted_floorid', 'predicted_roomid']]
+                # Check for out-of-bounds issues
+                if len(true_indices) > 0 and np.max(true_indices) < len(column_names):
+                    # Get the predicted floor and room IDs
+                    true_column_names = [column_names[idx].replace("floorid_", "").replace("roomid_", "") for idx in
+                                         true_indices]
+
+                    # Add information to the new DataFrame
+                    ssid_value = ssid_key.replace('device', '')  # Extract the SSID number
+                    predicted_floorid = true_column_names[0] if len(true_column_names) > 0 else None
+                    predicted_roomid = true_column_names[1] if len(true_column_names) > 1 else None
+
+                    # Add to 'predictions_summary'
+                    predictions_summary = predictions_summary._append({
+                        'ssid': ssid_value,
+                        'predicted_floorid': predicted_floorid,
+                        'predicted_roomid': predicted_roomid,
+                    }, ignore_index=True)
+
+                # Add a timestamp for reference
+                current_timestamp = datetime.now()
+                print("Timestamp:", current_timestamp)
+
+        # Extract columns for 'final_predictions'
+        selected_columns = predictions_summary[['ssid', 'predicted_floorid', 'predicted_roomid']]
 
         # Create a new DataFrame named 'final_predictions'
         final_predictions = pd.DataFrame(selected_columns)
