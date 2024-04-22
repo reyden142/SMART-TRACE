@@ -284,16 +284,159 @@ def main():
         data_cap2 = pd.read_csv(scanned_data_cap2)
         data_cap3 = pd.read_csv(scanned_data_cap3)
 
+        # COMBINED d4 and d6
+        # WITH ADDITIONAL CHANNELS FROM OTHER CAP
+
+        coefficients = {
+            "cap1": {
+                2412: {"1": (-0.024, -61.023), "2": (0.2827, -36.555), "5": (0.3878, -9.6743)},
+                2417: {"1": (0.04, -56.859), "2": (-0.0036, -53.377), "5": (0.021, -36.732)},
+                2422: {"1": (-0.0778, -70.582), "2": (-0.0465, -57.052), "3": (0.6694, -33.635), "5": (-0.1676, -82.611)},
+                2427: {"3": (-0.8452, 9.2976), "1": (0.6731, -25.269), "2": (0.2202, -47.943)},
+                2432: {"1": (0.6207, -23.241), "2": (0.3929, -36.143), "3": (0.2655, -37.651)},
+                2437: {"3": (0.0444, -50.416)},
+                2442: {"1": (-0.1255, -71.997), "2": (0.1047, -53.554), "3": (-0.2599, -69.391)},
+                2447: {"1": (-0.6667, -124.17), "2": (-0.119, -83.807), "3": (-0.1774, -67.56), "5": (-0.1727, -79.866)},
+                2452: {"1": (0.2067, -41.894), "2": (0.149, -44.829), "3": (-0.3546, -91.039), "5": (-0.7143, -114.57)},
+                2457: {"1": (0.08, -53.266), "2": (0.425, -28.729), "3": (0.1188, -44.925), "5": (-0.0498, -72.19)},
+                2462: {"1": (-0.1609, -64.342), "2": (0.2363, -38.416), "3": (-0.2958, -106.97)}
+            },
+            "cap2": {
+                2412: {"1": (0.2101, -57.413), "2": (-0.0482, -80.835), "5": (0.225, -62.581)},
+                2417: {"1": (0.2417, -51.294), "2": (0.1959, -59.09), "5": (0.0288, -68.802)},
+                2422: {"1": (0.3673, -44.935), "2": (0.3049, -51.899), "3": (0.6694, -33.635), "5": (0.0153, -73.517)},
+                2432: {"1": (0.6207, -23.241), "2": (0.3929, -36.143), "3": (-0.0883, -65.034)},
+                2437: {"3": (0.7726, -21.769)},
+                2442: {"1": (-0.1255, -71.997), "2": (0.1047, -53.554), "3": (0.2563, -54.682)},
+                2447: {"1": (-0.0812, -53.422), "2": (-0.119, -83.807), "3": (0.3658, -49.46), "5": (-0.1727, -79.866)},
+                2452: {"1": (0.132, -60.967), "2": (0.9795, 5.2032), "3": (-0.7243, -137.61), "5": (-0.7143, -114.57)},
+                2457: {"1": (0.2378, -50.732), "2": (0.0334, -63.397), "3": (0.0499, -64.936), "5": (-0.0498, -72.19)},
+                2462: {"1": (0.1852, -56.06), "2": (0.1738, -50.895), "3": (0.2272, -53.008)}
+            },
+            "cap3": {
+                2412: {"1": (0.7291, -23.486), "2": (-0.0186, -87.503), "5": (0.3878, -9.6743)},
+                2417: {"1": (0.39, -47.237), "2": (-0.2875, -108.68), "5": (0.021, -36.732)},
+                2422: {"1": (0.3685, -54.482), "2": (0.324, -60.304), "3": (0.6694, -33.635), "5": (0.0396, -37.967)},
+                2427: {"5": (-1.0054, -97.567)},
+                2432: {"1": (0.6207, -23.241), "2": (0.3929, -36.143), "3": (0.7924, -6.1627)},
+                2437: {"3": (0.7078, -16.978)},
+                2442: {"1": (-0.1255, -71.997), "2": (0.1047, -53.554)},
+                2447: {"1": (-0.0812, -53.422), "2": (0.0601, -43.927), "3": (-0.0129, -52.832), "5": (-0.1727, -79.866)},
+                2452: {"1": (0.0747, -70.878), "2": (0.3107, -56.937), "3": (-0.7243, -137.61), "5": (-0.7143, -114.57)},
+                2457: {"1": (0.1002, -31.957), "2": (-0.0519, -82.597), "3": (0.0073, -38.155), "5": (-0.0498, -72.19)},
+                2462: {"1": (0.1534, -65.258), "2": (0.2363, -38.416), "3": (0.2018, -59.922)}
+            }
+        }
+
+        # Define the mapping of Device ID to SSID
+        device_ssid_mapping = {
+            1: "Realme_6Pro",
+            2: "RedmiNote_11",
+            3: "TechnoCamon_20",
+            4: "Vivo_Y21T",
+            5: "Xiaomi_10T",
+            6: "Xiaomipoco_X3"
+        }
+
+        # Print the updated DataFrames to verify the output
+        print("CAP1 Data:")
+        print(data_cap1)
+
+        print("CAP2 Data:")
+        print(data_cap2)
+
+        print("CAP3 Data:")
+        print(data_cap3)
+
+        # Function to calculate new signal strength and add valid rows to new DataFrame
+        def update_signal_strength(row):
+            source = row['source']
+            channel = row['channel']
+            signal_strength = row['signal_strength']
+            ssid_name = row['ssid']  # Name of the SSID
+
+            # Find the correct device_id based on the SSID's name
+            device_id = None
+            for id, ssid in device_ssid_mapping.items():
+                if ssid == ssid_name:
+                    device_id = id
+                    break
+
+            # Check if calibration data is available for the source, channel, and device_id
+            if (
+                    coefficients.get(source)
+                    and coefficients[source].get(channel)
+                    and coefficients[source][channel].get(str(device_id))
+            ):
+                a, b = coefficients[source][channel][str(device_id)]
+                new_signal_strength = a * signal_strength + b
+                row['signal_strength'] = new_signal_strength
+                row['ssid'] = device_id  # Set SSID to the correct Device_ID
+                return row
+            else:
+                # Log missing coefficients but retain original row data
+                if not coefficients.get(source):
+                    print(f"No coefficients found for source '{source}'")
+                elif not coefficients[source].get(channel):
+                    print(f"No coefficients found for channel '{channel}' in source '{source}'")
+                elif not coefficients[source][channel].get(str(device_id)):
+                    print(
+                        f"No coefficients found for device ID '{device_id}' in channel '{channel}', source '{source}'")
+                # Retain the original signal strength and other data
+
+                # Update the 'ssid' column to reflect device ID
+            row['ssid'] = str(device_id)  # Change SSID to device ID
+
+            return row
+
+        # Function to process a DataFrame and remove duplicates
+        def process_dataframe(ap_data, updated_df):
+            for _, row in ap_data.iterrows():
+                new_row = update_signal_strength(row)
+                if new_row is not None:
+                    updated_df = updated_df._append(new_row, ignore_index=True)
+
+            # Remove duplicates based on key columns
+            updated_df = updated_df.drop_duplicates(subset=['source', 'channel', 'ssid', 'signal_strength'], keep='first')
+            return updated_df
+
+            # Remove duplicates based on key columns
+            updated_df = updated_df.drop_duplicates(subset=['source', 'channel', 'ssid', 'signal_strength'], keep='first')
+            return updated_df
+
+        # Create a dictionary to store the updated DataFrames
+        updated_data = {
+            "cap1": pd.DataFrame(),
+            "cap2": pd.DataFrame(),
+            "cap3": pd.DataFrame()
+        }
+
+        # Process each DataFrame and update the corresponding entry in 'updated_data'
+        updated_data["cap1"] = process_dataframe(data_cap1, updated_data["cap1"])
+        updated_data["cap2"] = process_dataframe(data_cap2, updated_data["cap2"])
+        updated_data["cap3"] = process_dataframe(data_cap3, updated_data["cap3"])
+
+        # Print the updated DataFrames to verify the output
+        print("Updated Data for Cap1:")
+        print(updated_data["cap1"])
+
+        print("Updated Data for Cap2:")
+        print(updated_data["cap2"])
+
+        print("Updated Data for Cap3:")
+        print(updated_data["cap3"])
+
+
         # Combine data from cap1, cap2, and cap3
-        combined_data = pd.concat([data_cap1, data_cap2, data_cap3], ignore_index=True)
-        validationData = pd.concat([data_cap1, data_cap2, data_cap3], ignore_index=True)
+        combined_data = pd.concat([updated_data["cap1"], updated_data["cap2"], updated_data["cap3"]], ignore_index=True)
+        validationData = pd.concat([updated_data["cap1"], updated_data["cap2"], updated_data["cap3"]], ignore_index=True)
 
         #'''
         # Add a new column 'source_without_C' by removing 'C' from 'source'
-        combined_data['ssid'] = combined_data['ssid'].str.replace('C', '')
+        #combined_data['ssid'] = combined_data['ssid'].str.replace('C', '')
 
         # Convert the 'source_without_C' column to numeric
-        combined_data['ssid'] = pd.to_numeric(combined_data['ssid'], errors='coerce')
+        #combined_data['ssid'] = pd.to_numeric(combined_data['ssid'], errors='coerce')
         #'''
 
         # Print or use the combined_data DataFrame as needed
@@ -482,7 +625,6 @@ def main():
 
         # Create a new DataFrame named 'final_predictions'
         final_predictions = pd.DataFrame(selected_columns)
-
 
         print('Final Predictions: ')
         print(final_predictions)
