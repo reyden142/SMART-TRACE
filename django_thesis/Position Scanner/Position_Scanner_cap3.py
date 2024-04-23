@@ -8,7 +8,7 @@ from mysql.connector import Error
 from datetime import datetime
 
 # Define the MikroTik router's IP address, username, and password
-router_ip = '[fe80::6e3b:6bff:fe5a:e788%5]'
+router_ip = '192.168.203.2'
 username = 'thesis2.0'
 password = 'admin'
 
@@ -22,10 +22,12 @@ db_config = {
 
 # List of specific MAC addresses to filter
 specific_ssid = [
-                    "C1",
-                    "C2",
-                    #"AP4",
-                    #"CpE_Wifi"
+                    "Vivo_Y21T",
+                    "Xiaomipoco_X3",
+                    "Realme_6Pro",
+                    "RedmiNote_11",
+                    "TechnoCamon_20",
+                    "Xiaomi_10T"
 
                 ]
 
@@ -120,11 +122,25 @@ def main():
                     # Wait for the scan to complete, adjust the sleep time as needed
                     #time.sleep(1)  # You can adjust the sleep duration
 
-                    # If specific_ssid is not in the data, add a default entry
-                    for ssid in specific_ssid:
-                        if ssid not in latest_results:
-                            default_entry = ('0', ssid, '0', 100, cap_interface, datetime.now())
-                            latest_results[ssid] = default_entry
+                    # Load data from CSV files
+                    cap2 = pd.read_csv('scanned_aps_cap2.csv')  # Load data from 'scanned_aps_cap2.csv'
+                    cap3 = pd.read_csv('scanned_aps_cap3.csv')  # Load data from 'scanned_aps_cap3.csv'
+
+                    # Create sets of unique SSIDs from both CSV files
+                    cap2_ssids = set(cap2['ssid'].unique())
+                    cap3_ssids = set(cap3['ssid'].unique())
+
+                    # Combine SSIDs from both CSVs
+                    all_ssids = cap2_ssids.union(cap3_ssids)  # Combined set of SSIDs from both files
+                    print("all_ssids:", all_ssids)
+
+                    # Check which SSIDs in 'all_ssids' are not in 'latest_results'
+                    missing_ssids = all_ssids - latest_results.keys()
+
+                    # For each missing SSID, add the default entry
+                    for ssid in missing_ssids:
+                        default_entry = ('0', ssid, '0', 100, cap_interface, datetime.now())
+                        latest_results[ssid] = default_entry
 
                     current_data.extend(latest_results.values())
                     data.extend(current_data)
