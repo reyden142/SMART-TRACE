@@ -93,6 +93,14 @@ def clean_data(df):
     for col in columns_removed:
         df.drop(col, axis=1, inplace=True)
 
+    # Create a condition to identify rows where all 'channel_cap' columns are zero
+    zero_channel_condition = (df['channel_cap1'] == 0) & \
+                             (df['channel_cap2'] == 0) & \
+                             (df['channel_cap3'] == 0)
+
+    # Filter the DataFrame to remove rows where the condition is True
+    df = df[~zero_channel_condition]
+
     # Return the cleaned dataframe.
     return df
 
