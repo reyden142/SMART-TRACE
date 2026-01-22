@@ -1,9 +1,0 @@
-{
-    "require": {
-        "pear2/net_routeros": "dev-master"
-    },
-    "config": {
-        "http": "http://localhost:8080",
-        "https": "http://localhost:8080"
-    }
-}
